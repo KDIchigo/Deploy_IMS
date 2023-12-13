@@ -1,0 +1,56 @@
+#project-allocation__header {
+    min-height: 22px;
+    border: 0.889px solid rgba(0, 0, 0, 0.125);
+    width: 100%;
+
+    div {
+        // border: 0.889px solid rgba(0,0,0,.125);
+        border-right: 0.889px solid rgba(0, 0, 0, 0.125);
+        padding: 8px;
+        min-height: 22px;
+        font-weight: bold;
+    }
+}
+
+.projectCollapse {
+    border-radius: 0;
+    border-top: 0px !important;
+    .ant-collapse-header,
+    .ant-collapse-item {
+        border-radius: 0 !important;
+    }
+    .ant-collapse-content-box {
+        padding: 0 !important;
+    }
+
+    .ant-collapse-content {
+        max-height: 140px;
+        overflow-y: auto;
+    }
+    .ant-collapse-header-text {
+        font-weight: bold
+    }
+    .ant-collapse-extra {
+        flex: 0 0 13.5%;
+    }
+}
+.btnLoadingSyn {
+    width: 11.9% !important;
+    height: 19.6px;
+}
+.btnHelp {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px !important;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s;
+}
+.btnHelp:hover {
+    transform: translateY(-5px);
+}

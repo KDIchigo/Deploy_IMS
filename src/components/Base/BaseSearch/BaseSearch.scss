@@ -1,0 +1,23 @@
+.searchIcon {
+    width: 50px;
+}
+
+.ant-input-group-wrapper .ant-input-group-addon:first-child {
+    border-radius: 4px 0px 0px 4px !important;
+}
+
+.ant-input-group-wrapper .ant-input-group-addon:last-child {
+    border-radius: 0px 4px 4px 0px !important;
+}
+
+.border__none > .ant-select-selector {
+    border-radius: 4px !important;
+    &:hover {
+        border: 1px solid transparent !important;
+        box-shadow: none !important;
+    }
+}
+
+.ant-input {
+    padding: 4.6px 11px
+} 

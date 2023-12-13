@@ -1,0 +1,42 @@
+.box {
+  width: 90%;
+}
+
+.float-right {
+  float: right;
+}
+
+#floatingInputdanger:focus .floatingLabeldanger {
+  color: red;
+}
+
+.actionTable {
+  min-width: 50px;
+  z-index: 1;
+  background-color: white;
+  border-radius: 4px;
+}
+
+.filterCard {
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.moreIcon,
+.filterIcon {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.moreIcon:hover,
+.moreIcon:focus,
+.filterIcon:hover,
+.filterIcon:active {
+  color: rgba(67, 67, 241, 0.308);
+}
+.iconActive {
+  color: rgba(67, 67, 241, 0.308);
+}
+.btnFilter{
+  height: 34px !important;
+  width: 100px !important;
+}

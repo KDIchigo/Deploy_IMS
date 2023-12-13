@@ -1,0 +1,7 @@
+.disable-row {
+    pointer-events: none;
+  }
+  .disable-row .ant-table-cell {
+    background-color: #f5f5f5; /* Màu nền của cell trong row bị disable */
+  
+  }

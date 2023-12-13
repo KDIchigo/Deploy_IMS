@@ -1,0 +1,21 @@
+.subject__timeline > .timeline {
+   
+
+    .timeline-icon {
+        width: 6%;
+        inset-inline-start: 0%
+    }
+
+    .timeline-body {
+        margin-inline-start: 6%;
+        margin-inline-end: 0%;
+    }
+
+    li:before {
+        inset-inline-start: 3%;
+    }
+}
+.btnFilter{
+    height: 34px !important;
+    width: 100px !important;
+  }

@@ -1,0 +1,24 @@
+.expand__issueSetting .ant-table-expanded-row {
+    max-height: 300px; /* Set the maximum width to 1300 pixels */
+    overflow-y: auto;
+}
+.expanded-row {
+    // background-color: #eaeaea; /* Change the background color to your preference */
+    font-weight: bold; /* Example style change */
+}
+/* You can also set the table header to remain fixed at the top */
+.expand__issueSetting .ant-table-thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #fff; /* Set the background color to match your design */
+}
+td {
+    border: 1px solid #f0f0f0;
+    border-collapse: collapse;
+    margin: 0px !important
+}
+.btnFilter{
+    height: 34px !important;
+    width: 100px !important;
+  }

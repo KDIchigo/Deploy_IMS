@@ -1,0 +1,393 @@
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative;
+    height: 100vh;
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    width: 100vw;
+}
+
+.ant-select-selector {
+    border-radius: 4px !important;
+    &:hover {
+        border: 1px solid $lightalmon !important;
+        box-shadow: none !important;
+    }
+}
+.form-control {
+    border-radius: 4px !important;
+    &:hover {
+        border: 1px solid $lightalmon !important;
+        box-shadow: none !important;
+    }
+    &:focus {
+        border: 1px solid $lightalmon !important;
+        box-shadow: none !important;
+    }
+    &:active {
+        border: 1px solid $lightalmon !important;
+        box-shadow: none !important;
+    }
+}
+
+.ant-input {
+    border: 1px solid --input-border;
+    border-radius: 4px;
+    &:hover {
+        border: 1px solid $lightalmon;
+        box-shadow: none;
+    }
+    &:focus {
+        border: 1px solid $lightalmon;
+        box-shadow: none;
+    }
+}
+
+.selectDesign {
+    border-color: --input-border;
+    border-radius: 4px;
+    width: 100%;
+    height: 34px;
+    border-bottom-left-radius: 4px;
+    box-shadow: none;
+    // height: 34px !important;
+}
+
+.selectProjectDesign {
+    border-color: --input-border;
+    border-radius: 4px;
+    width: 100%;
+    height: 34px;
+    border-bottom-left-radius: 4px;
+    box-shadow: none;
+    // height: 34px !important;
+}
+.cardDropdown {
+    left: 0;
+    top: 100%;
+    background-color: white;
+    z-index: 10;
+    width: 360px;
+    border-radius: 4px;
+    left: 0;
+    transition: opacity 150ms ease-in-out;
+}
+
+.filterMenu {
+    .MuiPaper-rounded {
+        left: 280px !important;
+    }
+}
+
+.ant-color-picker,
+.ant-select-dropdown,
+.ant-picker-dropdown {
+    z-index: 1302 !important;
+}
+
+.ant-table-expanded-row-fixed {
+    padding: 0px !important;
+}
+
+.modal-title {
+    font-size: 24px;
+}
+
+.cardBtn {
+    min-width: 90px !important;
+}
+
+.addNewBtn {
+    margin: 4px !important;
+    padding: 7px 16px !important;
+}
+
+.ant-affix {
+    z-index: 9999 !important;
+}
+
+.errorMsg {
+    color: red;
+    margin: 0;
+    font-size: 12px;
+}
+
+.actionLeft {
+    border-top-left-radius: 0px !important;
+    border-bottom-left-radius: 0px !important;
+    min-width: 80px;
+}
+
+.actionRight {
+    border-top-right-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+    width: 60px;
+}
+
+.orangeBtn {
+    background-color: #eea726;
+    color: #fff;
+    &:hover {
+        background-color: #e5a226;
+        color: #fff !important;
+    }
+}
+
+.activeBtn {
+    background-color: rgb(23, 190, 23);
+    color: #fff;
+    &:hover {
+        background-color: rgb(11, 187, 11);
+        color: #fff !important;
+    }
+}
+
+.inactiveBtn {
+    background-color: red;
+    color: #fff;
+    &:hover {
+        background-color: rgb(212, 12, 12);
+        color: #fff !important;
+    }
+}
+
+
+.milestoneCollapse {
+    border-radius: 0;
+    border-top: 0px !important;
+    .ant-collapse-header,
+    .ant-collapse-item {
+        border-radius: 0 !important;
+    }
+    .ant-collapse-content-box {
+        padding: 0 !important;
+    }
+
+    .ant-collapse-content {
+        max-height: 140px;
+        overflow-y: auto;
+    }
+    .ant-collapse-header-text {
+        font-weight: bold
+    }
+}
+
+.btn {
+    height: 34px !important;
+}
+
+.ant-space {
+    padding: 4px;
+}
+
+.ant-btn {
+    border-radius: 4px !important;
+}
+
+.ant-btn-compact-first-item {
+    border-radius: 4px 0px 0px 4px !important;
+    height: 38px;
+    padding: 0px 30px;
+}
+
+.ant-btn-compact-last-item {
+    border-radius: 0px 4px 4px 0px !important;
+    height: 38px;
+}
+
+.flexGrow_1 {
+    flex-grow: 1;
+}
+
+.ant-tabs-nav {
+    margin: 0 !important;
+}
+
+.d_flex_column {
+    display: flex;
+    flex-direction: column;
+}
+
+.d_flex_row {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex_height {
+    flex: 1;
+    height: 100%;
+}
+.tabScreen {
+    .ant-tabs-content-holder {
+        flex-grow: 1;
+        @extend .flex_height;
+
+        .ant-tabs-content {
+            @extend .flex_height;
+
+            .ant-tabs-tabpane {
+                @extend .flex_height;
+            }
+        }
+    }
+
+    .ant-tabs-tab {
+        background-color: #ffffff !important;
+        border-radius: 0 !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+    .ant-tabs-tab-active {
+        border-bottom: 2px solid #ec8550f0 !important;
+    }
+}
+
+.badgeInactive {
+    .ant-badge-status-text {
+        color: red !important;
+    }
+}
+
+.badgeActive {
+    .ant-badge-status-text {
+        color: #198754 !important;
+    }
+}
+
+.modal-footer,
+.modal-header {
+    background-color: #eeeeee;
+}
+
+.modal-footer {
+    padding: 8px 16px !important;
+}
+
+.text_pending {
+    color: #ec8550 !important;
+}
+
+.bg_pending {
+    background-color: #ec8550 !important;
+}
+
+.disable,
+.disable > .ant-select-selector {
+    border-color: #ced4da !important;
+    background-color: #e9ecef !important;
+    cursor: not-allowed;
+    color: black !important;
+    font-family: Roboto, Helvetica, Arial, sans-serif !important;
+    font-weight: lighter;
+    &:hover,
+    &:disabled,
+    &:active,
+    &:focus {
+        border-color: #ced4da !important;
+        background-color: #e9ecef !important;
+        color: black !important;
+    }
+
+    input,
+    span {
+        color: black !important;
+    }
+}
+
+.disableSelect > .ant-select-selector {
+    border-color: #ced4da !important;
+    &:hover,
+    &:disabled,
+    &:active,
+    &:focus {
+        border-color: #d9d9d9 !important;
+        background-color: rgba(0, 0, 0, 0.04) !important;
+    }
+}
+
+.dotted-line {
+    border-top: 1px dotted #000; /* Adjust the thickness and color as needed */
+    width: 100%; /* Set the width to fill the container */
+    margin: 10px 0; /* Adjust the margin as needed */
+}
+
+.scroll_auto {
+    overflow-y: auto;
+}
+
+.addNewIssueChild button {
+    height: 30px;
+}
+
+.helpModal {
+    color: #fff;
+    width: 100%;
+    text-align: center;
+    background: #364d79;
+    margin: 0;
+}
+
+.action_space {
+    margin-right: 5% !important;
+}
+
+// ----------- Google ------------------
+#loginGoogle {
+    button {
+        /* Your custom styles go here */
+        background-color: #4285f4;
+        color: #fff;
+        box-shadow: none !important;
+        border-radius: 4px !important;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+        border: 1px solid #e6533c !important;
+        justify-content: center;
+
+        span {
+            color: #e6533c !important
+        }
+
+        &:hover {
+            background-color: #e6533c !important;
+            div {
+                background-color: #e6533c !important;
+            }
+            span {
+                color: #fff !important
+            }
+        }
+    }
+}
+
+/* Override styles for the GoogleLogin icon */
+.react-google-login-button svg {
+    /* Your custom styles go here */
+    margin-right: 8px;
+}
+
+#logoutGoogle {
+    /* Your custom styles go here */
+    width: 100%;
+    height: 40px !important;
+    button {
+        background-color: transparent !important;
+        color: #fff;
+        border: 0 !important;
+        cursor: pointer;
+        box-shadow: none !important;
+        height: 40px !important;
+        width: 100%;
+
+        div {
+            background-color: transparent !important;
+            padding-left: 0 !important;
+        }
+    }
+}
+
+// -------------------------------------
+// .ant-table-wrapper .ant-table.ant-table-small .ant-table-tbody .ant-table-wrapper:only-child .ant-table {
+//     margin-inline: 2% -8px;
+// }

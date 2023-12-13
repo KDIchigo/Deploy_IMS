@@ -1,0 +1,23 @@
+.btnLoadingProfile{
+    width: 12.1% !important;
+    height: 19.600px;
+}
+
+.modalCarousel {
+    padding: 0;
+    .ant-modal-content {
+        padding: 0;
+    }
+    .ant-modal-footer {
+        margin: 0;
+    }
+}
+
+.slick-dots  {
+    button{
+        background-color: #ec8550 !important;
+    }
+    border-radius: 0px;
+}
+.ant-modal-content {
+}

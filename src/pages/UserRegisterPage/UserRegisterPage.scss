@@ -1,0 +1,171 @@
+* {
+  margin: 0;
+  padding: 0;
+  border-box: box-sizing;
+}
+
+.background-register {
+  background-image: url("https://firebasestorage.googleapis.com/v0/b/imsavatar-31182.appspot.com/o/files%2FSyncImageIMS%2FSignin.jpg?alt=media&token=fa8babc6-01ee-44e7-898c-b7ed00c2fe5d");
+  background-size: cover;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.register__body {
+  position: absolute;
+  left: 15%;
+  width: 25%;
+  display: flex;
+}
+
+.register-form-button {
+  width: 100%;
+}
+.divider:after,
+.divider:before {
+  content: "";
+  flex: 3;
+  height: 1px;
+  background: rgba(67, 67, 241, 0.308);
+}
+.h-custom {
+  height: calc(100% - 73px);
+}
+
+@media (max-width: 1100px) {
+  .background-register {
+    background-image: none;
+    background-color: #e5ebf9;
+  }
+
+  .register__body {
+    width: 50%;
+    position: static;
+    display: block;
+    margin: auto;
+  }
+  .register-form-button {
+    width: 100%;
+  }
+  .fw-normal {
+    font-size: large !important;
+    margin-top: 10px;
+  }
+}
+@media (max-width: 768px) {
+  .register__body {
+    width: 70%;
+  }
+}
+@media (max-width: 425px) {
+  .register__body {
+    width: 80%;
+  }
+}
+@media (max-width: 375px) {
+  .register__body {
+    width: 90%;
+  }
+}
+@media (max-width: 320px) {
+  .register__body {
+    width: 100%;
+  }
+}
+@media (max-width: 450px) {
+  .h-custom {
+    height: 100%;
+  }
+}
+.fw-normal {
+  font-size: large;
+  margin-top: 10px;
+}
+.facebook {
+  background-color: #000080 !important;
+  border-color: #000080 !important;
+}
+
+.facebook:hover {
+  background-color: #3316b8 !important;
+  border-color: #141865 !important;
+}
+
+.hiddenMsg {
+  visibility: hidden;
+  margin: 0;
+}
+
+
+.carousel__regis {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.inner__regis {
+  white-space: nowrap;
+  transition: transform 0.3s;
+}
+
+.carousel-item__regis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent !important;
+}
+
+.carousel-item-text__regis {
+  font-size: 1.15rem;
+  margin: 40px 0 40px 0;
+  padding: 0 20px 0 20px;
+  white-space: normal;
+  color: #617d98;
+}
+.carousel-img__regis {
+  width: 250px;
+  padding: 0 20px 0 20px;
+}
+
+/* final stage */
+
+.carousel-buttons__regis {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.button-arrow__regis {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.indicators__regis {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.indicator-buttons__regis {
+  border: none;
+  cursor: pointer;
+}
+
+.indicators__regis > button {
+  margin: 5px;
+  background: none;
+}
+
+.indicator-symbol__regis {
+  color: #26343f;
+}
+
+.indicator-symbol-active__regis {
+  color: #ffffff;
+}

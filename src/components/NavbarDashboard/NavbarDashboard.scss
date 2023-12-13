@@ -1,0 +1,95 @@
+.logoDashboard {
+  background-color: #dddddd;
+  max-height: 65px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+}
+
+.headerDashboard {
+  padding: 0;
+  top: 0;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-left: 1px solid white;
+  background-color: white;
+  min-width: 100vh;
+  min-height: 65px;
+  z-index: 20;
+  // marginLeft: mgLeft !== false ? "" : "250px";
+  position: "sticky";
+}
+
+.widthCollapse {
+  min-width: 260px;
+  transition: all 0.3s;
+}
+
+.widthUnCollapse {
+  min-width: 80px;
+  transition: all 0.3s;
+}
+
+.itemMenu {
+  span {
+    &:hover {
+      color: red;
+    }
+    &:focus {
+      color: red;
+    }
+  }
+}
+
+.itemMenuActive {
+  span {
+    &:hover {
+      color: red;
+    }
+    &:focus {
+      color: red;
+    }
+  }
+}
+
+.iconNavbarBtn {
+  cursor: pointer;
+}
+
+.logoIMS {
+  max-height: 65px;
+}
+
+.navbarContent {
+  padding: 24px !important;
+  overflow: initial;
+  background-color: #eeeeee;
+  display: flex !important;
+  flex-direction: column;
+  flex-grow: 1;
+  // minHeight: "600px",
+  // marginLeft: mgLeft !== false ? "" : "250px",
+}
+// .siderDashboard {
+//   overflow: "auto";
+//   background-color: rgba(0, 0, 0, 0.05);
+//   // position: fixed !== false ? "" : "fixed",
+//   border: 1px solid rgba(0, 0, 0, 0.1);
+//   left: 0;
+//   top: 0;
+//   bottom: 0;
+//   height: 100vh;
+// }
+.btnHelpNav{
+  width: 70px !important;
+display: flex;
+justify-content: center;
+}
+.tagRole{
+  border-radius: 50px;
+  width: 25%;
+  height: 35px;
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+}

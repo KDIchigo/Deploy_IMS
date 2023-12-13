@@ -1,0 +1,126 @@
+* {
+  margin: 0;
+  padding: 0;
+  border-box: box-sizing;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+}
+.background-login {
+  background-image: url("https://firebasestorage.googleapis.com/v0/b/imsavatar-31182.appspot.com/o/files%2FSyncImageIMS%2FSignin.jpg?alt=media&token=fa8babc6-01ee-44e7-898c-b7ed00c2fe5d");
+  background-size: cover;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.sign-in__body {
+  position: absolute !important;
+  left: 15%;
+  width: 25%;
+  display: flex;
+}
+.login-form-button {
+  width: 100%;
+}
+.divider:after,
+.divider:before {
+  content: "";
+  flex: 3;
+  height: 1px;
+  background: rgba(213, 213, 224, 0.215);
+}
+.h-custom {
+  height: calc(100% - 73px);
+}
+@media (max-width: 1300px) {
+  .fw-normal {
+    font-size: large !important;
+    margin-top: 10px !important;
+  }
+}
+@media (max-width: 1100px) {
+  .background-login {
+    background-image: none;
+    background-color: #e5ebf9;
+    max-height: fit-content;
+  }
+
+  .sign-in__body {
+    width: 50%;
+    position: static;
+    display: block;
+    margin: auto;
+  }
+
+  .login-form-button {
+    width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  .sign-in__body {
+    width: 70%;
+  }
+}
+@media (max-width: 425px) {
+  .sign-in__body {
+    width: 80%;
+  }
+}
+@media (max-width: 375px) {
+  .sign-in__body {
+    width: 90%;
+  }
+}
+@media (max-width: 320px) {
+  .sign-in__body {
+    width: 100%;
+  }
+}
+@media (max-width: 450px) {
+  .h-custom {
+    height: 100%;
+  }
+}
+
+.fw-normal {
+  font-size: large;
+  margin-top: 10px;
+}
+.input-form ::placeholder {
+  padding-left: 10px;
+}
+.site-form-item-icon {
+  color: gray;
+}
+.text-center {
+  margin-top: 10px;
+}
+.className:hover {
+  color: "#3b71ca";
+}
+.anchor {
+  cursor: "pointer";
+  color: "#3b71ca";
+}
+
+.btnLogin_logo {
+  width: 40px;
+  height: 40px;
+}
+.facebook {
+  background-color: #000080 !important;
+  border-color: #000080 !important;
+}
+
+.facebook:hover {
+  background-color: #3316b8 !important;
+  border-color: #141865 !important;
+}

@@ -1,0 +1,30 @@
+.pointer {
+  cursor: pointer;
+}
+.title-setting {
+  font-size: 20px;
+}
+.body-card {
+  width: 100%;
+}
+
+@media (max-width: 425px) {
+  .body-card {
+    min-width: 350px;
+  }
+}
+@media (max-width: 375px) {
+  .body-card {
+    min-width: 350px;
+  }
+}
+@media (max-width: 320px) {
+  .body-card {
+    /* width: 100%; */
+    min-width: 350px;
+  }
+}
+.btnFilter{
+  height: 34px !important;
+  width: 100px !important;
+}

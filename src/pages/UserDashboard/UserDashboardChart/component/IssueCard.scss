@@ -1,0 +1,38 @@
+.issueCard{
+  justify-content: space-between;
+}
+.card-item {
+    // width: 200px;
+    height:227px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+  }
+.body-card{
+  text-align: center;
+  margin-top: 50px;
+}
+  .bottom-card{
+    display: flex;
+    margin-top: 30px;
+    justify-content: center;
+    font-size: 12px !important;
+  }
+
+.card-left{
+  border-right: 1px solid #818080; 
+ 
+}
+  .header-card{
+    color: #000;
+    font-size: larger;
+    text-align: center;
+  } 
+  
+  .prom-arrow-1 {
+    color: green;
+    margin-left: 5px;
+   
+  }
+  .prom-arrow-2{
+    color: red;
+  }

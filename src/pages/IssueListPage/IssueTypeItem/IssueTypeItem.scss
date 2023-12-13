@@ -1,0 +1,14 @@
+.issue-type__item {
+    border-bottom: 1px solid #d9d9d994;
+    height: 75px;
+}
+
+// .issue-type__item:first-child {
+//     border-top: 1px solid #d9d9d9;
+// }
+.issue__value {
+    &:hover {
+        text-decoration: underline;
+        color: orange;
+    }
+}
