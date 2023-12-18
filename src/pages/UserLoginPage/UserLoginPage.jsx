@@ -87,20 +87,19 @@ const UserLoginPage = () => {
     },
   });
 
-  useEffect(() => {
-    function start() {
-      gapi.client.init({
-        clientId: clientId,
-        scope: "",
-      });
-    }
-    gapi.load("client:auth2", start);
-  });
+  // useEffect(() => {
+  //   function start() {
+  //     gapi.client.init({
+  //       clientId: clientId,
+  //       scope: "",
+  //     });
+  //   }
+  //   gapi.load("client:auth2", start);
+  // },[]);
 
   return (
     <>
       <ToastContainer autoClose="2000" theme="colored" />
-
       <Form
         className="background-login"
         onSubmit={formik.handleSubmit}
@@ -111,8 +110,12 @@ const UserLoginPage = () => {
           style={loadingData ? { pointerEvents: "none" } : {}}
         >
           <div className="d-flex flex-row mt-5 mb-4">
-            <MDBIcon fas icon="cubes fa-3x me-3" style={{ color: "#ff6219" }} />
-            <span className="h1 fw-bold mb-0">IMS</span>
+            {/* <MDBIcon fas icon="cubes fa-3x me-3" style={{ color: "#ff6219" }} /> */}
+            <img
+              width={60} height={60}
+              src="https://firebasestorage.googleapis.com/v0/b/imsavatar-31182.appspot.com/o/files%2FSyncImageIMS%2FLogo%20IMS.png?alt=media&token=f84ca891-2f0f-4358-9eaa-97b2fca2cabe"
+            />
+            <span className="h1 fw-bold mb-0 mt-3 ms-2">IMS</span>
           </div>
           {/* <div className="d-flex flex-row ">
             <p className="lead fw-normal mt-2">Sign in with</p>

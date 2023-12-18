@@ -44,7 +44,7 @@ export const NewIssue = ({
       due_date: "",
       status: 1,
       project_id: projectId,
-      assignee: "",
+      // assignee: "",
       milestone_id: "",
       created_by: currentUser.email,
       user_id: currentUser.user_id,
@@ -66,6 +66,9 @@ export const NewIssue = ({
     }),
     onSubmit: async (values) => {
       setLoadingData(true);
+      // if(values.assignee === "") {
+      //   let {assignee, ...newValues} = values
+      // }
       const { err } = await axiosClient.post(`/Issue`, values);
       if (err) {
         toast.error("Add issue fail!");
@@ -160,7 +163,7 @@ export const NewIssue = ({
                   <p className="hiddenMsg">acb</p>
                 )}
               </div>
-              {/* <div className="col-md-6 col-sm-12 px-3">
+              <div className="col-md-6 col-sm-12 px-3">
                 <BaseSelectInput
                   id="parent_id"
                   name="parent_id"
@@ -176,7 +179,6 @@ export const NewIssue = ({
                   // important="true"
                   formik={formik}
                   isFilter={false}
-                  disabled={true}
                   placeholder="Issue Requirement"
                   status={
                     formik.errors.parent_id && formik.touched.parent_id
@@ -190,18 +192,15 @@ export const NewIssue = ({
                 ) : (
                   <p className="hiddenMsg">acb</p>
                 )}
-              </div> */}
-              <div className="col-md-6 col-sm-12 px-3">
+              </div>
+
+              <div className="col-md-3 col-sm-12 px-3">
                 <BaseSelectInput
                   id="issue_type"
                   name="issue_type"
                   label="Issue Type"
                   type="issue_group"
-                  defaultValue={
-                    formik.values.issue_type_value === ""
-                      ? undefined
-                      : formik.values.issue_type_value
-                  }
+                  defaultValue={issueType.issue_value}
                   options={issueSettings.issue_types}
                   onChange={formik.handleChange}
                   disabled={true}
@@ -222,7 +221,7 @@ export const NewIssue = ({
                   <p className="hiddenMsg">acb</p>
                 )}
               </div>
-              <div className="col-md-6 col-sm-12 px-3">
+              <div className="col-md-3 col-sm-12 px-3">
                 <BaseSelectInput
                   label="Work Process"
                   id="work_process"
@@ -283,7 +282,6 @@ export const NewIssue = ({
                   defaultValue={formik.values.student_name}
                   options={students}
                   onChange={formik.handleChange}
-                  important="true"
                   formik={formik}
                   isFilter={false}
                   placeholder="Assignee"

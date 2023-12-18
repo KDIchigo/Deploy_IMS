@@ -65,10 +65,10 @@ const StyledMenu = styled((props) => (
   },
 }));
 
-export const NavBarAvatar = () => {
+export const NavBarAvatar = ({user}) => {
   const navigate = useNavigate();
   const login = localStorage.getItem("login");
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [modalChangePass, setModalChangePass] = useState(false);
@@ -83,16 +83,16 @@ export const NavBarAvatar = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const fetchData = async () => {
-    const { data } = await axiosClient.get(`User/${currentUser.user_id}`);
-    setUser(data);
-    setLoading(true);
-    // console.log(data);
-  };
+  // const fetchData = async () => {
+  //   const { data } = await axiosClient.get(`User/${currentUser.user_id}`);
+  //   setUser(data);
+  //   setLoading(true);
+  //   // console.log(data);
+  // };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
   return (
     <div
       className="float-end me-4 position-relative"

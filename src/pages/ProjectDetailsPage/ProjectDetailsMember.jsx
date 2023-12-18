@@ -27,6 +27,7 @@ export const ProjectDetailsMember = () => {
   const [actionId, setActionId] = useState(undefined);
   const [loadingRemove, setLoadingRemove] = useState(false);
   const [loadingSelect, setLoadingSelect] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(false);
   const [students, setStudents] = useState([]);
   const [searchProjectParams, setSearchProjectParams] = useState([
     {
@@ -37,26 +38,43 @@ export const ProjectDetailsMember = () => {
   ]);
   const handleMemberSynchronize = async (convertId, bearToken, projectId) => {
     setLoadingTable(true);
-    const { data, err } = await axiosClient.post(
-      `/ClassStudent/AsyncProjectMembers?convertId=${convertId}&bearToken=${bearToken}&id=${projectId}`
-    );
-    if (err) {
-      toast.error(`Synchronize member ${project.group_name} group fail!`);
-      return;
-    } else {
-      toast.success(
-        `Synchronize member ${project.group_name} group successfully!`
+    let classObj = classes.filter(ele => ele.class_id === project.class_id)[0]
+    if(convertId !== null && bearToken !== null && classObj.class_convert_id !== null && classObj.class_convert_token !== null) {
+      const { data, err } = await axiosClient.post(
+        `/ClassStudent/AsyncProjectMembers?convertId=${convertId}&bearToken=${bearToken}&id=${projectId}`
       );
-      // fetchData();
-      fetchDataSelect();
+      if (err) {
+        toast.error(`Synchronize member ${project.group_name} group fail!`);
+        return;
+      } else {
+        toast.success(
+          `Synchronize member ${project.group_name} group successfully!`
+        );
+        fetchData();
+        // fetchDataSelect();
+      }
+    } else {
+      if(convertId === null || bearToken === null) {
+        toast.error(
+          `You have not configured a personal token and project ID for this class. Please try again!`
+        )
+      }
+      if(classObj.class_convert_id === null || classObj.class_convert_token === null) {
+        toast.error(
+          `You have not configured a personal token and group ID for this class. Please try again!`
+        )
+      }
     }
+    
     setLoadingTable(false);
   };
+
   const fetchData = async () => {
     const { data } = await axiosClient.get(`Project/${projectId}`);
     setProject(data);
     setLoadingLeader(false);
     setLoadingTable(false);
+    setLoadingStatus(false)
   };
 
   const fetchDataSelect = async () => {
@@ -76,6 +94,7 @@ export const ProjectDetailsMember = () => {
     setLoadingData(true);
     setLoadingTable(false);
     setLoadingRemove(false);
+    setLoadingStatus(false)
     setLoadingSelect(true);
   };
   const onChange = (key) => {
@@ -94,7 +113,7 @@ export const ProjectDetailsMember = () => {
         break;
     }
   };
-  const handleSetLeader = (studentId, project) => {
+  const handleSetLeader = (student, project) => {
     swalWithBootstrapButtons
       .fire({
         title: "Are you sure?",
@@ -138,6 +157,41 @@ export const ProjectDetailsMember = () => {
       });
   };
 
+  const handleChangeStatus = (student, updateStatus) => {
+    setActionId(student.class_student_id);
+    swalWithBootstrapButtons
+      .fire({
+        title: "Are you sure?",
+        text: `Are you sure to change status ${student.student_name} student?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Update it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          let Id = [];
+          Id.push(student.class_student_id);
+          setLoadingStatus(true);
+          const { data, err } = await axiosClient.post(
+            `ClassStudent/UpdateStatus?status=${updateStatus}`,
+            Id
+          );
+
+          if (err) {
+            toast.error(`Change status ${student.student_name} student fail!`);
+            // setLoadingStatus(false);
+            return;
+          }
+          toast.success(
+            `Change status ${student.student_name} student successfully!`
+          );
+          // fetchClassData(classId);
+          fetchDataSelect();
+        }
+      });
+  };
   const handleProjectStudentDelete = async (student, projectChange) => {
     swalWithBootstrapButtons
       .fire({
@@ -158,6 +212,7 @@ export const ProjectDetailsMember = () => {
             class_student_id: student.class_student_id,
             student_id: student.student_id,
             class_id: projectChange.class_id,
+            project_id: projectChange.project_id,
           });
           const { data, err } = await axiosClient.post(
             `ClassStudent/RemoveStudents`,
@@ -184,7 +239,7 @@ export const ProjectDetailsMember = () => {
   }, []);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position={IsStudent() ? "project-student-member" : "project"}
         spin={loadingData && loadingSelect}
@@ -235,7 +290,7 @@ export const ProjectDetailsMember = () => {
                                       className="fw-bold m-0 "
                                       style={{ paddingBottom: 20 }}
                                     >
-                                      Project Member of {project.group_name} (
+                                      Members of Project {project.group_name} (
                                       {project.project_code})
                                     </h3>{" "}
                                   </div>
@@ -276,7 +331,9 @@ export const ProjectDetailsMember = () => {
                                   loadingTable={loadingTable}
                                   loadingLeader={loadingLeader}
                                   loadingRemove={loadingRemove}
+                                  loadingStatus={loadingStatus}
                                   handleSetLeader={handleSetLeader}
+                                  handleChangeStatus={handleChangeStatus}
                                   handleProjectStudentDelete={
                                     handleProjectStudentDelete
                                   }
@@ -328,7 +385,7 @@ export const ProjectDetailsMember = () => {
                                 className="fw-bold m-0 "
                                 style={{ paddingBottom: 20 }}
                               >
-                                Project Member of {project.group_name} (
+                                Members of Project {project.group_name} (
                                 {project.project_code})
                               </h3>{" "}
                             </div>
@@ -369,7 +426,9 @@ export const ProjectDetailsMember = () => {
                             loadingTable={loadingTable}
                             loadingLeader={loadingLeader}
                             loadingRemove={loadingRemove}
+                            loadingStatus={loadingStatus}
                             handleSetLeader={handleSetLeader}
+                            handleChangeStatus={handleChangeStatus}
                             handleProjectStudentDelete={
                               handleProjectStudentDelete
                             }

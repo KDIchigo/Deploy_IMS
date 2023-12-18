@@ -33,7 +33,13 @@ export const ActionClass = ({ classId, fetchData, searchParams, classObj }) => {
       {classObj.status === 1 ? <BaseButton value="Inactive" nameTitle="actionLeft inactiveBtn p-1 ps-1 pe-3" onClick={() => handleChangeStatus(classId, 0)}/> : ''}
       {classObj.status === 0 ? <BaseButton value="Active" nameTitle="actionLeft activeBtn p-1 ps-1 pe-4"  onClick={() => handleChangeStatus(classId, 1)}/> : ''} */}
       <div className="d-flex justify-content-around">
-        <Tooltip title="Details" placement="top" color="#ffc107" size="large">
+        <Tooltip
+          title="Details"
+          className="action_space"
+          placement="top"
+          color="#ffc107"
+          size="large"
+        >
           <div>
             <BaseButton
               icon={<EditOutlined />}
@@ -47,6 +53,7 @@ export const ActionClass = ({ classId, fetchData, searchParams, classObj }) => {
         {classObj.status === 1 ? (
           <Tooltip
             title="Inactive"
+            className="action_space"
             placement="top"
             color="#dc3545"
             size="large"
@@ -65,7 +72,13 @@ export const ActionClass = ({ classId, fetchData, searchParams, classObj }) => {
           ""
         )}
         {classObj.status === 0 ? (
-          <Tooltip title="Active" placement="top" color="#198754" size="large">
+          <Tooltip
+            title="Active"
+            className="action_space"
+            placement="top"
+            color="#198754"
+            size="large"
+          >
             <div>
               <BaseButton
                 icon={<SettingOutlined />}

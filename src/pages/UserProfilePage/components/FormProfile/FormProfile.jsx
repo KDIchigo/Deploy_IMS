@@ -363,7 +363,7 @@ export const FormProfile = ({ user, roles, userId }) => {
               <BaseInputField
                 type="text"
                 id="user_convert_id"
-                label="User Gitlab Id"
+                label="User Gitlab ID"
                 refInput={ref2}
                 iconLabel={
                   <>

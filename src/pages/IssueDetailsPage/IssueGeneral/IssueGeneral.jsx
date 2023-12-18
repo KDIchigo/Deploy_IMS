@@ -15,23 +15,21 @@ import "./IssueGeneral.scss";
 import { SelectInputAssignee } from "src/components/Base/BaseSelectInput/SelectInputAssignee";
 
 export const IssueGeneral = ({
-  issueHistory,
-  fetchSubIssueData,
-  fetchIssueHistoryData,
-  loadingSubIssueData,
-  loadingIssueHistoryData,
-  loadingSubIssueAction,
   students,
   issueRequirements,
   issueObj,
   milestones,
   issueSettings,
-  subIssues,
-  projectId,
-  handleNewSubIssue,
-  handleSubIssueDetails,
   handleUpdateIssue,
   issues,
+  fetchIssueRequirement,
+  loadingIssueRequirementApi,
+  fetchIssueSetting,
+  loadingIssueSettingApi,
+  fetchMilestone,
+  loadingMilestoneApi,
+  fetchAssignee,
+  loadingAssigneeApi,
 }) => {
   const navigate = useNavigate();
   const [assigneeValue, setAssigneeValue] = useState([]);
@@ -52,18 +50,36 @@ export const IssueGeneral = ({
         .required("Issue Title is required")
         .max(1023, "Issue Title must be lower than 1023 characters"),
       milestone_id: Yup.string().required("Project Milestone is required"),
-      due_date: Yup.string().required("Due Date is required"),
-      issue_type: Yup.string()
-        .required("Issue Type is required")
-        .max(36, "Issue Type must be lower than 36 characters"),
-      issue_status: Yup.string()
-        .required("Issue Status is required")
-        .max(36, "Issue Status must be lower than 36 characters"),
-      work_process: Yup.string()
-        .required("Work Process is required")
-        .max(36, "Work Process must be lower than 36 characters"),
+      // due_date: Yup.string().required("Due Date is required"),
+      // issue_type: Yup.string()
+      //   .required("Issue Type is required")
+      //   .max(36, "Issue Type must be lower than 36 characters"),
+      // issue_status: Yup.string()
+      //   .required("Issue Status is required")
+      //   .max(36, "Issue Status must be lower than 36 characters"),
+      // work_process: Yup.string()
+      //   .required("Work Process is required")
+      //   .max(36, "Work Process must be lower than 36 characters"),
       // assignee_id: Yup.string().required("Issue Manager is required"),
     }),
+    validate: (values) => {
+      const errors = {};
+      if (!isView) {
+        if (values.due_date === null) {
+          errors.due_date = "Due Date is required";
+        }
+        if (values.issue_type === null) {
+          errors.issue_type = "Issue Type is required";
+        }
+        if (values.issue_status === null) {
+          errors.issue_status = "Issue Status is required";
+        }
+        if (values.work_process === null) {
+          errors.work_process = "Work Process is required";
+        }
+      }
+      return errors;
+    },
     onSubmit: async (values) => {
       isView
         ? setIsView(false)
@@ -87,7 +103,7 @@ export const IssueGeneral = ({
     },
   });
   // console.log(issueSettings);
-
+  // console.log(isView)
   return (
     <>
       <form
@@ -148,32 +164,6 @@ export const IssueGeneral = ({
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
-            {/* <div className="col-md-3 col-sm-12 px-3">
-              <BaseInputField
-                type="text"
-                id="issue_type_value"
-                name="issue_type_value"
-                label="Issue Type "
-                placeholder="Enter Issue Type"
-                value={formik.values.issue_type_value}
-                onChange={formik.handleChange}
-                classNameInput={
-                  formik.errors.issue_type_value &&
-                  formik.touched.issue_type_value
-                    ? "is-invalid"
-                    : ""
-                }
-                important="true"
-                onBlur={formik.handleBlur}
-                readOnly={true}
-              />
-              {formik.errors.issue_type_value &&
-              formik.touched.issue_type_value ? (
-                <p className="errorMsg"> {formik.errors.issue_type_value} </p>
-              ) : (
-                <p className="hiddenMsg">acb</p>
-              )}
-            </div> */}
             <div className="col-md-6 col-sm-12 px-3">
               <BaseSelectInput
                 id="parent_id"
@@ -186,6 +176,9 @@ export const IssueGeneral = ({
                     : formik.values.parent_title
                 }
                 options={issueRequirements}
+                onClick={fetchIssueRequirement}
+                loading={loadingIssueRequirementApi}
+                loadingApi={loadingIssueRequirementApi}
                 onChange={formik.handleChange}
                 // important="true"
                 formik={formik}
@@ -217,6 +210,9 @@ export const IssueGeneral = ({
                     : formik.values.issue_type_value
                 }
                 options={issueSettings.issue_types}
+                onClick={fetchIssueSetting}
+                loading={loadingIssueSettingApi}
+                loadingApi={loadingIssueSettingApi}
                 onChange={formik.handleChange}
                 disabled={isView}
                 important="true"
@@ -247,6 +243,9 @@ export const IssueGeneral = ({
                     : formik.values.work_process_value
                 }
                 options={issueSettings.work_process}
+                onClick={fetchIssueSetting}
+                loading={loadingIssueSettingApi}
+                loadingApi={loadingIssueSettingApi}
                 onChange={formik.handleChange}
                 disabled={isView}
                 important="true"
@@ -271,6 +270,9 @@ export const IssueGeneral = ({
                 label="Project Milestone"
                 id="milestone_id"
                 defaultValue={formik.values.milestone_name}
+                onClick={fetchMilestone}
+                loading={loadingMilestoneApi}
+                loadingApi={loadingMilestoneApi}
                 options={milestones}
                 onChange={formik.handleChange}
                 disabled={isView}
@@ -291,43 +293,15 @@ export const IssueGeneral = ({
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
-            {/* <div className="col-md-3 col-sm-12 px-3">
-              <SelectInputAssignees
-                id="assignee"
-                name="assignee"
-                label="Assignee"
-                important="true"
-                placeholder="Enter Assignee"
-                defaultValue={
-                  formik.values.assignee === ""
-                    ? undefined
-                    : formik.values.assignee
-                }
-                students={students}
-                onChange={formik.handleChange}
-                handleAssigneeValue={handleAssigneeValue}
-                formik={formik}
-                checked={
-                  formik.values.student_name === ""
-                    ? undefined
-                    : formik.values.student_name
-                }
-                isFilter={false}
-                status={
-                  formik.errors.assignee && formik.touched.assignee
-                    ? "error"
-                    : ""
-                }
-                onBlur={formik.handleBlur}
-              />
-            </div> */}
-
             <div className="col-md-3 col-sm-12 px-3">
               <SelectInputAssignee
                 label="Assignee"
                 id="assignee"
                 type="class_student"
                 defaultValue={formik.values.assignee_name}
+                onClick={fetchAssignee}
+                loading={loadingAssigneeApi}
+                loadingApi={loadingAssigneeApi}
                 options={students}
                 onChange={formik.handleChange}
                 disabled={isView}
@@ -353,13 +327,18 @@ export const IssueGeneral = ({
                 label="Due Date"
                 name="due_date"
                 className="w-100 px-2 datePicker"
-                valueDueDate={formik.values.due_date}
+                defaultValue={formik.values.due_date}
                 value={formik.values.due_date}
                 onChange={formik.handleChange}
                 disabled={isView}
                 classNameInput={
                   formik.errors.due_date && formik.touched.due_date
                     ? "is-invalid"
+                    : ""
+                }
+                status={
+                  formik.errors.due_date && formik.touched.due_date
+                    ? "error"
                     : ""
                 }
                 important="true"
@@ -383,6 +362,9 @@ export const IssueGeneral = ({
                     : formik.values.issue_status_value
                 }
                 options={issueSettings.issue_statuses}
+                onClick={fetchIssueSetting}
+                loading={loadingIssueSettingApi}
+                loadingApi={loadingIssueSettingApi}
                 onChange={formik.handleChange}
                 disabled={isView}
                 important="true"
@@ -402,74 +384,6 @@ export const IssueGeneral = ({
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
-            {/* <div className="col-md-2 col-sm-12 px-3">
-              <BaseInputField
-                type="number"
-                id="estimate_time"
-                name="estimate_time"
-                label="Estimate Time"
-                placeholder="Enter Estimate Time"
-                value={formik.values.estimate_time}
-                onChange={formik.handleChange}
-                important="true"
-                classNameInput={
-                  formik.errors.estimate_time && formik.touched.estimate_time
-                    ? "is-invalid"
-                    : ""
-                }
-                onBlur={formik.handleBlur}
-              />
-              {formik.errors.estimate_time && formik.touched.estimate_time ? (
-                <p className="errorMsg"> {formik.errors.estimate_time} </p>
-              ) : (
-                <p className="hiddenMsg">acb</p>
-              )}
-            </div>
-            <div className="col-md-2 col-sm-12 px-3">
-              <BaseInputField
-                type="number"
-                id="actual_time"
-                name="actual_time"
-                label="Actual Time"
-                placeholder="Enter Actual Time"
-                value={formik.values.actual_time}
-                onChange={formik.handleChange}
-                important="true"
-                classNameInput={
-                  formik.errors.actual_time && formik.touched.actual_time
-                    ? "is-invalid"
-                    : ""
-                }
-                onBlur={formik.handleBlur}
-              />
-              {formik.errors.actual_time && formik.touched.actual_time ? (
-                <p className="errorMsg"> {formik.errors.actual_time} </p>
-              ) : (
-                <p className="hiddenMsg">acb</p>
-              )}
-            </div>
-            <div className="col-md-2 col-sm-12 px-3">
-              <BaseInputField
-                type="text"
-                id="point"
-                name="point"
-                label="Point"
-                placeholder="Enter Point"
-                value={formik.values.point}
-                onChange={formik.handleChange}
-                classNameInput={
-                  formik.errors.point && formik.touched.point
-                    ? "is-invalid"
-                    : ""
-                }
-                onBlur={formik.handleBlur}
-              />
-              {formik.errors.point && formik.touched.point ? (
-                <p className="errorMsg"> {formik.errors.point} </p>
-              ) : (
-                <p className="hiddenMsg">acb</p>
-              )}
-            </div> */}
             <div className="col-md-12 col-sm-12 mt-0 px-3">
               <BaseTextArea
                 formik={formik}
@@ -481,32 +395,30 @@ export const IssueGeneral = ({
                 row={10}
               />
             </div>
-            {/* <div className="col-md-6 col-sm-12 mt-0 px-3">
-              <IssueDetailsTab
-                issueObj={issueObj}
-                subIssues={subIssues}
-                projectId={projectId}
-                issueSettings={issueSettings}
-                students={students}
-                milestones={milestones}
-                issueHistory={issueHistory}
-                fetchSubIssueData={fetchSubIssueData}
-                loadingSubIssueData={loadingSubIssueData}
-                fetchIssueHistoryData={fetchIssueHistoryData}
-                loadingIssueHistoryData={loadingIssueHistoryData}
-                loadingSubIssueAction={loadingSubIssueAction}
-                handleNewSubIssue={handleNewSubIssue}
-                handleSubIssueDetails={handleSubIssueDetails}
-              />
-            </div> */}
-            {/* <div className="col-md-6 col-sm-12 mt-1 px-3">
-              <BaseRadio formik={formik} type="status" />
-            </div> */}
           </div>
-          <div className="row">
-            <div className="col-12 px-3">
-              {loadingData ? (
-                isView ? (
+        </div>
+        <div className="row">
+          <div className="col-12 px-3">
+            {loadingData ? (
+              isView ? (
+                <BaseButton
+                  nameTitle="float-start mt-4 btnLoadingUpdateIssue"
+                  type="button"
+                  value="Update"
+                  color="info"
+                />
+              ) : (
+                <BaseButton
+                  nameTitle="float-start mt-4 btnLoadingUpdateIssue "
+                  type="submit"
+                  color="secondary"
+                  icon={<LoadingOutlined />}
+                  disabled={true}
+                />
+              )
+            ) : (
+              <>
+                {isView ? (
                   <BaseButton
                     nameTitle="float-start mt-4 btnLoadingUpdateIssue"
                     type="submit"
@@ -515,43 +427,14 @@ export const IssueGeneral = ({
                   />
                 ) : (
                   <BaseButton
-                    nameTitle="float-start mt-4 btnLoadingUpdateIssue "
+                    nameTitle="float-start mt-4 btnLoadingUpdateIssue"
                     type="submit"
+                    value="Update"
                     color="secondary"
-                    icon={<LoadingOutlined />}
-                    disabled={true}
                   />
-                )
-              ) : (
-                <>
-                  {isView ? (
-                    <BaseButton
-                      nameTitle="float-start mt-4 btnLoadingUpdateIssue"
-                      type="submit"
-                      value="Update"
-                      color="info"
-                    />
-                  ) : (
-                    <BaseButton
-                      nameTitle="float-start mt-4 btnLoadingUpdateIssue"
-                      type="submit"
-                      value="Update"
-                      color="secondary"
-                    />
-                  )}
-                </>
-              )}
-              <BaseButton
-                nameTitle="float-end mt-4 me-3 btn-cancel"
-                type="button"
-                value="Back"
-                color="dark"
-                variant="outline"
-                onClick={() => {
-                  navigate("/issue-list");
-                }}
-              />
-            </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </form>

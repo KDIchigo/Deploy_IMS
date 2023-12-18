@@ -14,9 +14,7 @@ import { BaseSelectInput } from "src/components/Base/BaseSelectInput/BaseSelectI
 import { NavbarDashboard } from "src/components/NavbarDashboard/NavbarDashboard";
 import { ConditionEnum } from "src/enum/Enum";
 import { exportToExcel } from "src/utils/handleExcel";
-import {
-  handlePageSizeChange
-} from "src/utils/handleSearchFilter";
+import { handlePageSizeChange } from "src/utils/handleSearchFilter";
 import { MonthWeekSelector } from "./FilterProjectMonthWeek/MonthWeekSelector";
 import "./ProjectDashboard.scss";
 import ProjectIssueBarChart from "./ProjectDashboardChart/ProjectIssueBarChart";
@@ -68,7 +66,11 @@ const ProjectDashboard = () => {
   const [projectMember, setProjectMember] = useState([]);
   const [classObj, setClassObj] = useState([]);
   const [members, setMembers] = useState([]);
-  const [commits, setCommits] = useState([]);
+  const [commits, setCommits] = useState({
+    totalRecord: 0,
+    data: [],
+    summary: "",
+  });
   const [loadingData, setLoadingData] = useState(false);
   const [project, setProject] = useState("");
   const [checkedMember, setCheckedMember] = useState();
@@ -107,6 +109,7 @@ const ProjectDashboard = () => {
 
     const { data: project } = await axiosClient.get(`/Project/${projectId}`);
     setProject(project);
+    console.log(project);
     const { data: issueMilestoneArr } = await axiosClient.post(
       `Project/GetMilestoneStatusTracker?projectId=${projectId}`
     );
@@ -182,11 +185,12 @@ const ProjectDashboard = () => {
           responseType: "arraybuffer", // Đảm bảo dữ liệu trả về dưới dạng binary
         }
       );
-      exportToExcel(exportExcel);
+      exportToExcel(exportExcel, "CommitList.xlsx");
     } catch (error) {
-      console.error("Fail to download file Excel: ", error);
+      // console.error("Fail to download file Excel: ", error);
       setLoadingExport(false);
     }
+    setLoadingExport(false);
   };
 
   const onPageChange = (pageNumber, pageSize) => {
@@ -211,16 +215,13 @@ const ProjectDashboard = () => {
     );
   };
 
-  const handleProjectAllocationSynchronize = async (classItem, project) => {
+  const handleProjectCommitSynchronize = async (project) => {
     // console.log(classItem, projects)
-    let convertId = classItem.class_convert_id;
-    let bearToken = classItem.class_convert_token;
-    if (
-      project.project_convert_id === null ||
-      project.project_convert_id === null
-    ) {
+    let convertId = project.project_convert_id;
+    let bearToken = project.project_convert_token;
+    if (convertId === null || bearToken === null) {
       toast.error(
-        `Synchronize projects ${classItem.class_code} fail!!! All projects must have project gitlab ID and bearToken.`
+        `Synchronize projects ${project.project_code} fail!!! ${project.project_code} project must have project gitlab ID and bearToken.`
       );
       setLoadingSync(false);
       return;
@@ -229,17 +230,17 @@ const ProjectDashboard = () => {
     if (convertId !== null && bearToken !== null) {
       setLoadingSync(true);
       const { data, err } = await axiosClient.post(
-        `/Project/AsyncProjectList?classConvertId=${convertId}&bearToken=${bearToken}`,
+        `/Project/AsyncCommit?projectConvertId=${convertId}&bearToken=${bearToken}`,
         projects
       );
       if (err) {
-        toast.error(`Synchronize projects ${classItem.class_code} fail!`);
+        toast.error(`Synchronize projects ${project.project_code} fail!`);
         // showErrorMessage(err);
         setLoadingSync(false);
         return;
       } else {
         toast.success(
-          `Synchronize projects ${classItem.class_code} successfully!`
+          `Synchronize projects ${project.project_code} successfully!`
         );
         setLoadingSync(false);
         // fetchData(searchParams);
@@ -252,7 +253,7 @@ const ProjectDashboard = () => {
         (toastErr = toastErr + " and ");
       bearToken === null && (toastErr = toastErr + "bearToken");
       toast.error(
-        `Synchronize projects ${classItem.class_code} fail!!! Because the ${classItem.class_code} class does not have ${toastErr} yet.`
+        `Synchronize projects ${project.project_code} fail!!! Because the ${project.project_code} project does not have ${toastErr} yet.`
       );
       setLoadingSync(false);
     }
@@ -270,7 +271,7 @@ const ProjectDashboard = () => {
   };
 
   const onMemberFilter = (filter, id) => {
-    setLoadingTable(true)
+    setLoadingTable(true);
     const filterConditions = searchParams.filterConditions.filter(
       (obj) => obj.field !== filter.field
     );
@@ -288,7 +289,7 @@ const ProjectDashboard = () => {
     // fetchMemberData(filter.value, selectedWeek, isSelectedWeek);
     // fetchWaitingListData(searchWaitingListParams, filter.value, true);
   };
-
+  console.log(classObj);
   //----------------------------------------------------
   useEffect(() => {
     fetchData(projectId);
@@ -311,8 +312,77 @@ const ProjectDashboard = () => {
                   </h3>
                 </div>
                 <div className="row">
-                  <div className="col-3">
-                    {/* <ProjectMonthWeekSelector
+                  <div className="col-6">
+                    <div className="row">
+                      <div className="col-6">
+                        <BaseSelectInput
+                          isLabel={false}
+                          id="semester_id"
+                          type="setting"
+                          options={[]}
+                          classNameDiv="selectProjectDesign"
+                          defaultValue={classObj.semester_name}
+                          isFilter={false}
+                          disabled={true}
+                          placeholder="Semester"
+                          onFilter={onMemberFilter}
+                          checked={checkedMember}
+                          onChange={onChangeMember}
+                        />
+                      </div>
+                      <div className="col-6">
+                        <BaseSelectInput
+                          isLabel={false}
+                          id="subject_id"
+                          type="subject"
+                          options={[]}
+                          classNameDiv="selectProjectDesign"
+                          defaultValue={classObj.subject_code}
+                          isFilter={false}
+                          disabled={true}
+                          placeholder="Subject"
+                          onFilter={onMemberFilter}
+                          checked={checkedMember}
+                          onChange={onChangeMember}
+                        />
+                      </div>
+                      <div className="col-6 mt-4">
+                        <BaseSelectInput
+                          isLabel={false}
+                          id="class_id"
+                          type="class"
+                          options={[]}
+                          classNameDiv="selectProjectDesign"
+                          defaultValue={project.class_code}
+                          isFilter={false}
+                          disabled={true}
+                          placeholder="Class"
+                          onFilter={onMemberFilter}
+                          checked={checkedMember}
+                          onChange={onChangeMember}
+                        />
+                      </div>
+                      <div className="col-6 mt-4">
+                        <BaseSelectInput
+                          isLabel={false}
+                          id="project_id"
+                          type="project"
+                          options={[]}
+                          classNameDiv="selectProjectDesign"
+                          defaultValue={project.project_code}
+                          isFilter={false}
+                          disabled={true}
+                          placeholder="Project"
+                          onFilter={onMemberFilter}
+                          checked={checkedMember}
+                          onChange={onChangeMember}
+                        />
+                      </div>
+                      <h6 className="mt-4" style={{ fontWeight: "bold" }}>
+                        Project Issue Statics By Week
+                      </h6>
+                      <div className="col-6">
+                        {/* <ProjectMonthWeekSelector
                       onWeekChange={handleWeekChange}
                       months={months}
                       weeks={weeks}
@@ -321,30 +391,32 @@ const ProjectDashboard = () => {
                       handleMonthChange={handleMonthChange}
                       handleWeekChange={handleWeekChange}
                     /> */}
-                    {/* <BaseButton
+                        {/* <BaseButton
                       color="light"
                       value="Issue"
                       onClick={() => navigate(`/issue-list/${projectId}`)}
                     /> */}
-                    <MonthWeekSelector
-                      selectedWeek={selectedWeek}
-                      handleWeekChange={handleWeekChange}
-                      generateWeekOptions={generateWeekOptions}
-                    />
-                  </div>
-                  <div className="col-3">
-                    <BaseSelectInput
-                      isLabel={false}
-                      id="author_id"
-                      type="class_student"
-                      options={members}
-                      defaultValue="all"
-                      isFilter={true}
-                      placeholder="Member"
-                      onFilter={onMemberFilter}
-                      checked={checkedMember}
-                      onChange={onChangeMember}
-                    />
+                        <MonthWeekSelector
+                          selectedWeek={selectedWeek}
+                          handleWeekChange={handleWeekChange}
+                          generateWeekOptions={generateWeekOptions}
+                        />
+                      </div>
+                      <div className="col-6">
+                        <BaseSelectInput
+                          isLabel={false}
+                          id="author_id"
+                          type="class_student"
+                          options={members}
+                          defaultValue="all"
+                          isFilter={true}
+                          placeholder="Member"
+                          onFilter={onMemberFilter}
+                          checked={checkedMember}
+                          onChange={onChangeMember}
+                        />
+                      </div>
+                    </div>
                   </div>
                   <div className="col-6">
                     {loadingData && (
@@ -357,7 +429,7 @@ const ProjectDashboard = () => {
                   <div className="col-7">
                     {" "}
                     <strong style={{ fontStyle: "italic" }}>
-                      Found 2 commits
+                      Found {commits.totalRecord} commits
                     </strong>
                   </div>
                   <div className="col-5">
@@ -392,9 +464,7 @@ const ProjectDashboard = () => {
                         color="primary"
                         isIconLeft={true}
                         icon={<SyncOutlined size={10} />}
-                        onClick={() =>
-                          handleProjectAllocationSynchronize(classObj, project)
-                        }
+                        onClick={() => handleProjectCommitSynchronize(project)}
                       />
                     )}
                   </div>

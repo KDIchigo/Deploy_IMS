@@ -165,6 +165,7 @@ export const SubjectAssignmentTable = ({
             Table: {
               borderColor: "rgba(0, 0, 0, 0.1)",
               headerBorderRadius: "4px",
+              headerBg: "#edececd1",
               controlItemBgActiveHover: "rgba(0, 0, 0, 0.05)",
               controlItemBgActive: "rgba(0, 0, 0, 0.05)",
             },
@@ -173,6 +174,7 @@ export const SubjectAssignmentTable = ({
       >
         <Table
           className="flexGrow_1"
+          style={{ height: "50vh", overflow: "hidden" }}
           // rowSelection={rowSelection}
           loading={loadingTable}
           columns={columns}
@@ -181,8 +183,8 @@ export const SubjectAssignmentTable = ({
           size="small"
           bordered
           scroll={{
-            x: 1180,
-            y: 330,
+            x: 1130,
+            y: 362,
           }}
         />
         <BasePagination

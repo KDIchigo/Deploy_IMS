@@ -52,6 +52,7 @@ const items = [
 
 export const ClassStudents = ({
   classId,
+  classObj,
   fetchData,
   searchParams,
   students,
@@ -69,6 +70,21 @@ export const ClassStudents = ({
   setCheckedSearchInput,
   checkedSearchSelect,
   setCheckedSearchSelect,
+  setSearchParamsURL,
+  existStudents,
+  setExistStudents,
+  studentsParams,
+  setStudentsParams,
+  loadingOther,
+  loadingOtherData,
+  loadingOtherTable,
+  setLoadingOther,
+  setLoadingOtherData,
+  setLoadingOtherTable,
+  checkedSearchInputOther,
+  setCheckedSearchInputOther,
+  checkedSearchSelectOther,
+  setCheckedSearchSelectOther,
 }) => {
   const navigate = useNavigate();
   const [modalStudent, setModalStudent] = useState(false);
@@ -98,7 +114,7 @@ export const ClassStudents = ({
           responseType: "arraybuffer", // Đảm bảo dữ liệu trả về dưới dạng binary
         }
       );
-      exportToExcel(exportExcel);
+      exportToExcel(exportExcel, "StudentList.xlsx");
       // const blob = new Blob([exportExcel], {
       //   type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       // });
@@ -172,9 +188,13 @@ export const ClassStudents = ({
       <Box className="box w-100 d-flex flex-column flexGrow_1 flex_height ">
         {/* <div className="card custom-card mb-0 flexGrow_1">
             <div className="card-body d-flex flex-column"> */}
-        <div className="row d-flex flex-row">
-          <div className="col-lg-7 my-auto d-flex">
-            {/* <BaseSearch
+        <div className="row">
+          <div className="row p-0 m-0 align-items-center justify-content-between">
+            <h3 className="fw-bold m-0 " style={{ paddingBottom: 10 }}>
+              Students for Class {classObj.class_code}
+            </h3>
+            <div className="col-lg-7 col-md-3 my-auto">
+              {/* <BaseSearch
               className="col-lg-9 col-md-8 p-0 m-0"
               placeholderInput="Search here..."
               placeholderSelect="Search by"
@@ -185,137 +205,106 @@ export const ClassStudents = ({
               checkedSearchInput={checkedSearchInput}
               onResetSearchInput={onResetSearchInput}
             /> */}
-            <BaseSearchAll
-              className="col-lg-7 p-0 m-0"
-              placeholderInput="Search here..."
-              options={searchClassStudent}
-              onSearch={onSearchAll}
-              checkedSearchSelect={checkedSearchSelect}
-              onResetSearchSelect={onResetSearchSelect}
-              checkedSearchInput={checkedSearchInput}
-              onResetSearchInput={onResetSearchInput}
-            />
-          </div>
-          <div className="col-lg-5 mt-sm-0 mt-2 align-items-center float-end d-flex flex-row">
-            <Space
-              wrap
-              className="my-auto py-2 col-lg-3 mb-1 ms-0 float-end flexGrow_1 dropdownStudent"
-            >
-              <Tooltip
-                title="Reset"
-                placement="topLeft"
-                color="#845adf"
-                size="large"
+              <BaseSearchAll
+                className="col-lg-7 p-0 m-0"
+                placeholderInput="Search here..."
+                options={searchClassStudent}
+                onSearch={onSearchAll}
+                checkedSearchSelect={checkedSearchSelect}
+                onResetSearchSelect={onResetSearchSelect}
+                checkedSearchInput={checkedSearchInput}
+                onResetSearchInput={onResetSearchInput}
+              />
+            </div>
+            <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 position-relative d-flex align-items-center justify-content-end">
+              <Space
+                wrap
+                className="col-lg-7 float-end d-flex h-100 justify-content-end"
               >
-                {loading ? (
-                  <LoadingOutlined
-                    className="filterIcon me-4 float-end"
-                    disabled
-                  />
-                ) : (
-                  <ReloadOutlined
-                    className="filterIcon me-4 float-end"
-                    onClick={() => {
-                      onReset();
-                    }}
-                  />
-                )}
-              </Tooltip>
-              <div className="flexGrow_1 d-flex flex-row justify-content-end">
-                {/* <Tooltip
-                  title="Export"
+                <Tooltip
+                  title="Reset"
                   placement="top"
-                  color="#8E69DF"
+                  color="#845adf"
                   size="large"
-                > */}
-                {/* <div>
-                    <BaseButton
-                      color="primary"
-                      variant="outline"
-                      nameTitle="me-2 px-3 py-1"
-                      icon={<DownloadOutlined />}
-                      onClick={() => handleExportToExcel()}
+                >
+                  {loading ? (
+                    <LoadingOutlined
+                      className="filterIcon me-4 float-end"
+                      disabled
                     />
-                  </div> */}
-                <div>
+                  ) : (
+                    <ReloadOutlined
+                      className="filterIcon me-4 float-end"
+                      onClick={() => {
+                        onReset();
+                      }}
+                    />
+                  )}
+                </Tooltip>
+                <div className="d-flex align-items-center">
                   <BaseButton
                     color="success"
                     variant="outline"
                     value="Export"
-                    nameTitle="mt-1 me-4 px-3 py-1"
+                    nameTitle="me-2 px-3 py-1"
                     isIconLeft={true}
                     icon={<ExportOutlined />}
                     onClick={() => handleExportToExcel()}
                   />
-                </div>
-                {/* </Tooltip> */}
-                {/* <ImportClassStudent
-                  classId={classId}
-                  fetchData={fetchData}
-                  searchParams={searchParams}
-                /> */}
-                {/* <ImportDemo
-                  classId={classId}
-                  fetchData={fetchData}
-                  searchParams={searchParams}
-                /> */}
-                {/* <Tooltip
-                  title="Import"
-                  placement="top"
-                  color="#E6533C"
-                  size="large"
-                > */}
-                {/* <div>
-                    <BaseButton
-                      variant="outline"
-                      nameTitle="px-3 py-1"
-                      color="danger"
-                      icon={<UploadOutlined />}
-                      onClick={() =>
-                        navigate(`/class-import-student/${classId}`)
-                      }
-                    />
-                  </div> */}
-                <div>
                   <BaseButton
                     variant="outline"
-                    nameTitle="mt-1 px-3 py-1"
+                    nameTitle="ms-3 px-3 py-1"
                     color="danger"
                     value="Import"
                     isIconLeft={true}
                     icon={<ImportOutlined />}
                     onClick={() => navigate(`/class-import-student/${classId}`)}
                   />
+                  {/* </Tooltip> */}
                 </div>
-                {/* </Tooltip> */}
-              </div>
+              </Space>
               <Dropdown.Button
                 type="primary"
-                className="flexGrow_1 d-flex flex-row justify-content-end ms-0"
+                className="w-auto ms-3 d-flex justify-content-end"
                 menu={menuProps}
                 icon={<DownOutlined />}
                 onChange={handleButtonClick}
               >
                 Add New
               </Dropdown.Button>
-            </Space>
-            <NewClassStudent
-              modal={modalStudent}
-              setModalStudent={setModalStudent}
-              toggle={toggleStudent}
-              fetchData={fetchData}
-              searchParams={searchParams}
-              classId={classId}
-            />
-            <NewClassStudentExist
-              modal={modalStudentExist}
-              setModalStudentExist={setModalStudentExist}
-              toggle={toggleStudentExist}
-              classId={classId}
-              fetchData={fetchData}
-              searchParams={searchParams}
-              settingStudent={settingStudent}
-            />
+              <NewClassStudent
+                modal={modalStudent}
+                setModalStudent={setModalStudent}
+                toggle={toggleStudent}
+                fetchData={fetchData}
+                searchParams={searchParams}
+                classId={classId}
+              />
+              <NewClassStudentExist
+                modal={modalStudentExist}
+                setModalStudentExist={setModalStudentExist}
+                toggle={toggleStudentExist}
+                classId={classId}
+                fetchData={fetchData}
+                searchParams={searchParams}
+                settingStudent={settingStudent}
+                setSearchParamsURL={setSearchParamsURL}
+                students={existStudents}
+                setStudents={setExistStudents}
+                studentsParams={studentsParams}
+                setStudentsParams={setStudentsParams}
+                loadingOther={loadingOther}
+                loadingOtherData={loadingOtherData}
+                loadingOtherTable={loadingOtherTable}
+                setLoading={setLoadingOther}
+                setLoadingData={setLoadingOtherData}
+                setLoadingTable={setLoadingOtherTable}
+                checkedSearchInput={checkedSearchInputOther}
+                setCheckedSearchInput={setCheckedSearchInputOther}
+                checkedSearchSelect={checkedSearchSelectOther}
+                setCheckedSearchSelect={setCheckedSearchSelectOther}
+              />
+            </div>
           </div>
         </div>
 

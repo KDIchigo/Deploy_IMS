@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { NavbarDashboard } from "src/components/NavbarDashboard/NavbarDashboard";
 import "./SubjectDetailsAssignment.scss";
 import { SubjectAssignment } from "./SubjectAssignment/SubjectAssignment";
@@ -9,7 +9,11 @@ import { axiosClient } from "src/axios/AxiosClient";
 import { ConditionEnum } from "src/enum/Enum";
 import { useSearchParams } from "react-router-dom";
 // import qs from "qs";
-import { decodeParam, genDataStateParam } from "src/utils/handleEnDecode";
+import {
+  backDataStateParam,
+  decodeParam,
+  genDataStateParam,
+} from "src/utils/handleEnDecode";
 const searchAssignment = [
   {
     id: "assignment_name",
@@ -17,10 +21,12 @@ const searchAssignment = [
   },
 ];
 export const SubjectDetailsAssignment = () => {
+  const location = useLocation();
   const { subjectId } = useParams();
   const [searchParamsURL, setSearchParamsURL] = useSearchParams();
   const searchURLParams = new URLSearchParams(location.search);
   const param = searchURLParams.get("param");
+  const [paramDecode, setParamDecode] = useState(param);
   // const filterConditions =
   //   filterConditionsJson
   //     ? JSON.parse(filterConditionsJson)
@@ -50,7 +56,7 @@ export const SubjectDetailsAssignment = () => {
     summary: "",
   });
   const [searchParams, setSearchParams] = useState(
-    decodeParam(param) === null
+    decodeParam(paramDecode) === null
       ? {
           pageNumber: 1,
           pageSize: 10,
@@ -58,14 +64,14 @@ export const SubjectDetailsAssignment = () => {
           filterConditions: filterSubjectAssignment,
         }
       : {
-          pageNumber: decodeParam(param).pageNumber,
-          pageSize: decodeParam(param).pageSize,
-          sortString: decodeParam(param).sortString,
-          filterConditions: decodeParam(param).filterConditions,
+          pageNumber: decodeParam(paramDecode).pageNumber,
+          pageSize: decodeParam(paramDecode).pageSize,
+          sortString: decodeParam(paramDecode).sortString,
+          filterConditions: decodeParam(paramDecode).filterConditions,
         }
   );
 
-  const fetchData = async () => {
+  const fetchDataSelect = async () => {
     const { data: subjectById } = await axiosClient.get(
       `/Subject/${subjectId}`
     );
@@ -80,7 +86,7 @@ export const SubjectDetailsAssignment = () => {
     genDataStateParam(param, setCheckedStatus, "status");
     setLoadingData(true);
   };
-  const fetchDataSelect = async (searchParams) => {
+  const fetchData = async (searchParams) => {
     const { data: assignmentArr } = await axiosClient.post(
       "Assignment/GetByPaging",
       searchParams
@@ -103,15 +109,61 @@ export const SubjectDetailsAssignment = () => {
     }
   };
 
+  const fetchBackData = () => {
+    const params = new URLSearchParams(location.search);
+    const paramFromURL = params.get("param");
+
+    // Nếu filter thay đổi, cập nhật trạng thái của component
+    if (paramDecode !== paramFromURL) {
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedSearchInput,
+        "search",
+        [],
+        searchAssignment,
+        "",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedStatus,
+        "status",
+        [],
+        [],
+        "status",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      // console.log(decodeParam(paramFromURL))
+    } else {
+      genDataStateParam(
+        param,
+        setCheckedSearchInput,
+        "search",
+        [],
+        searchAssignment
+      );
+      genDataStateParam(param, setCheckedStatus, "status");
+    }
+  };
+
   useEffect(() => {
-    fetchData();
-    fetchDataSelect(searchParams);
+    // Xử lý sự thay đổi trong URL
+    fetchBackData();
+  }, [location.search, paramDecode]);
+
+  useEffect(() => {
+    fetchData(searchParams);
+    fetchDataSelect();
   }, []);
   return (
     <>
-      {/* {console.log(subjectObj)} */}
-      <ToastContainer autoClose="2000" theme="colored" />
-
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position="subject"
         spin={loadingData && loadingSelect}

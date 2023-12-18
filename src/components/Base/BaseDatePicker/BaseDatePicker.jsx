@@ -8,6 +8,7 @@ dayjs.extend(customParseFormat);
 export const BaseDatePicker = ({
   id,
   className,
+  placeholder,
   label,
   important,
   isFilter,
@@ -121,6 +122,7 @@ export const BaseDatePicker = ({
         id={id}
         status={status}
         allowClear
+        placeholder={placeholder}
         disabledDate={disabledDate}
         className={classNameDiv}
         disabled={disabled}
@@ -133,7 +135,9 @@ export const BaseDatePicker = ({
         style={{ borderRadius: "4px", height: 34 }}
         format={dateFormat}
         defaultValue={
-          value === "" ? null : dayjs(formatDate(value), dateFormat)
+          value === "" || value === null
+            ? null
+            : dayjs(formatDate(value), dateFormat)
         }
         onChange={handleRangePickerChangeJSON}
         onBlur={onBlur}

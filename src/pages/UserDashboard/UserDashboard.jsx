@@ -39,6 +39,17 @@ const getUnique = (arr, value) => {
 
   return unique;
 };
+
+const handleSecondDecimal = (number) => {
+  if(number === null || number === undefined) {
+    return null;
+  }
+  if(Number.isInteger(number)){
+    return number;
+  }
+  return number.toFixed(2);
+};
+
 const generateWeekOptions = () => {
   const weekOptions = [];
   const currentWeek = moment();
@@ -91,6 +102,7 @@ const UserDashboard = () => {
   const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [loadingSubject, setLoadingSubject] = useState(false);
   const [loadingClass, setLoadingClass] = useState(false);
   const [loadingSemester, setLoadingSemester] = useState(false);
@@ -427,12 +439,16 @@ const UserDashboard = () => {
     // fetchDataSelect();
     // fetchSelectData();
     setIsSelectClass(true);
+    setLoading(true)
   }, []);
   return (
     <>
-      {console.log(loadingData, loadingSelectData)}
+      {/* {console.log(loadingData, loadingSelectData)} */}
       <NavbarDashboard
-        spin={loadingData && loadingSelectData}
+        spin={ loading &&
+          loadingData &&
+          loadingSelectData 
+        }
         position="user_dashboard"
         dashboardBody={
           <Box className="box w-100 d-flex flex-column flexGrow_1 ">
@@ -465,7 +481,7 @@ const UserDashboard = () => {
                     </div>
                     <div className="row mb-1 mt-5">
                       {" "}
-                      <h6>Project Issue Statics By Week</h6>
+                      <h6 style={{fontWeight: "bold"}}>Project Issue Statics By Week</h6>
                       {/* <MonthWeekSelector
                         onWeekChange={handleWeekChange}
                         months={months}
@@ -513,7 +529,7 @@ const UserDashboard = () => {
                         paddingTop: "11px",
                       }}
                     >
-                      <span>{averageReq.averageRequirementCount}</span>
+                      <span>{handleSecondDecimal(averageReq.averageRequirementCount)}</span>
                       <p>Average project requirement</p>
                     </div>
                     <div
@@ -526,47 +542,40 @@ const UserDashboard = () => {
                         paddingTop: "11px",
                       }}
                     >
-                      <span>{averageReq.requirementCount}</span>
+                      <span>{handleSecondDecimal(averageReq.requirementCount)}</span>
                       <p>Total project requirement</p>
                     </div>
                   </div>
                 </div>
                 {/* <h2>{projectOpt.group_name}</h2> */}
                 <div>
-                  {loadingData &&
-                  loadingSelectData &&
-                  projectOpt !== undefined &&
-                  issueTypes.length !== 0 &&
-                  classOpt.length !== 0 ? (
-                    issueTypes.issue_types.map((issueType) => (
-                      <div key={issueType.issue_setting_id}>
-                        <a
-                          className="mx-2"
-                          style={{ color: "blue", fontWeight: "bold" }}
-                          onClick={() =>
-                            navigate(
-                              `/issue-list/${projectOpt.project_id}/${issueType.issue_setting_id}`
-                            )
-                          }
-                        >
-                          {issueType.issue_value}
-                        </a>
-                        {!loadingFilterData &&
-                        loadingData &&
-                        loadingSelectData ? (
-                          <UserDashboardChart
-                            lineChart={lineChart}
-                            issueStatus={issueStatus}
-                            issueCard={issueCard}
-                            issueTypes={issueType.issue_value}
-                            loadingData={loadingData}
-                          />
-                        ) : (
-                          <Spin
-                            tip="Loading"
-                            size="large"
-                            style={{ minHeight: "100vh" }}
+                {console.log(loadingData ,
+                    loadingSelectData ,
+                    projectOpt !== undefined ,
+                    issueTypes.length !== 0 ,
+                    classOpt.length !== 0)}
+                  {!loadingFilterData && loadingData && loadingSelectData ? (
+                    loadingData &&
+                    loadingSelectData &&
+                    projectOpt !== undefined &&
+                    classOpt.length !== 0 &&
+                    issueTypes.length !== 0 ? (
+                      issueTypes.issue_types.map((issueType) => (
+                        <div key={issueType.issue_setting_id}>
+                          <a
+                            className="mx-2"
+                            style={{ color: "blue", fontWeight: "bold" }}
+                            onClick={() =>
+                              navigate(
+                                `/issue-list/${projectOpt.project_id}/${issueType.issue_setting_id}`
+                              )
+                            }
                           >
+                            {issueType.issue_value}
+                          </a>
+                          {!loadingFilterData &&
+                          loadingData &&
+                          loadingSelectData ? (
                             <UserDashboardChart
                               lineChart={lineChart}
                               issueStatus={issueStatus}
@@ -574,12 +583,81 @@ const UserDashboard = () => {
                               issueTypes={issueType.issue_value}
                               loadingData={loadingData}
                             />
-                          </Spin>
-                        )}
-                      </div>
-                    ))
+                          ) : (
+                            <Spin
+                              tip="Loading"
+                              size="large"
+                              style={{ minHeight: "100vh" }}
+                            >
+                              <UserDashboardChart
+                                lineChart={lineChart}
+                                issueStatus={issueStatus}
+                                issueCard={issueCard}
+                                issueTypes={issueType.issue_value}
+                                loadingData={loadingData}
+                              />
+                            </Spin>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                    )
                   ) : (
-                    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                    <Spin
+                      tip="Loading"
+                      size="large"
+                      style={{ minHeight: "100vh" }}
+                    >
+                      {loadingData &&
+                      loadingSelectData &&
+                      projectOpt !== undefined &&
+                      issueTypes.length !== 0 &&
+                      classOpt.length !== 0 ? (
+                        issueTypes.issue_types.map((issueType) => (
+                          <div key={issueType.issue_setting_id}>
+                            <a
+                              className="mx-2"
+                              style={{ color: "blue", fontWeight: "bold" }}
+                              onClick={() =>
+                                navigate(
+                                  `/issue-list/${projectOpt.project_id}/${issueType.issue_setting_id}`
+                                )
+                              }
+                            >
+                              {issueType.issue_value}
+                            </a>
+                            {/* {!loadingFilterData &&
+                            loadingData &&
+                            loadingSelectData ? ( */}
+                            <UserDashboardChart
+                              lineChart={lineChart}
+                              issueStatus={issueStatus}
+                              issueCard={issueCard}
+                              issueTypes={issueType.issue_value}
+                              loadingData={loadingData}
+                            />
+                            {/* ) : (
+                              <Spin
+                                tip="Loading"
+                                size="large"
+                                style={{ minHeight: "100vh" }}
+                              >
+                                <UserDashboardChart
+                                  lineChart={lineChart}
+                                  issueStatus={issueStatus}
+                                  issueCard={issueCard}
+                                  issueTypes={issueType.issue_value}
+                                  loadingData={loadingData}
+                                />
+                              </Spin>
+                            )} */}
+                          </div>
+                        ))
+                      ) : (
+                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                      )}
+                    </Spin>
                   )}
                 </div>
               </div>

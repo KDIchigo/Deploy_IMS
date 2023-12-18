@@ -173,7 +173,6 @@ export const NewClassMilestone = ({ classId, fetchData, searchParams }) => {
                   <p className="hiddenMsg">acb</p>
                 )}
               </div>
-
               <div className="col-md-6 col-sm-12 px-3">
                 {/* <BaseRadio label="Status" important="true" formik={formik} type="status"/> */}
                 <BaseRadio
@@ -181,10 +180,11 @@ export const NewClassMilestone = ({ classId, fetchData, searchParams }) => {
                   formik={formik}
                   type="status"
                   feature="pending"
-                  isLabel={false}
+                  isLabel={true}
+                  label="Status"
+                  important="true"
                 />
               </div>
-
               <div className="col-md-12 col-sm-12 mt-3 px-3 ">
                 <BaseTextArea
                   formik={formik}

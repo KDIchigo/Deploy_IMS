@@ -229,7 +229,7 @@ export const NewProjectMilestone = ({
                   <p className="hiddenMsg">acb</p>
                 )}
               </div>
-              <div className="col-md-6 col-sm-12 mt-4 px-3">
+              <div className="col-md-6 col-sm-12 px-3">
                 {/* <BaseRadio label="Status" important="true" formik={formik} type="status"/> */}
                 <BaseRadio
                   value={formik.values.status}
@@ -237,6 +237,8 @@ export const NewProjectMilestone = ({
                   type="status"
                   feature="pending"
                   isLabel={true}
+                  label="Status"
+                  important="true"
                 />
               </div>
               <div className="col-md-12 col-sm-12 px-3">

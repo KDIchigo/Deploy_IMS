@@ -3,6 +3,7 @@ import {
   LoadingOutlined,
   MoreOutlined,
   PlusOutlined,
+  SettingOutlined,
   StarOutlined,
 } from "@ant-design/icons";
 import { Dropdown, Tooltip } from "antd";
@@ -11,6 +12,8 @@ import { MoveToAnotherProject } from "src/pages/ProjectListPage/ProjectStudentIt
 import { BaseFilter } from "../BaseFilter/BaseFilter";
 import { BaseButton } from "../BaseButton/BaseButton";
 import { StatusEnum } from "src/enum/Enum";
+import { MoveStudent } from "src/pages/ProjectListPage/MoveAddStudent/MoveStudent";
+import { AddStudent } from "src/pages/ProjectListPage/MoveAddStudent/AddStudent";
 export const ProjectActionDemo = ({
   option,
   optionId,
@@ -31,6 +34,8 @@ export const ProjectActionDemo = ({
   handleMoveToAnotherProject,
   handleSetLeader,
   handleProjectStudentDelete,
+  handleProjectClassStudentDelete,
+  handleProjectStudentChangeStatus,
   isLeader,
   loadingLeader,
   loadingAddStudent,
@@ -38,14 +43,17 @@ export const ProjectActionDemo = ({
   loadingMove,
   loadingRemove,
 }) => {
-  const [modal, setModal] = useState(false);
-  const toggle = () => setModal(!modal);
+  const [modalMove, setModalMove] = useState(false);
+  const [modalAdd, setModalAdd] = useState(false);
+  const toggleMove = () => setModalMove(!modalMove);
+  const toggleAdd = () => setModalAdd(!modalAdd);
 
   let items = [];
   if (isWaitingList) {
     const addToProject = [];
     projects.map((project) =>
       addToProject.push({
+        key: project.project_id,
         value: project.project_id,
         label: (
           <a onClick={() => handleAddStudentToProject(project, option)}>
@@ -58,11 +66,11 @@ export const ProjectActionDemo = ({
       {
         key: "1",
         label: (
-          <a target="_blank">
+          <a target="_blank" onClick={toggleAdd}>
             <PlusOutlined className="me-2" /> Add to Project
           </a>
         ),
-        children: addToProject,
+        // children: addToProject,
       },
       {
         key: "2",
@@ -82,6 +90,7 @@ export const ProjectActionDemo = ({
       .filter((projectItem) => projectItem.project_id !== project.project_id)
       .map((projectItem) =>
         moveToAnotherProject.push({
+          key: projectItem.project_id,
           value: projectItem.project_id,
           label: (
             <a
@@ -101,18 +110,18 @@ export const ProjectActionDemo = ({
       );
     items = [
       {
-        key: "1",
+        key: "5",
         label: (
-          <a target="_blank">
-            <PlusOutlined className="me-2" /> Add to Project
+          <a target="_blank" onClick={toggleMove}>
+            <PlusOutlined className="me-2" /> Move to Project
           </a>
         ),
-        children: moveToAnotherProject,
+        // children: moveToAnotherProject,
       },
     ];
     if (!isLeader) {
       items.push({
-        key: "2",
+        key: "6",
         label: (
           <a
             target="_blank"
@@ -123,17 +132,51 @@ export const ProjectActionDemo = ({
         ),
       });
     }
-    items.push({
-      key: "3",
-      label: (
-        <a
-          target="_blank"
-          onClick={() => handleProjectStudentDelete(option, project)}
-        >
-          <DeleteFilled className="me-2" /> Delete
-        </a>
-      ),
-    });
+    items.push(
+      {
+        key: "7",
+        label: (
+          <a
+            target="_blank"
+            onClick={() => handleProjectStudentChangeStatus(option, project)}
+          >
+            <SettingOutlined className="me-2" />{" "}
+            {option.status === 1 ? "Deactivate" : "Activate"}
+          </a>
+        ),
+      },
+      {
+        key: "8",
+        label: (
+          <a
+            target="_blank"
+            onClick={() => handleProjectStudentDelete(option, project)}
+          >
+            <DeleteFilled className="me-2" /> Remove
+          </a>
+        ),
+        children: [
+          {
+            value: "Remove to Waiting List",
+            label: (
+              <a onClick={() => handleProjectStudentDelete(option, project)}>
+                Remove to Waiting List
+              </a>
+            ),
+          },
+          {
+            value: "Remove from the project and class",
+            label: (
+              <a
+                onClick={() => handleProjectClassStudentDelete(option, project)}
+              >
+                Remove from the project and class
+              </a>
+            ),
+          },
+        ],
+      }
+    );
   }
 
   // const handleDelete = async (id) => {
@@ -199,6 +242,24 @@ export const ProjectActionDemo = ({
           </Dropdown>
         </Tooltip>
       </div>
+      {!isWaitingList ? (
+        <MoveStudent
+          modal={modalMove}
+          toggle={toggleMove}
+          option={option}
+          projects={projects}
+          project={project}
+          handleMoveToAnotherProject={handleMoveToAnotherProject}
+        />
+      ) : (
+        <AddStudent
+          modal={modalAdd}
+          toggle={toggleAdd}
+          option={option}
+          projects={projects}
+          handleAddStudentToProject={handleAddStudentToProject}
+        />
+      )}
     </>
   );
 };

@@ -22,6 +22,14 @@ function handleToDDMMYYYY(inputDate) {
 
   return formattedDate;
 }
+
+const truncateText = (text, maxLength) => {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return text.slice(0, maxLength) + '...';
+};
+
 export const IssueTypeItem = ({
   onPageChange,
   onSelectChange,
@@ -106,17 +114,17 @@ export const IssueTypeItem = ({
                 <BaseIssueSettingCard
                   issueGroup="Type"
                   issueValue={issue.issue_type_value}
-                  issueValueObj={JSON.parse(issue.issue_type_style)}
+                  issueValueObj={issue.issue_type_style}
                 />
                 <BaseIssueSettingCard
                   issueGroup="Status"
                   issueValue={issue.issue_status_value}
-                  issueValueObj={JSON.parse(issue.issue_status_style)}
+                  issueValueObj={issue.issue_status_style}
                 />
                 <BaseIssueSettingCard
                   issueGroup="Process"
                   issueValue={issue.work_process_value}
-                  issueValueObj={JSON.parse(issue.work_process_style)}
+                  issueValueObj={issue.work_process_style}
                 />
             </div>
           </div>

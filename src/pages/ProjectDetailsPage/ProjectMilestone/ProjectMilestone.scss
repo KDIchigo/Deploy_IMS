@@ -1,0 +1,49 @@
+.milestoneCollapse {
+    border-radius: 0;
+    border-top: 0px !important;
+    .ant-collapse-header {
+        border-radius: 0 !important;
+        width: 100%;
+        .ant-collapse-content {
+            max-height: 140px;
+            overflow-y: auto;
+        }
+        .ant-collapse-header-text {
+            width: 23.5%;
+            font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .ant-collapse-extra {
+            width: 76.5% !important;
+            display: flex;
+            .milestone_extra_item:nth-child(1) {
+                width: 21% !important;
+            }
+            .milestone_extra_item:nth-child(2) {
+                width: 20% !important;
+            }
+            .milestone_extra_item:nth-child(3) {
+                width: 31% !important;
+            }
+            .milestone_extra_item:nth-child(4) {
+                width: 15% !important;
+            }
+            .milestone_extra_item:nth-child(5) {
+                width: 13% !important;
+            }
+        }
+    }
+    .ant-collapse-item {
+        border-radius: 0 !important;
+    }
+    .ant-collapse-content-box {
+        padding: 0 !important;
+    }
+    .ant-collapse-content {
+        max-height: 140px;
+        overflow-y: auto;
+    }
+}

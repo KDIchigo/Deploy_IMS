@@ -1,7 +1,27 @@
 import { axiosClient } from "src/axios/AxiosClient";
 import { ConditionEnum, FilterOperatorEnum, StatusEnum } from "src/enum/Enum";
 import { encodeParam } from "./handleEnDecode";
+const findDuplicates = (array1, array2, key1, key2) => {
+  const duplicates = [];
 
+  // Tạo một Map để lưu trữ giá trị của array2 dựa trên key2
+  const mapArray2 = new Map(array2.map((item) => [item[key2], item]));
+
+  // Lặp qua từng phần tử trong array1
+  for (const item1 of array1) {
+    const value1 = item1[key1];
+
+    // Kiểm tra xem có giá trị tương ứng trong array2 không
+    const item2 = mapArray2.get(value1);
+
+    if (item2) {
+      // Nếu tìm thấy sự trùng lặp, thêm dữ liệu của array1 vào mảng duplicates
+      duplicates.push(item1);
+    }
+  }
+
+  return duplicates;
+};
 const getUnique = (arr, value) => {
   const unique = arr
     .map((e) => e[value])
@@ -202,6 +222,9 @@ const fetchProjectStudent = async (
 };
 
 const fetchProjectAdmin = async (
+  currentUser,
+  IsAdmin,
+  IsManager,
   searchClassParams,
   setClasses,
   setSearchClassParams,
@@ -211,13 +234,67 @@ const fetchProjectAdmin = async (
   setProjects,
   setLoadingData
 ) => {
+  
+  let newSearchClassParams = searchClassParams
+  if (IsManager()) {
+    // newSearchParams = { ...searchParams };
+    const { data: subjectArr } = await axiosClient.post(
+      "/Subject/GetFilterData?sortString=created_date ASC",
+      [
+        {
+          field: "assignee_id",
+          value: currentUser.user_id,
+          condition: ConditionEnum.Equal,
+        },
+      ]
+    );
+
+    if (subjectArr.length !== 0) {
+      subjectArr.map((ele, index) => {
+        if (index === 0) {
+          if (subjectArr.length === 1) {
+            newSearchClassParams.push({
+              field: "subject_id",
+              value: ele.subject_id,
+              condition: ConditionEnum.Equal,
+            });
+          } else {
+            newSearchClassParams.push({
+              field: "subject_id",
+              value: ele.subject_id,
+              condition: ConditionEnum.Equal,
+              operator: FilterOperatorEnum.OR,
+              parenthesis: FilterOperatorEnum.OpenParenthesis,
+            });
+          }
+        }
+        if (index !== 0) {
+          if (index !== subjectArr.length - 1) {
+            newSearchClassParams.push({
+              field: "subject_id",
+              value: ele.subject_id,
+              condition: ConditionEnum.Equal,
+              operator: FilterOperatorEnum.OR,
+            });
+          } else {
+            newSearchClassParams.push({
+              field: "subject_id",
+              value: ele.subject_id,
+              condition: ConditionEnum.Equal,
+              parenthesis: FilterOperatorEnum.CloseParenthesis,
+            });
+          }
+        }
+      });
+    }
+  }
   const { data: classArr } = await axiosClient.post(
     "/Class/GetFilterData?sortString=created_date ASC",
-    searchClassParams
+    newSearchClassParams
   );
   setClasses(classArr);
-  // console.log(searchClassParams)
-  setSearchClassParams(searchClassParams);
+  // console.log(newSearchClassParams)
+  setSearchClassParams(newSearchClassParams);
   setLoadingClass(true);
   //   console.log("all", classArr);
 
@@ -361,6 +438,9 @@ const fetchFilterAdminOld = async (
   }
 };
 const fetchFilterAdmin = async (
+  currentUser,
+  IsAdmin,
+  IsManager,
   searchClassParams,
   searchProjectParams,
   isSelectClass,
@@ -414,6 +494,60 @@ const fetchFilterAdmin = async (
     key: systemSettingArr[0].setting_id,
     value: systemSettingArr[0].setting_value,
   };
+
+  if (IsManager()) {
+    // newSearchParams = { ...searchParams };
+    const { data: subjectArr } = await axiosClient.post(
+      "/Subject/GetFilterData?sortString=created_date ASC",
+      [
+        {
+          field: "assignee_id",
+          value: currentUser.user_id,
+          condition: ConditionEnum.Equal,
+        },
+      ]
+    );
+
+    if (subjectArr.length !== 0) {
+      subjectArr.map((ele, index) => {
+        if (index === 0) {
+          if (subjectArr.length === 1) {
+            newSearchClassParams.push({
+              field: "subject_id",
+              value: ele.subject_id,
+              condition: ConditionEnum.Equal,
+            });
+          } else {
+            newSearchClassParams.push({
+              field: "subject_id",
+              value: ele.subject_id,
+              condition: ConditionEnum.Equal,
+              operator: FilterOperatorEnum.OR,
+              parenthesis: FilterOperatorEnum.OpenParenthesis,
+            });
+          }
+        }
+        if (index !== 0) {
+          if (index !== subjectArr.length - 1) {
+            newSearchClassParams.push({
+              field: "subject_id",
+              value: ele.subject_id,
+              condition: ConditionEnum.Equal,
+              operator: FilterOperatorEnum.OR,
+            });
+          } else {
+            newSearchClassParams.push({
+              field: "subject_id",
+              value: ele.subject_id,
+              condition: ConditionEnum.Equal,
+              parenthesis: FilterOperatorEnum.CloseParenthesis,
+            });
+          }
+        }
+      });
+    }
+  }
+
   const { data: classArr } = await axiosClient.post(
     "/Class/GetFilterData?sortString=created_date ASC",
     isSelectClass ? searchClassParams : newSearchClassParams
@@ -423,27 +557,24 @@ const fetchFilterAdmin = async (
   setLoadingClass(true);
 
   setSubjectOpt(getUnique(classArr, "subject_id"));
-  let subjectParams = {
-    key: getUnique(classArr, "subject_id")[0].subject_id,
-    value: getUnique(classArr, "subject_id")[0].subject_code,
-  };
+  // let subjectParams = {
+  //   key: getUnique(classArr, "subject_id")[0].subject_id,
+  //   value: getUnique(classArr, "subject_id")[0].subject_code,
+  // };
   setLoadingSubject(true);
   // console.log(getUnique(classArr, "subject_id"));
 
-  // let newSearchProjectParams = [...searchProjectParams];
-  // newSearchProjectParams = [
-  //   {
-  //     field: "class_id",
-  //     value: classArr.length !== 0 ? classArr[0].class_id : "",
-  //     condition: ConditionEnum.Equal,
-  //   },
-  // ];
+  let newSearchProjectParams = [...searchProjectParams];
+  newSearchProjectParams = [
+    {
+      field: "class_id",
+      value: classArr.length !== 0 ? classArr[0].class_id : "",
+      condition: ConditionEnum.Equal,
+    },
+  ];
   classArr.length !== 0 ? setClassId(classArr[0].class_id) : "";
   setClassObj(classArr.length !== 0 ? classArr[0] : "");
-  let classParams = {
-    key: classArr[0],
-    value: classArr[0].class_code,
-  };
+
   // const { data: projectList } = await axiosClient.post(
   //   "/Project/GetFilterData?sortString=created_date ASC",
   //   newSearchProjectParams
@@ -497,6 +628,9 @@ const fetchFilterAdmin = async (
 };
 
 const fetchFilterDecodeAdmin = async (
+  currentUser,
+  IsAdmin,
+  IsManager,
   searchClassParams,
   searchProjectParams,
   isSelectClass,
@@ -554,6 +688,61 @@ const fetchFilterDecodeAdmin = async (
     key: systemSettingArr[0].setting_id,
     value: systemSettingArr[0].setting_value,
   };
+
+  
+  if (IsManager()) {
+    // newSearchParams = { ...searchParams };
+    const { data: subjectArr } = await axiosClient.post(
+      "/Subject/GetFilterData?sortString=created_date ASC",
+      [
+        {
+          field: "assignee_id",
+          value: currentUser.user_id,
+          condition: ConditionEnum.Equal,
+        },
+      ]
+    );
+
+    if (subjectArr.length !== 0) {
+      subjectArr.map((ele, index) => {
+        if (index === 0) {
+          if (subjectArr.length === 1) {
+            newSearchClassParams.push({
+              field: "subject_id",
+              value: ele.subject_id,
+              condition: ConditionEnum.Equal,
+            });
+          } else {
+            newSearchClassParams.push({
+              field: "subject_id",
+              value: ele.subject_id,
+              condition: ConditionEnum.Equal,
+              operator: FilterOperatorEnum.OR,
+              parenthesis: FilterOperatorEnum.OpenParenthesis,
+            });
+          }
+        }
+        if (index !== 0) {
+          if (index !== subjectArr.length - 1) {
+            newSearchClassParams.push({
+              field: "subject_id",
+              value: ele.subject_id,
+              condition: ConditionEnum.Equal,
+              operator: FilterOperatorEnum.OR,
+            });
+          } else {
+            newSearchClassParams.push({
+              field: "subject_id",
+              value: ele.subject_id,
+              condition: ConditionEnum.Equal,
+              parenthesis: FilterOperatorEnum.CloseParenthesis,
+            });
+          }
+        }
+      });
+    }
+  }
+
   const { data: classArr } = await axiosClient.post(
     "/Class/GetFilterData?sortString=created_date ASC",
     isSelectClass ? searchClassParams : newSearchClassParams
@@ -606,7 +795,7 @@ const fetchFilterDecodeAdmin = async (
       setProjectOpt(projectList);
     }
 
-    console.log(projectDecode);
+    // console.log(projectDecode);
 
     const newSearchWaitingListParams = [
       {
@@ -796,6 +985,181 @@ const fetchFilterStudent = async (
   setLoadingData(true);
 };
 
+const fetchFilterDecodeStudent = async (
+  currentUser,
+  IsStudent,
+  IsTeacher,
+  searchClassParams,
+  searchProjectParams,
+  isSelectClass,
+  setSemesters,
+  setSearchClassParams,
+  setSearchProjectParams,
+  setLoadingSemester,
+  setLoadingSubject,
+  setLoadingClass,
+  setLoadingData,
+  setSubjectOpt,
+  setClassOpt,
+  setClassObj,
+  setProjectOpt,
+  setClassId,
+  searchWaitingListParams,
+  setWaitingListStudents,
+  setSearchWaitingListParams,
+  setLoadingWaitingData,
+  setSearchParamsURL,
+  semesterDecode,
+  subjectDecode,
+  classDecode,
+  projectDecode
+) => {
+  let newSearchClassParams = [];
+  const { data: studentArr } = await axiosClient.post(
+    "/ClassStudent/GetFilterData?sortString=created_date ASC",
+    [
+      {
+        field: "student_id",
+        value: currentUser.user_id,
+        condition: ConditionEnum.Equal,
+      },
+    ]
+  );
+  const { data: systemSettingArr } = await axiosClient.post(
+    `/Setting/GetFilterData?sortString=display_order ASC`,
+    [
+      {
+        field: "data_group",
+        value: "2",
+        condition: ConditionEnum.Equal,
+      },
+      {
+        field: "status",
+        value: StatusEnum.Inactive,
+        condition: ConditionEnum.NotEqual,
+      },
+    ]
+  );
+  setSemesters(systemSettingArr);
+  setLoadingSemester(true);
+
+  newSearchClassParams = [
+    ...searchClassParams,
+    {
+      field: "semester_id",
+      value:
+        systemSettingArr.length !== 0 ? systemSettingArr[0].setting_id : "",
+      condition: ConditionEnum.Equal,
+    },
+  ];
+
+  let classFilter = handleClassFilterCondition(
+    studentArr,
+    currentUser,
+    IsStudent,
+    IsTeacher
+  );
+  classFilter.map((ele) => newSearchClassParams.push(ele));
+
+  const { data: classArr } = await axiosClient.post(
+    "/Class/GetFilterData?sortString=created_date ASC",
+    isSelectClass ? searchClassParams : newSearchClassParams
+  );
+  // console.log(searchClassParams);
+  setClassOpt(classArr[0]);
+  setSearchClassParams(searchClassParams);
+  setLoadingClass(true);
+
+  setSubjectOpt(getUnique(classArr, "subject_id"));
+  setLoadingSubject(true);
+  // console.log(getUnique(classArr, "subject_id"));
+
+  let newSearchProjectParams = [...searchProjectParams];
+  newSearchProjectParams = [
+    {
+      field: "class_id",
+      value: classDecode !== null ? classDecode.class_id : "",
+      condition: ConditionEnum.Equal,
+    },
+  ];
+  let projectFilter = handleProjectFilterCondition(
+    studentArr,
+    currentUser,
+    IsStudent,
+    IsTeacher
+  );
+  projectFilter.map((ele) => newSearchProjectParams.push(ele));
+  // console.log(projectFilter);
+  if (classDecode !== null) {
+    classDecode.teacher_id === currentUser.user_id &&
+      (newSearchProjectParams = [
+        {
+          field: "class_id",
+          value: classDecode.class_id,
+          condition: ConditionEnum.Equal,
+        },
+      ]);
+    console.log(classDecode);
+    if (projectDecode.project_code === "all") {
+      const { data: projectList } = await axiosClient.post(
+        `/Project/GetProjectStudent?class_id=${classDecode.class_id}&sortString=created_date ASC`,
+        newSearchProjectParams
+      );
+      setProjectOpt(projectList);
+    } else {
+      newSearchClassParams.push({
+        field: "project_id",
+        value: projectDecode.project_id,
+        condition: ConditionEnum.Equal,
+      });
+      const { data: projectList } = await axiosClient.post(
+        `/Project/GetProjectStudent?class_id=${classDecode.class_id}&sortString=created_date ASC`,
+        newSearchProjectParams
+      );
+      setProjectOpt(projectList);
+    }
+
+    classDecode !== null ? setClassId(classDecode.class_id) : "";
+    setClassObj(classDecode !== null ? classDecode : "");
+    // const { data: projectList } = await axiosClient.post(
+    //   "/Project/GetFilterData?sortString=created_date ASC",
+    //   newSearchProjectParams
+    // );
+    setSearchProjectParams(newSearchProjectParams);
+
+    const newSearchWaitingListParams = [
+      {
+        field: "project_id",
+        value: "",
+        condition: ConditionEnum.IsNull,
+      },
+      {
+        field: "class_id",
+        value: classDecode !== null ? classDecode.class_id : "",
+        condition: ConditionEnum.Equal,
+      },
+      {
+        field: "status",
+        value: StatusEnum.Inactive,
+        condition: ConditionEnum.NotEqual,
+      },
+    ];
+    const { data, err } = await axiosClient.post(
+      `/ClassStudent/GetFilterData?sortString=created_date ASC`,
+      newSearchWaitingListParams
+    );
+
+    setWaitingListStudents(data);
+    setSearchWaitingListParams(searchWaitingListParams);
+  } else {
+    setProjectOpt([]);
+    setWaitingListStudents([]);
+  }
+
+  // fetchFilterData(searchClassParams);
+  setLoadingWaitingData(true);
+  setLoadingData(true);
+};
 const fetchClassAuth = async (
   classId,
   currentUser,
@@ -886,8 +1250,8 @@ const fetchClassDecodeAuth = async (
   //   );
   //   setClassOpt(classItem);
   //   setClassObj(classItem);
-  // } 
-  console.log(classDecode)
+  // }
+  console.log(classDecode);
   // console.log(classItem)
 
   const { data: projectList } = await axiosClient.post(
@@ -895,10 +1259,11 @@ const fetchClassDecodeAuth = async (
     []
   );
   setProjectOpt(projectList);
-  console.log(projectList);
+  // console.log(projectList);
   setLoadingData(true);
 };
 const fetchProjectAuth = async (
+  projects,
   projectId,
   classId,
   setProjectOpt,
@@ -929,16 +1294,17 @@ const fetchProjectAuth = async (
     `/Project/GetProjectStudent?class_id=${classId}&sortString=created_date ASC`,
     []
   );
-  let projects =
+  let projectArr =
     projectId === "all"
-      ? projectList
-      : projectList.filter((ele) => ele.project_id === projectId);
-  setProjectOpt(projects);
+      ? findDuplicates(projectList, projects, "project_id", "project_id")
+      : findDuplicates(projectList, projects, "project_id", "project_id").filter((ele) => ele.project_id === projectId);
+  setProjectOpt(projectArr);
   // setSearchParamsURL({ project: encodeParam(projects) });
   setLoadingData(true);
 };
 
 const fetchProjectDecodeAuth = async (
+  projects,
   projectId,
   classId,
   setProjectOpt,
@@ -953,12 +1319,17 @@ const fetchProjectDecodeAuth = async (
     `/Project/GetProjectStudent?class_id=${classItem.class_id}&sortString=created_date ASC`,
     []
   );
-  console.log(projectList);
-  let projects =
+  // console.log(projectList);
+  let projectArr =
     projectId === "all"
-      ? projectList
-      : projectList.filter((ele) => ele.project_id === projectId);
-  setProjectOpt(projects);
+      ? findDuplicates(projectList, projects, "project_id", "project_id")
+      : findDuplicates(
+          projectList,
+          projects,
+          "project_id",
+          "project_id"
+        ).filter((ele) => ele.project_id === projectId);
+  setProjectOpt(projectArr);
   // setSearchParamsURL({ project: encodeParam(projects) });
   setLoadingData(true);
 };
@@ -966,6 +1337,7 @@ export {
   fetchFilterAdmin,
   fetchFilterDecodeAdmin,
   fetchFilterStudent,
+  fetchFilterDecodeStudent,
   fetchProjectAdmin,
   fetchProjectStudent,
   fetchClassAuth,

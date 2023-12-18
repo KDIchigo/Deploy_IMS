@@ -26,8 +26,10 @@ import { NewSystemSetting } from "./components/NewSystemSetting/NewSystemSetting
 import { SystemSettingTable } from "./components/SystemSettingTable/SystemSettingTable";
 import { Tooltip } from "antd";
 import { BaseSearchAll } from "src/components/Base/BaseSearch/BaseSearchAll";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import {
+  backDataStateParam,
+  checkCurrentURL,
   decodeParam,
   encodeParam,
   genDataStateParam,
@@ -59,9 +61,11 @@ const filter = {
   condition: ConditionEnum.Equal,
 };
 const SystemSettingListPage = () => {
+  const location = useLocation();
   const [searchParamsURL, setSearchParamsURL] = useSearchParams();
   const searchURLParams = new URLSearchParams(location.search);
   const param = searchURLParams.get("param");
+  const [paramDecode, setParamDecode] = useState(param);
   // const pageNumberURL = searchURLParams.get("pageNumber");
   // const pageSizeURL = searchURLParams.get("pageSize");
   // const sortStringURL = searchURLParams.get("sortString");
@@ -104,7 +108,7 @@ const SystemSettingListPage = () => {
   const [checkedStatus, setCheckedStatus] = useState();
 
   const [searchParams, setSearchParams] = useState(
-    decodeParam(param) === null
+    decodeParam(paramDecode) === null
       ? {
           pageNumber: 1,
           pageSize: 10,
@@ -112,14 +116,14 @@ const SystemSettingListPage = () => {
           filterConditions: [],
         }
       : {
-          pageNumber: decodeParam(param).pageNumber,
-          pageSize: decodeParam(param).pageSize,
-          sortString: decodeParam(param).sortString,
-          filterConditions: decodeParam(param).filterConditions,
+          pageNumber: decodeParam(paramDecode).pageNumber,
+          pageSize: decodeParam(paramDecode).pageSize,
+          sortString: decodeParam(paramDecode).sortString,
+          filterConditions: decodeParam(paramDecode).filterConditions,
         }
   );
 
-  const fetchData = async (searchParams) => {
+  const fetchDataEffect = async (searchParams) => {
     const { data: settingList } = await axiosClient.post(
       "/Setting/GetByPaging",
       searchParams
@@ -127,15 +131,27 @@ const SystemSettingListPage = () => {
     setSettings(settingList);
 
     genDataStateParam(
-      param,
+      paramDecode,
       setCheckedSearchInput,
       "search",
       [],
       searchSetting
     );
-    genDataStateParam(param, setCheckedStatus, "status");
-    genDataStateParam(param, setCheckedSettingGroup, "setting_group");
+    genDataStateParam(paramDecode, setCheckedStatus, "status");
+    genDataStateParam(paramDecode, setCheckedSettingGroup, "setting_group");
+    setSearchParamsURL({ param: encodeParam(searchParams) });
 
+    setLoading(false);
+    setLoadingData(true);
+    setLoadingTable(false);
+    // console.log(settingList.data);
+  };
+  const fetchData = async (searchParams) => {
+    const { data: settingList } = await axiosClient.post(
+      "/Setting/GetByPaging",
+      searchParams
+    );
+    setSettings(settingList);
     setLoading(false);
     setLoadingData(true);
     setLoadingTable(false);
@@ -221,12 +237,72 @@ const SystemSettingListPage = () => {
   };
 
   useEffect(() => {
-    fetchData(searchParams);
+    fetchDataEffect(searchParams);
   }, []);
 
+  const fetchBackData = () => {
+    const params = new URLSearchParams(location.search);
+    const paramFromURL = params.get("param");
+
+    // Nếu filter thay đổi, cập nhật trạng thái của component
+    if (paramDecode !== paramFromURL) {
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedSearchInput,
+        "search",
+        [],
+        searchSetting,
+        "",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedStatus,
+        "status",
+        [],
+        [],
+        "status",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedSettingGroup,
+        "setting_group",
+        settings,
+        [],
+        "data_group",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      // console.log(decodeParam(paramFromURL))
+    } else {
+    genDataStateParam(
+      paramDecode,
+      setCheckedSearchInput,
+      "search",
+      [],
+      searchSetting
+    );
+      genDataStateParam(paramDecode, setCheckedStatus, "status");
+      genDataStateParam(paramDecode, setCheckedSettingGroup, "setting_group");
+    }
+  };
+
+  useEffect(() => {
+    // Xử lý sự thay đổi trong URL
+    fetchBackData();
+  }, [location.search, paramDecode]);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position="setting"
         spin={loadingData}
@@ -295,19 +371,13 @@ const SystemSettingListPage = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-lg-5 col-md-8 mt-sm-0 mt-2    position-relative align-items-center float-end ">
+                    <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 position-relative d-flex align-items-center justify-content-end">
                       {/* <div
                           className=" align-items-center float-end "
                           style={{ marginRight: "10px" }}
                         > */}
-                      <NewSystemSetting
-                        fetchData={fetchData}
-                        searchParams={searchParams}
-                        dataGroup={dataGroup}
-                        settings={settings}
-                      />
                       {/* </div> */}
-                      <div className="col-lg-7 float-end me-4 mt-1 d-flex h-100 justify-content-end">
+                      <div className="col-lg-7 float-end d-flex h-100 justify-content-end">
                         <Tooltip
                           title="Reset"
                           placement="topLeft"
@@ -330,6 +400,12 @@ const SystemSettingListPage = () => {
                           )}
                         </Tooltip>
                       </div>
+                      <NewSystemSetting
+                        fetchData={fetchData}
+                        searchParams={searchParams}
+                        dataGroup={dataGroup}
+                        settings={settings}
+                      />
                     </div>
                   </div>
                 </div>

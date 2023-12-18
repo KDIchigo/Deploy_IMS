@@ -18,6 +18,8 @@ import { HandleAuth } from "src/utils/handleAuth";
 import * as Yup from "yup";
 import "./ClassGeneral.scss";
 import { showErrorMessage } from "src/utils/HandleErrorMessage";
+import { BaseDatePicker } from "src/components/Base/BaseDatePicker/BaseDatePicker";
+import { BaseSelectInput } from "src/components/Base/BaseSelectInput/BaseSelectInput";
 
 export const ClassGeneral = ({
   classObj,
@@ -25,6 +27,12 @@ export const ClassGeneral = ({
   teachers,
   subjects,
   fetchData,
+  loadingSemesterApi,
+  fetchSystemSetting,
+  loadingSubjectApi,
+  fetchSubject,
+  loadingTeacherApi,
+  fetchTeacher,
 }) => {
   // console.log(classObj, semesters, teachers, subjects);
   const navigate = useNavigate();
@@ -38,7 +46,7 @@ export const ClassGeneral = ({
   //   fetchClassData()
   const [loadingData, setLoadingData] = useState(false);
   const [isView, setIsView] = useState(true);
-  const { currentUser } = HandleAuth();
+  const { currentUser, IsTeacher } = HandleAuth();
   const formik = useFormik({
     initialValues: { ...classObj, modified_by: currentUser.email },
     validationSchema: Yup.object({
@@ -92,7 +100,7 @@ export const ClassGeneral = ({
       <form
         onSubmit={formik.handleSubmit}
         autoComplete="off"
-        className=" d-flex flex-column flexGrow_1"
+        className="d-flex flex-column flexGrow_1"
       >
         <h3 className="fw-bold m-0" style={{ paddingBottom: 30 }}>
           Class Details for {classObj.class_code}
@@ -129,20 +137,24 @@ export const ClassGeneral = ({
             </div>
 
             <div className="col-md-6 col-sm-12 px-3">
-              <SelectInputSubject
+              <BaseSelectInput
                 label="Subject Code"
+                type="subject"
                 id="subject_id"
+                placeholder="Subject Code"
                 defaultValue={formik.values.subject_code}
+                options={subjects}
+                loading={loadingSubjectApi}
+                loadingApi={loadingSubjectApi}
+                onClick={fetchSubject}
+                onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 status={
                   formik.errors.subject_id && formik.touched.subject_id
                     ? "error"
                     : ""
                 }
-                placeholder="Subject Code"
-                options={subjects}
                 disabled={isView}
-                onChange={formik.handleChange}
                 important="true"
                 formik={formik}
               />
@@ -153,20 +165,24 @@ export const ClassGeneral = ({
               )}
             </div>
             <div className="col-md-6 col-sm-12 px-3">
-              <SelectInputSetting
+              <BaseSelectInput
                 label="Semester"
+                type="setting"
                 id="semester_id"
-                defaultValue={formik.values.semester_name}
-                onBlur={formik.handleBlur}
                 placeholder="Semester"
+                defaultValue={formik.values.semester_name}
+                loading={loadingSemesterApi}
+                loadingApi={loadingSemesterApi}
+                onClick={fetchSystemSetting}
                 options={semesters}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 disabled={isView}
                 status={
                   formik.errors.semester_id && formik.touched.semester_id
                     ? "error"
                     : ""
                 }
-                onChange={formik.handleChange}
                 important="true"
                 formik={formik}
               />
@@ -177,12 +193,16 @@ export const ClassGeneral = ({
               )}
             </div>
             <div className="col-md-6 col-sm-12 px-3">
-              <SelectInputUser
+              <BaseSelectInput
                 label="Teacher"
+                type="user"
                 id="teacher_id"
                 placeholder="Teacher"
                 defaultValue={formik.values.teacher_name}
                 options={teachers}
+                loading={loadingTeacherApi}
+                loadingApi={loadingTeacherApi}
+                onClick={fetchTeacher}
                 disabled={isView}
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
@@ -234,8 +254,8 @@ export const ClassGeneral = ({
                 type="number"
                 id="class_convert_id"
                 name="class_convert_id"
-                label="Gitlab class(groups) id"
-                placeholder="Gitlab class(groups) id"
+                label="Gitlab Class(groups) ID"
+                placeholder="Gitlab Class(groups) ID"
                 value={formik.values.class_convert_id}
                 readOnly={isView}
                 onChange={formik.handleChange}
@@ -254,6 +274,31 @@ export const ClassGeneral = ({
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
+            <div className="col-md-6 col-sm-12 px-3">
+              <BaseDatePicker
+                id="modified_date"
+                label="Last Update"
+                name="modified_date"
+                className="w-100 px-2 datePicker"
+                defaultValue={formik.values.modified_date}
+                placeholder="It hasn't been updated"
+                value={formik.values.modified_date}
+                onChange={formik.handleChange}
+                disabled={true}
+                classNameInput={
+                  formik.errors.modified_date && formik.touched.modified_date
+                    ? "is-invalid"
+                    : ""
+                }
+                status={
+                  formik.errors.modified_date && formik.touched.modified_date
+                    ? "error"
+                    : ""
+                }
+                formik={formik}
+                onBlur={formik.handleBlur}
+              />
+            </div>
             <div className="col-md-6 col-sm-12 mt-1 px-3">
               {/* <BaseRadio label="Status" important="true" formik={formik} type="status"/> */}
               <BaseRadio
@@ -261,8 +306,10 @@ export const ClassGeneral = ({
                 formik={formik}
                 type="status"
                 feature="class"
-                isLabel={false}
-                disabled={isView}
+                isLabel={true}
+                disabled={isView || IsTeacher()}
+                label="Status"
+                important="true"
               />
             </div>
             <div className="col-md-12 col-sm-12 mt-3 px-3">

@@ -95,8 +95,8 @@ export const ProjectWaitingItem = ({
           status:
             student.status === 1 ? (
               <Badge
-                key="#198754"
-                color="#198754"
+                key="#26BF94"
+                color="#26BF94"
                 text="Active"
                 className="badgeActive"
               />

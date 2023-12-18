@@ -1,5 +1,6 @@
 import {
   CaretDownOutlined,
+  ExportOutlined,
   LoadingOutlined,
   ReloadOutlined,
   SyncOutlined,
@@ -7,13 +8,15 @@ import {
 import { Box, Grid } from "@mui/material";
 import { Empty, Spin, Tooltip } from "antd";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { axiosClient } from "src/axios/AxiosClient";
 import { BaseButton } from "src/components/Base/BaseButton/BaseButton";
 import { BaseFilter } from "src/components/Base/BaseFilter/BaseFilter";
 import { BasePagination } from "src/components/Base/BasePagination/BasePagination";
-import { BaseSearch } from "src/components/Base/BaseSearch/BaseSearch";
+import { BaseSearchAll } from "src/components/Base/BaseSearch/BaseSearchAll";
 import { BaseSelectInput } from "src/components/Base/BaseSelectInput/BaseSelectInput";
+import { ConditionEnum } from "src/enum/Enum";
 import { swalWithBootstrapButtons } from "src/enum/swal";
 import { HandleAuth } from "src/utils/handleAuth";
 import {
@@ -26,9 +29,7 @@ import {
 import { BatchUpdate } from "../BatchUpdate/BatchUpdate";
 import { SearchFilterAll } from "../FilterIssue/SearchFilterAll";
 import { IssueTypeStudent } from "../IssueTypeStudent/IssueTypeStudent";
-import { NewIssueAll } from "../NewIssue/NewIssueAll";
 import "./IssueTypeAll.scss";
-import { BaseSearchAll } from "src/components/Base/BaseSearch/BaseSearchAll";
 const searchIssue = [
   {
     id: "issue_title",
@@ -47,6 +48,7 @@ export const IssueTypeAll = ({
   onChangeProject,
   checkedProject,
 }) => {
+  const navigate = useNavigate();
   const { currentUser } = HandleAuth();
   let defaultSelectProject = undefined;
   if (project !== undefined) {
@@ -123,6 +125,11 @@ export const IssueTypeAll = ({
     }
   };
 
+  const handleCancelBatch = (handleReset) => {
+    handleReset();
+    setOpenBatchUpdate(false);
+  };
+
   const handleBatchUpdate = (listUpdate, handleReset) => {
     swalWithBootstrapButtons
       .fire({
@@ -147,6 +154,8 @@ export const IssueTypeAll = ({
               due_date: select.due_date,
               issue_title: select.issue_title,
               description: select.description,
+              created_date: select.created_date,
+              created_by: select.created_by,
               modified_by: currentUser.email,
               issue_type:
                 listUpdate.issue_type === ""
@@ -264,6 +273,29 @@ export const IssueTypeAll = ({
   const onResetSearchInput = (value) => {
     setCheckedSearchInput(value);
   };
+
+  const handleExportToExcel = async () => {
+    try {
+      // Gọi API để lấy dữ liệu Excel
+      const { data: exportExcel } = await axiosClient.post(
+        "/Issue/Export",
+        [
+          {
+            field: "project_id",
+            value: project.project_id,
+            condition: ConditionEnum.Equal,
+          },
+        ],
+        {
+          responseType: "arraybuffer", // Đảm bảo dữ liệu trả về dưới dạng binary
+        }
+      );
+      exportToExcel(exportExcel, "StudentList.xlsx");
+    } catch (error) {
+      console.error("Fail to download file Excel: ", error);
+    }
+  };
+
   const fetchData = async (searchParams) => {
     const { data: issueArr } = await axiosClient.post(
       `/Issue/getByPaging`,
@@ -285,13 +317,13 @@ export const IssueTypeAll = ({
           {/* <div className="card custom-card mb-0 flexGrow_1">
         <div className="card-body d-flex flex-column flexGrow_1"> */}
           <div className="d-flex">
-            <div className="col-lg-9">
+            <div className="col-lg-8">
               <h3 className="fw-bold m-0" style={{ paddingBottom: 30 }}>
                 Issue List
               </h3>
             </div>
 
-            <div className="col-lg-3 float-end d-flex">
+            <div className="col-lg-4 d-flex align-items-center justify-content-end">
               <BaseSelectInput
                 label="Project"
                 isLabel={false}
@@ -299,7 +331,7 @@ export const IssueTypeAll = ({
                 type="project"
                 defaultValue={defaultSelectProject}
                 placeholder="Project"
-                classNameDiv="col-lg-6 ms-1 "
+                classNameDiv="col-lg-5 ms-3"
                 options={projects}
                 isFilter={true}
                 isFilterIssue={true}
@@ -312,7 +344,7 @@ export const IssueTypeAll = ({
                   color="light"
                   value="Batch Update"
                   // variant="outline"
-                  nameTitle=" ms-4 btn-batch"
+                  nameTitle="ms-4 btn-batch"
                   onClick={() => setOpenBatchUpdate(!openBatchUpdate)}
                 />
               )}
@@ -375,13 +407,14 @@ export const IssueTypeAll = ({
                         <BaseButton
                           value="Filter"
                           color="light"
+                          nameTitle="btnFilter"
                           icon={<CaretDownOutlined />}
                         />
                       }
                       filterBody={
                         <div
                           className="cardDropdown"
-                          style={{ zIndex: 1, width: 400 }}
+                          style={{ zIndex: 1, width: 500 }}
                         >
                           <div className="card custom-card mb-0">
                             <div className="card-body filterCard">
@@ -425,19 +458,8 @@ export const IssueTypeAll = ({
                       onResetSearchInput={onResetSearchInput}
                     />
                   </div>
-                  <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 position-relative align-items-center float-end p-0">
-                    <NewIssueAll
-                      // dataGroup={IssueSettingEnum.WorkProcess}
-                      issues={issues}
-                      searchParams={searchParams}
-                      fetchData={fetchData}
-                      students={students}
-                      milestones={milestones}
-                      projectId={project.project_id}
-                      issueSettings={issueSettings}
-                      issueRequirements={issueRequirements}
-                    />
-                    <div className="col-lg-7 float-end me-4 mt-1 d-flex h-100 justify-content-end flex-row align-items-center">
+                  <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 position-relative d-flex align-items-center justify-content-end p-0">
+                    <div className="col-lg-9 float-end d-flex h-100 justify-content-end">
                       <Tooltip
                         title="Reset"
                         placement="top"
@@ -477,7 +499,37 @@ export const IssueTypeAll = ({
                           onClick={() => handleIssuesSynchronize(project)}
                         />
                       </div>
+                      <div>
+                        <BaseButton
+                          color="success"
+                          variant="outline"
+                          value="Export"
+                          nameTitle="ms-2 px-3"
+                          isIconLeft={true}
+                          icon={<ExportOutlined />}
+                          onClick={() => handleExportToExcel()}
+                        />
+                      </div>
                     </div>
+                    <BaseButton
+                      nameTitle="my-auto ms-3 px-3 py-2 col-lg-3 col-md-3 mb-1 float-end addNewBtn"
+                      onClick={() =>
+                        navigate(`/new-issue/${project.project_id}`)
+                      }
+                      color="warning"
+                      value="Add New"
+                    />
+                    {/* <NewIssueAll
+                      // dataGroup={IssueSettingEnum.WorkProcess}
+                      issues={issues}
+                      searchParams={searchParams}
+                      fetchData={fetchData}
+                      students={students}
+                      milestones={milestones}
+                      projectId={project.project_id}
+                      issueSettings={issueSettings}
+                      issueRequirements={issueRequirements}
+                    /> */}
                   </div>
                 </div>
 
@@ -553,8 +605,8 @@ export const IssueTypeAll = ({
               <div
                 className={
                   openBatchUpdate
-                    ? "col-3 d-flex flex-column widthBatchUpdate mx-2 ps-3"
-                    : "col-3 d-flex flex-column widthUnBatchUpdate d-none mx-2 ps-3"
+                    ? "col-3 d-flex flex-column flexGrow_1 widthBatchUpdate mx-2 ps-3"
+                    : "col-3 d-flex flex-column flexGrow_1 widthUnBatchUpdate d-none mx-2 ps-3"
                 }
               >
                 <BatchUpdate
@@ -563,6 +615,7 @@ export const IssueTypeAll = ({
                   milestones={milestones}
                   handleBatchUpdate={handleBatchUpdate}
                   handleAssigneeValue={handleAssigneeValue}
+                  handleCancelBatch={handleCancelBatch}
                   assigneeValue={assigneeValue}
                 />
               </div>

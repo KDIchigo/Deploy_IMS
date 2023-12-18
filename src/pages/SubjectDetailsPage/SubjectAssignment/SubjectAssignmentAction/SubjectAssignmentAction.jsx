@@ -120,7 +120,7 @@ export const SubjectAssignmentAction = ({
         {option.status === 0 && (
           <>
             <Tooltip
-              title="Active"
+              title="Activate"
               className="action_space"
               placement="top"
               color="#198754"
@@ -179,7 +179,7 @@ export const SubjectAssignmentAction = ({
         {option.status === 1 && (
           <>
             <Tooltip
-              title="Inactive"
+              title="Deactivate"
               className="action_space"
               placement="top"
               color="#dc3545"

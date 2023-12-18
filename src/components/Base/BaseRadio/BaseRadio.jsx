@@ -16,19 +16,17 @@ export const BaseRadio = ({
       {isLabel ? (
         <label htmlFor="input-placeholder" className="form-label me-2">
           {label}
-          {important === "true" ? (
+          {important === "true" && (
             <span className="ms-1" style={{ color: "red" }}>
               *
             </span>
-          ) : (
-            ""
           )}
         </label>
       ) : (
         ""
       )}
 
-      <div className="input-group">
+      <div className="input-group mt-1">
         <Radio.Group disabled={disabled}
           onChange={(e) => {
             formik.setFieldValue(`${type}`, e.target.value);

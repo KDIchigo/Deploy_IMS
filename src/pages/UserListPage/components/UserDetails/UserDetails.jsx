@@ -14,6 +14,7 @@ import { swalWithBootstrapButtons } from "src/enum/Swal";
 import * as Yup from "yup";
 import "./UserDetails.scss";
 import { showErrorMessage } from "src/utils/HandleErrorMessage";
+import { BaseDatePicker } from "src/components/Base/BaseDatePicker/BaseDatePicker";
 const status = [
   {
     value: 1,
@@ -37,7 +38,10 @@ export const UserDetails = ({
   user,
   fetchData,
   searchParams,
+  loadingSettingApi,
+  fetchDataSelect,
   code,
+  param,
 }) => {
   const toggle = () => {
     setModal(!modal);
@@ -99,12 +103,13 @@ export const UserDetails = ({
           reverseButtons: true,
         })
         .then(async (result) => {
-          console.log(result);
+          // console.log(result);
+          let { modified_date, ...newValues } = values;
           if (result.isConfirmed) {
             setLoadingData(true);
             const { data, err } = await axiosClient.put(
               `/User/${user.user_id}`,
-              values
+              newValues
             );
             if (err) {
               // toast.error(`The user named ${code} was updated fail!`);
@@ -142,7 +147,7 @@ export const UserDetails = ({
             className="row"
             style={loadingData ? { pointerEvents: "none" } : {}}
           >
-            <div className="col-md-12 col-sm-12 px-3">
+            <div className="col-md-6 col-sm-12 px-3">
               <BaseInputField
                 type="text"
                 id="fullname"
@@ -217,7 +222,12 @@ export const UserDetails = ({
                 type="setting"
                 id="setting_id"
                 defaultValue={formik.values.setting_value}
+                loadingSettingApi={loadingSettingApi}
+                loading={loadingSettingApi}
+                onClick={fetchDataSelect}
+                param={param}
                 options={roles}
+                disabled={true}
                 onChange={formik.handleChange}
                 placeholder="Role"
                 onBlur={formik.handleBlur}
@@ -235,16 +245,42 @@ export const UserDetails = ({
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
-            <div className="col-md-6 col-sm-12 px-3 mt-3">
+            <div className="col-md-6 col-sm-12 px-3">
+              <BaseDatePicker
+                id="modified_date"
+                label="Last Update"
+                name="modified_date"
+                className="w-100 px-2 datePicker"
+                defaultValue={formik.values.modified_date}
+                placeholder="It hasn't been updated"
+                value={formik.values.modified_date}
+                onChange={formik.handleChange}
+                disabled={true}
+                classNameInput={
+                  formik.errors.modified_date && formik.touched.modified_date
+                    ? "is-invalid"
+                    : ""
+                }
+                status={
+                  formik.errors.modified_date && formik.touched.modified_date
+                    ? "error"
+                    : ""
+                }
+                formik={formik}
+                onBlur={formik.handleBlur}
+              />
+            </div>
+            <div className="col-md-6 col-sm-12 px-3">
               <BaseRadio
                 value={formik.values.status}
                 formik={formik}
                 type="status"
                 isLabel={true}
+                label="Status"
+                important="true"
               />
-              {/* <BaseCheckbox formik={formik} type="status" /> */}
             </div>
-            <div className="col-md-12 col-sm-12 px-3 mt-1">
+            <div className="col-md-12 mt-2 col-sm-12 px-3 mt-1">
               <BaseTextArea
                 formik={formik}
                 label="Note"

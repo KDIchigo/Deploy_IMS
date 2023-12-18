@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { store } from "./app/store";
 import { Role } from "./enum/Role";
+import { Layout } from "./layout/Layout";
 import { ClassDetailsGeneral } from "./pages/ClassDetailsPage/ClassDetailsGeneral";
 import { ClassDetailsMilestone } from "./pages/ClassDetailsPage/ClassDetailsMilestone";
 import { ClassDetailsPage } from "./pages/ClassDetailsPage/ClassDetailsPage";
@@ -19,6 +20,7 @@ import { ForgotPassword } from "./pages/ForgotPassword/ForgotPassword";
 import { IssueDetailsPage } from "./pages/IssueDetailsPage/IssueDetailsPage";
 import { FilterIssue } from "./pages/IssueListPage/FilterIssue/FilterIssue";
 import { IssueListPage } from "./pages/IssueListPage/IssueListPage";
+import { IssueNewPage } from "./pages/IssueNewPage/IssueNewPage";
 import { LandingPage } from "./pages/LandingPage/LandingPage";
 import ProjectDashboard from "./pages/ProjectDashboard/ProjectDashboard";
 import { ProjectDetailsMember } from "./pages/ProjectDetailsPage/ProjectDetailsMember";
@@ -34,18 +36,18 @@ import { SubjectListPage } from "./pages/SubjectListPage/SubjectListPage";
 import SystemSettingListPage from "./pages/SystemSettingListPage/SystemSettingListPage";
 import UserDashboard from "./pages/UserDashboard/UserDashboard";
 import { UserListPage } from "./pages/UserListPage/UserListPage";
+import YourComponent from "./pages/UserListPage/YourComponent";
 import UserLoginPage from "./pages/UserLoginPage/UserLoginPage";
 import { UserProfilePage } from "./pages/UserProfilePage/UserProfilePage";
 import UserRegisterPage from "./pages/UserRegisterPage/UserRegisterPage";
 import { AuthoRoutes } from "./routes/AuthoRoutes";
 import { PrivateRoute } from "./routes/PrivateRoute";
-import YourComponent from "./pages/ProjectListPage/MyDropdown";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <BrowserRouter>
       <Routes>
-        {/* <Route path="/" element={<Layout />}> */}
+        <Route path="/" element={<Layout />}>
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/sign-in" element={<UserLoginPage />} />
         <Route path="/register" element={<UserRegisterPage />} />
@@ -54,10 +56,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/access-denied" element={<AccessDenied />} />
         <Route path="/not-found" element={<NotFound />} />
         <Route index element={<LandingPage />} />
-        <Route path="/filter" element={<FilterIssue />} />
-        <Route path="/demo" element={<YourComponent />}/>
+        {/* <Route path="/filter" element={<FilterIssue />} /> */}
+        {/* <Route path="/demo" element={<YourComponent />} /> */}
         <Route path="/" element={<PrivateRoute />}>
-
           <Route
             path="/user-list"
             element={
@@ -279,14 +280,31 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               />
             }
           />
-          <Route path="/user-profile" element={<UserProfilePage />} />
-
           <Route
-            path="/system-setting-list"
+            path="/new-issue/:projectId"
             element={
               <AuthoRoutes
-                element={<SystemSettingListPage />}
-                listRole={[Role.Admin]}
+                element={<IssueNewPage />}
+                listRole={[
+                  Role.Student,
+                  Role.Teacher,
+                  Role.Manager,
+                  Role.Admin,
+                ]}
+              />
+            }
+          />
+          <Route
+            path="/new-issue/:projectId/:issueTypeId"
+            element={
+              <AuthoRoutes
+                element={<IssueNewPage />}
+                listRole={[
+                  Role.Student,
+                  Role.Teacher,
+                  Role.Manager,
+                  Role.Admin,
+                ]}
               />
             }
           />
@@ -304,14 +322,23 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               />
             }
           />
-
+          <Route path="/user-profile" element={<UserProfilePage />} />
+          <Route
+            path="/system-setting-list"
+            element={
+              <AuthoRoutes
+                element={<SystemSettingListPage />}
+                listRole={[Role.Admin]}
+              />
+            }
+          />
           <Route path="/user-dashboard" element={<UserDashboard />} />
           <Route
             path="/project-dashboard/:projectId"
             element={<ProjectDashboard />}
           />
         </Route>
-        {/* </Route> */}
+        </Route>
       </Routes>
     </BrowserRouter>
   </Provider>

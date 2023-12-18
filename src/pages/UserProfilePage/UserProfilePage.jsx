@@ -49,11 +49,11 @@ export const UserProfilePage = () => {
 
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         spin={true}
         dashboardBody={
-          <div className="py-3 d-flex flex-column flexGrow_1">
+          <div className="pt-3 d-flex flex-column flexGrow_1">
             <div className="col-xl-12">
               <div className="card custom-card">
                 <div className="card-body">

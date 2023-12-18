@@ -246,12 +246,14 @@ export const NewClassStudent = ({
                     <p className="hiddenMsg">acb</p>
                   )}
                 </div> */}
-                <div className="col-md-6 col-sm-12 mt-3">
+                <div className="col-md-6 col-sm-12">
                   <BaseRadio
                     value={formik.values.status}
                     formik={formik}
                     type="status"
                     isLabel={true}
+                    label="Status"
+                    important="true"
                   />
                   {/* <BaseCheckbox formik={formik} type="status" /> */}
                 </div>

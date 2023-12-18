@@ -18,6 +18,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { VerifyEmail } from "./VerifyEmail/VerifyEmail";
 import { ConditionEnum } from "src/enum/Enum";
 import { Spin } from "antd";
+import { LoginWithGoogle } from "../UserLoginPage/components/LoginWithGoogle/LoginWithGoogle";
 
 const UserRegisterPage = () => {
   const [loadingData, setLoadingData] = useState(false);
@@ -152,12 +153,12 @@ const UserRegisterPage = () => {
                   style={loadingData ? { pointerEvents: "none" } : {}}
                 >
                   <div className="d-flex flex-row mt-4 mb-3">
-                    <MDBIcon
-                      fas
-                      icon="cubes fa-3x me-3"
-                      style={{ color: "#ff6219" }}
+                    <img
+                      width={60}
+                      height={60}
+                      src="https://firebasestorage.googleapis.com/v0/b/imsavatar-31182.appspot.com/o/files%2FSyncImageIMS%2FLogo%20IMS.png?alt=media&token=f84ca891-2f0f-4358-9eaa-97b2fca2cabe"
                     />
-                    <span className="h1 fw-bold mb-0">IMS</span>
+                    <span className="h1 fw-bold mb-0 mt-3 ms-2">IMS</span>
                   </div>
                   {/* <div className="d-flex flex-row ">
                     <p className="lead fw-normal mb-0">Sign in with</p>
@@ -312,15 +313,8 @@ const UserRegisterPage = () => {
                   <div className="divider d-flex align-items-center mb-2 mt-2 ">
                     <p className="text-center  mx-3 mb-2">OR</p>
                   </div>
-                  <div>
-                    {" "}
-                    <BaseButton
-                      color="danger"
-                      value="LOGIN WITH GOOGLE"
-                      variant="outline"
-                      nameTitle="login-form-button mb-1"
-                    />
-                  </div>
+
+                  <LoginWithGoogle />
                   {/* <GoogleLogin
           clientId={clientId}
           buttonText="Login"

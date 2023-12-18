@@ -7,4 +7,9 @@ const showErrorMessage = (err) => {
     toast.error(`${values.join(", ")}`);
   });
 };
-export { showErrorMessage };
+
+const isErrorMessageEmpty = (err) => {
+  return Object.keys(err.response.data.Error).length === 0;
+};
+
+export { showErrorMessage, isErrorMessageEmpty};

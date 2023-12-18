@@ -70,38 +70,28 @@ export const NewSystemSetting = ({
     },
     validationSchema: Yup.object({
       setting_value: Yup.string()
-        .required("Setting Value is required")
+        // .required("Setting Value is required")
         .max(255, "Setting Value must be lower than 255 characters"),
-      // .test(
-      //   "is-valid-postal-code",
-      //   "Phone must be a valid phone number and have 10 digits",
-      //   function (value) {
-      //     if (domainValidate === "domain") {
-      //       const postalCodePattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-      //       if (!postalCodePattern.test(value)) {
-      //         return false; // Validation failed
-      //       }
-      //     }
-      //     return true;
-      //   }
-      // ),
       display_order: Yup.string()
         .required("Display Order is required")
         .matches(
           /^[0-9]+$/,
           "Display Order must be numbers not contain characters"
         ),
-      // .test(
-      //   "is-valid-postal-code",
-      //   "Phone must be a valid phone number and have 10 digits",
-      //   function (value) {
-      //     if (value === 3) {
-      //       setDomainValidate("domain");
-      //     }
-      //     return true;
-      //   }
-      // ),
     }),
+    validate: (values) => {
+      const errors = {};
+      if (values.setting_value === "") {
+        errors.setting_value = "Setting Value is required";
+      }
+      if (parseInt(values.data_group,10) === 3) {
+        const postalCodePattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+        if (!postalCodePattern.test(values.setting_value)) {
+          errors.setting_value = "Setting Value is valid email address";
+        }
+      }
+      return errors;
+    },
     onSubmit: async (values) => {
       setLoadingData(true);
       const { err } = await axiosClient.post(`/Setting`, values);
@@ -168,7 +158,7 @@ export const NewSystemSetting = ({
 
             <div className="col-md-6 col-sm-12 px-3">
               <SelectInputSettingGroup
-                label="Data Group"
+                label="Setting Group"
                 id="data_group"
                 defaultValue={formik.values.data_group}
                 options={data_group}
@@ -178,7 +168,7 @@ export const NewSystemSetting = ({
                 dataGroup={dataGroup}
                 settings={settings}
                 isFilter={false}
-                placeholder="Data Group"
+                placeholder="Setting Group"
                 // handleCheckDomain={handleCheckDomain}
                 status={
                   formik.errors.data_group && formik.touched.data_group
@@ -217,12 +207,14 @@ export const NewSystemSetting = ({
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
-            <div className="col-md-6 col-sm-12 mt-3 px-3">
+            <div className="col-md-6 col-sm-12 px-3">
               <BaseRadio
                 value={formik.values.status}
                 formik={formik}
                 type="status"
                 isLabel={true}
+                label="Status"
+                important="true"
               />
             </div>
             <div className="col-md-12 col-sm-12 mt-0 px-3">

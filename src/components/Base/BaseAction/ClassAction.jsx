@@ -15,6 +15,7 @@ import { BaseButton } from "src/components/Base/BaseButton/BaseButton";
 import { StatusEnum } from "src/enum/Enum";
 import { swalWithBootstrapButtons } from "src/enum/swal";
 import { showErrorMessage } from "src/utils/HandleErrorMessage";
+import { HandleAuth } from "src/utils/handleAuth";
 export const ClassAction = ({
   option,
   optionId,
@@ -28,6 +29,7 @@ export const ClassAction = ({
   code,
 }) => {
   const [modal, setModal] = useState(false);
+  const { IsTeacher } = HandleAuth();
   const [loadingData, setLoadingData] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(null);
 
@@ -153,6 +155,7 @@ export const ClassAction = ({
               {loadingStatus === 0 ? (
                 <BaseButton
                   color="danger"
+                  disabled={IsTeacher()}
                   variant="outline"
                   nameTitle="px-2 py-1"
                   icon={<LoadingOutlined />}
@@ -161,6 +164,7 @@ export const ClassAction = ({
                 <BaseButton
                   icon={<StopOutlined />}
                   variant="outline"
+                  disabled={IsTeacher()}
                   color="danger"
                   nameTitle="px-2 py-1"
                   onClick={() =>
@@ -186,6 +190,7 @@ export const ClassAction = ({
                 {loadingStatus === 2 ? (
                   <BaseButton
                     color="pending"
+                    disabled={IsTeacher()}
                     variant="outline"
                     nameTitle="px-2 py-1"
                     icon={<LoadingOutlined />}
@@ -194,6 +199,7 @@ export const ClassAction = ({
                   <BaseButton
                     icon={<PauseCircleOutlined />}
                     variant="outline"
+                    disabled={IsTeacher()}
                     color="pending"
                     nameTitle="px-2 py-1"
                     onClick={() =>
@@ -214,6 +220,7 @@ export const ClassAction = ({
                 {loadingStatus === 1 ? (
                   <BaseButton
                     color="success"
+                    disabled={IsTeacher()}
                     variant="outline"
                     nameTitle="px-2 py-1"
                     icon={<LoadingOutlined />}
@@ -222,6 +229,7 @@ export const ClassAction = ({
                   <BaseButton
                     icon={<PoweroffOutlined />}
                     variant="outline"
+                    disabled={IsTeacher()}
                     color="success"
                     nameTitle="px-2 py-1"
                     onClick={() =>
@@ -248,6 +256,7 @@ export const ClassAction = ({
                 {loadingStatus === 1 ? (
                   <BaseButton
                     color="success"
+                    disabled={IsTeacher()}
                     variant="outline"
                     nameTitle="px-2 py-1"
                     icon={<LoadingOutlined />}
@@ -256,6 +265,7 @@ export const ClassAction = ({
                   <BaseButton
                     icon={<PoweroffOutlined />}
                     variant="outline"
+                    disabled={IsTeacher()}
                     color="success"
                     nameTitle="px-2 py-1"
                     onClick={() =>
@@ -276,6 +286,7 @@ export const ClassAction = ({
                 {loadingData ? (
                   <BaseButton
                     color="danger"
+                    disabled={IsTeacher()}
                     variant="outline"
                     nameTitle="px-2 py-1"
                     icon={<LoadingOutlined />}
@@ -283,6 +294,7 @@ export const ClassAction = ({
                 ) : (
                   <BaseButton
                     color="danger"
+                    disabled={IsTeacher()}
                     variant="outline"
                     nameTitle="px-2 py-1"
                     onClick={() => handleDelete(option.class_id)}

@@ -6,12 +6,13 @@ import { useSearchParams } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { axiosClient } from "src/axios/AxiosClient";
 import { NavbarDashboard } from "src/components/NavbarDashboard/NavbarDashboard";
-import { ConditionEnum } from "src/enum/Enum";
+import { ConditionEnum, FilterOperatorEnum } from "src/enum/Enum";
 import { Role } from "src/enum/Role";
 import { AuthoComponentRoutes } from "src/routes/AuthoComponentRoutes";
 import { HandleAuth } from "src/utils/handleAuth";
 import {
   decodeParam,
+  encodeParam,
   genDataStateParam,
   genFilterDataStateParam,
   genFilterDateDataStateParam,
@@ -64,13 +65,26 @@ export const ProjectDetailsMilestone = () => {
   const [searchParams, setSearchParams] = useState(
     decodeParam(param) === null ? [] : decodeParam(param)
   );
-console.log(decodeParam(from_date))
-console.log(decodeParam(to_date))
+// console.log(decodeParam(from_date))
+// console.log(decodeParam(to_date))
   const fetchDataSelect = async () => {
     const { data: projectObj } = await axiosClient.get(`Project/${projectId}`);
     setProject(projectObj);
 
     let newSearchParams = [
+      {
+        field: "is_customized",
+        value: true,
+        condition: ConditionEnum.Equal,
+        operator: FilterOperatorEnum.OR,
+        parenthesis: FilterOperatorEnum.OpenParenthesis
+      },
+      {
+        field: "is_editable",
+        value: 0,
+        condition: ConditionEnum.Equal,
+        parenthesis: FilterOperatorEnum.CloseParenthesis
+      },
       {
         field: "class_id",
         value: projectObj.class_id,
@@ -82,15 +96,12 @@ console.log(decodeParam(to_date))
       //   condition: ConditionEnum.Equal,
       // },
       {
-        field: "is_editable",
-        value: 0,
-        condition: ConditionEnum.Equal,
-      },
-      {
         field: "project_id",
-        value: "",
-        condition: ConditionEnum.IsNull,
+        value: projectId,
+        condition: ConditionEnum.Equal,
+        operator: FilterOperatorEnum.AND
       },
+
     ];
     const { data: milestoneClass } = await axiosClient.post(
       "/Milestone/GetFilterData?sortString=created_date ASC",
@@ -115,9 +126,10 @@ console.log(decodeParam(to_date))
     genFilterDateDataStateParam(to_date, setCheckedFromDate, "from_date");
     genFilterDateDataStateParam(from_date, setCheckedToDate, "to_date");
     genFilterDataStateParam(param, setCheckedStatus, "status_inProgress");
+    setSearchParamsURL({ param: encodeParam(newSearchParams) });
     setLoadingData(true);
   };
-  console.log(decodeParam(param));
+  // console.log(decodeParam(param));
   const onChange = (key) => {
     switch (key) {
       case "1":
@@ -139,7 +151,7 @@ console.log(decodeParam(to_date))
   }, []);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position={IsStudent() ? "project-student-milestones" : "project"}
         spin={loadingData}

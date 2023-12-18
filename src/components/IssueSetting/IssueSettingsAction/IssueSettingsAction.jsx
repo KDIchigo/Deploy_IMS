@@ -100,7 +100,7 @@ export const IssueSettingsAction = ({
   };
   return (
     <>
-      <div className="d-flex justify-content-around">
+      <div className="d-flex bd-highlight mx-auto">
         <IssueSettingDetails
           issueSetting={option}
           fetchData={fetchData}
@@ -114,7 +114,7 @@ export const IssueSettingsAction = ({
         {option.status === 1 && (
           <Tooltip
             className="action_space"
-            title="Inactive"
+            title="Deactivate"
             placement="top"
             color="#dc3545"
             size="large"
@@ -152,7 +152,7 @@ export const IssueSettingsAction = ({
           <>
             <Tooltip
               className="action_space"
-              title="Active"
+              title="Activate"
               placement="top"
               color="#198754"
               size="large"

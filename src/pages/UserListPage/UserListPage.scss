@@ -36,7 +36,31 @@
 .iconActive {
   color: rgba(67, 67, 241, 0.308);
 }
-.btnFilter{
-  height: 34px !important;
-  width: 100px !important;
+
+
+//  -------------------------------------------
+
+.demo {
+  .ant-collapse-header {
+    width: 100%;
+    .ant-collapse-header-text {
+      margin-inline-end: initial !important;
+      width: 50% !important;
+    }
+
+    .ant-collapse-extra {
+      margin-inline-end: initial !important;
+      width: 50% !important;
+
+      span:nth-child(1) {
+        width: 50%;
+      }
+      span:nth-child(2) {
+        width: 25%;
+      }
+      span:nth-child(3) {
+        width: 25%;
+      }
+    }
+  }
 }

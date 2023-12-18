@@ -140,14 +140,19 @@ export const ClassMilestones = ({
 
   const handleSaveFilter = () => {
     setLoadingTable(true);
-    saveFilter(searchParams, setSearchParams, fetchData,
-      setSearchParamsURL);
+    saveFilter(searchParams, setSearchParams, fetchData, setSearchParamsURL);
   };
 
   const onSearchAll = (filter, options) => {
     setLoadingTable(true);
-    searchAllUtils(filter, options, searchParams, setSearchParams, fetchData,
-      setSearchParamsURL);
+    searchAllUtils(
+      filter,
+      options,
+      searchParams,
+      setSearchParams,
+      fetchData,
+      setSearchParamsURL
+    );
   };
   const onFilter = (filter) => {
     filterUtils(filter, searchParams, setSearchParams, fetchData);
@@ -231,7 +236,7 @@ export const ClassMilestones = ({
         <div className="row">
           <div className="row p-0 m-0  mb-4 align-items-center justify-content-between ">
             <h3 className="fw-bold m-0 " style={{ paddingBottom: 20 }}>
-              Milestone for {classObj.class_code}
+              Milestones for Class {classObj.class_code}
             </h3>
             <div className="col-lg-7 col-md-3 my-auto">
               <div className="d-flex p-0 m-0">
@@ -283,15 +288,8 @@ export const ClassMilestones = ({
                 />
               </div>
             </div>
-            <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 px-2 position-relative align-items-center float-end ">
-              <NewClassMilestone
-                classId={classId}
-                classObj={classObj}
-                fetchData={fetchData}
-                searchParams={searchParams}
-              />
-              {/* </div> */}
-              <div className="col-lg-7 float-end me-4 mt-1 d-flex h-100 justify-content-end">
+            <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 px-2 position-relative d-flex align-items-center justify-content-end">
+              <div className="col-lg-7 float-end d-flex h-100 justify-content-end">
                 <Tooltip
                   title="Reset"
                   placement="top"
@@ -314,6 +312,12 @@ export const ClassMilestones = ({
                   )}
                 </Tooltip>
               </div>
+              <NewClassMilestone
+                classId={classId}
+                classObj={classObj}
+                fetchData={fetchData}
+                searchParams={searchParams}
+              />
             </div>
           </div>
         </div>

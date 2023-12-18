@@ -18,6 +18,13 @@ export const ClassDetailsGeneral = () => {
   const [teachers, setTeachers] = useState([]);
   const [spin, setSpin] = useState(false);
 
+  const [loadingSemesterApi, setLoadingSemesterApi] = useState(false);
+  const [isCallSemesters, setIsCallSemesters] = useState(false);
+  const [loadingSubjectApi, setLoadingSubjectApi] = useState(false);
+  const [isCallSubjects, setIsCallSubjects] = useState(false);
+  const [loadingTeacherApi, setLoadingTeacherApi] = useState(false);
+  const [isCallTeachers, setIsCallTeachers] = useState(false);
+
   const fetchData = async () => {
     const { data: classById } = await axiosClient.get(`/Class/${classId}`);
     setClassObj(classById);
@@ -69,68 +76,83 @@ export const ClassDetailsGeneral = () => {
       ]
     );
     setTeachers(userArr);
-    setLoadingData(true);
+    // setLoadingData(true);
     setLoadingSelect(true);
   };
 
   const fetchSystemSetting = async () => {
-    const { data: systemSettingArr } = await axiosClient.post(
-      `/Setting/GetFilterData?sortString=display_order ASC`,
-      [
-        {
-          field: "data_group",
-          value: "2",
-          condition: ConditionEnum.Equal,
-        },
-        {
-          field: "status",
-          value: StatusEnum.Active,
-          condition: ConditionEnum.Equal,
-        },
-      ]
-    );
-    setSemesters(systemSettingArr);
+    if (!isCallSemesters) {
+      setLoadingSemesterApi(true);
+      const { data: systemSettingArr } = await axiosClient.post(
+        `/Setting/GetFilterData?sortString=display_order ASC`,
+        [
+          {
+            field: "data_group",
+            value: "2",
+            condition: ConditionEnum.Equal,
+          },
+          {
+            field: "status",
+            value: StatusEnum.Active,
+            condition: ConditionEnum.Equal,
+          },
+        ]
+      );
+      setSemesters(systemSettingArr);
+      setIsCallSemesters(true);
+      setLoadingSemesterApi(false);
+    }
   };
   const fetchSubject = async () => {
-    const { data: subjectArr } = await axiosClient.post(
-      "/Subject/GetFilterData?sortString=created_date ASC",
-      [
-        {
-          field: "status",
-          value: StatusEnum.Active,
-          condition: ConditionEnum.Equal,
-        },
-      ]
-    );
-    setSubjects(subjectArr);
+    if (!isCallSubjects) {
+      setLoadingSubjectApi(true);
+      const { data: subjectArr } = await axiosClient.post(
+        "/Subject/GetFilterData?sortString=created_date ASC",
+        [
+          {
+            field: "status",
+            value: StatusEnum.Active,
+            condition: ConditionEnum.Equal,
+          },
+        ]
+      );
+      setSubjects(subjectArr);
+      setIsCallSubjects(true);
+      setLoadingSubjectApi(false);
+    }
   };
   const fetchTeacher = async () => {
-    const { data: roleList } = await axiosClient.post(
-      `/Setting/GetFilterData?sortString=created_date ASC`,
-      [
-        {
-          field: "setting_value",
-          value: "Teacher",
-          condition: ConditionEnum.Equal,
-        },
-      ]
-    );
-    const { data: userArr } = await axiosClient.post(
-      "/User/GetFilterData?sortString=created_date ASC",
-      [
-        {
-          field: "setting_id",
-          value: roleList[0].setting_id,
-          condition: ConditionEnum.Equal,
-        },
-        {
-          field: "status",
-          value: StatusEnum.Active,
-          condition: ConditionEnum.Equal,
-        },
-      ]
-    );
-    setTeachers(userArr);
+    if (!isCallTeachers) {
+      setLoadingTeacherApi(true);
+      const { data: roleList } = await axiosClient.post(
+        `/Setting/GetFilterData?sortString=created_date ASC`,
+        [
+          {
+            field: "setting_value",
+            value: "Teacher",
+            condition: ConditionEnum.Equal,
+          },
+        ]
+      );
+      const { data: userArr } = await axiosClient.post(
+        "/User/GetFilterData?sortString=created_date ASC",
+        [
+          {
+            field: "setting_id",
+            value: roleList[0].setting_id,
+            condition: ConditionEnum.Equal,
+          },
+          {
+            field: "status",
+            value: StatusEnum.Active,
+            condition: ConditionEnum.Equal,
+          },
+        ]
+      );
+      setTeachers(userArr);
+      setIsCallTeachers(true);
+      setLoadingTeacherApi(false);
+    }
   };
   const fetchDataAndSelect = async () => {
     await Promise.all([
@@ -159,12 +181,11 @@ export const ClassDetailsGeneral = () => {
     }
   };
   useEffect(() => {
-    fetchDataAndSelect();
+    fetchData();
   }, []);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
-
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position="class"
         spin={loadingData}
@@ -181,16 +202,20 @@ export const ClassDetailsGeneral = () => {
                   <div className="flex_height">
                     <div className="card custom-card mb-0 flex_height">
                       <div className="card-body flex_height">
-                        {loadingData ? (
+                        {loadingData && (
                           <ClassGeneral
                             classObj={classObj}
                             semesters={semesters}
                             teachers={teachers}
                             subjects={subjects}
                             fetchData={fetchData}
+                            loadingSemesterApi={loadingSemesterApi}
+                            fetchSystemSetting={fetchSystemSetting}
+                            loadingSubjectApi={loadingSubjectApi}
+                            fetchSubject={fetchSubject}
+                            loadingTeacherApi={loadingTeacherApi}
+                            fetchTeacher={fetchTeacher}
                           />
-                        ) : (
-                          ""
                         )}
                       </div>
                     </div>

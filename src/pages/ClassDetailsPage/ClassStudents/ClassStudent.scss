@@ -1,5 +1,8 @@
-.dropdownStudent > .ant-space-item {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: row;
+.dropdownStudent {
+    .ant-space-item {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
 }

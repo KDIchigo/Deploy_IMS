@@ -81,22 +81,15 @@ export const ProjectWaitingList = ({
   //   setSearchParams(newSearchParams);
   //   setLoadingData(true);
   // };
-  const genExtra = () => (
-    <SettingOutlined
-      onClick={(event) => {
-        // If you don't want click extra trigger collapse, you can prevent this:
-        event.stopPropagation();
-      }}
-    />
-  );
-  let items = [
-    {
-      key: "0",
-      label: "Waiting List (These trainees would work personally)",
-      children: <ProjectStudentItem isWaitingList={true} />,
-      extra: genExtra(),
-    },
-  ];
+  // const genExtra = () => (
+  //   <SettingOutlined
+  //     onClick={(event) => {
+  //       // If you don't want click extra trigger collapse, you can prevent this:
+  //       event.stopPropagation();
+  //     }}
+  //   />
+  // );
+
   const onChange = (key) => {
     console.log(key);
   };
@@ -131,12 +124,12 @@ export const ProjectWaitingList = ({
                   onPageChange={onPageChange}
                 />
               ),
-              extra: (
-                <AuthoComponentRoutes
-                  element={genExtra()}
-                  listRole={[Role.Manager, Role.Admin, Role.Teacher]}
-                />
-              ),
+              // extra: (
+              //   <AuthoComponentRoutes
+              //     element={genExtra()}
+              //     listRole={[Role.Manager, Role.Admin, Role.Teacher]}
+              //   />
+              // ),
             },
           ]}
           defaultActiveKey={["1"]}

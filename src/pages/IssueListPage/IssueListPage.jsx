@@ -18,18 +18,27 @@ import {
   projectsByStudent,
   projectsByTeacher,
 } from "src/utils/HandleIssueAuth";
+import { useSearchParams } from "react-router-dom";
+import { decodeParam, encodeParam } from "src/utils/handleEnDecode";
 // const projectId = "35d4c71d-8bf0-42fb-8804-14d2c092dbf6";
 
 export const IssueListPage = () => {
   const { projectId, issueTypeId } = useParams();
   const { currentUser, IsStudent, IsLeader, IsTeacher, IsManager, IsAdmin } =
     HandleAuth();
+  const [searchParamsURL, setSearchParamsURL] = useSearchParams();
+  const searchURLParams = new URLSearchParams(location.search);
+  const projectParam = searchURLParams.get("projectParam");
+  const tab = searchURLParams.get("tab");
+  const param = searchURLParams.get("param");
+
   // console.log(projectId);
   // projectId === undefined && (projectId = "35d4c71d-8bf0-42fb-8804-14d2c092dbf6")
   // console.log(projectId)
   const navigate = useNavigate();
   const [spin, setSpin] = useState(false);
   const [milestonesCondition, setMilestonesCondition] = useState([]);
+  const [isFilterProject, setIsFilterProject] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const [loadingSelectData, setLoadingSelectData] = useState(false);
   const [loadingProjects, setLoadingProjects] = useState(false);
@@ -40,6 +49,8 @@ export const IssueListPage = () => {
   const [students, setStudents] = useState([]);
   const [issueRequirements, setIssueRequirements] = useState([]);
   const [checkedProject, setCheckedProject] = useState();
+  const [projectDecode, setProjectDecode] = useState(undefined);
+  const [tabDecode, setTabDecode] = useState(undefined);
   const [issueSettings, setIssueSettings] = useState([]);
   const [searchParams, setSearchParams] = useState([
     {
@@ -54,7 +65,16 @@ export const IssueListPage = () => {
     },
   ]);
 
-  const fetchAllData = async () => {
+  const handleTabClick = (key) => {
+    // Do something when a tab is clicked
+    setSearchParamsURL({
+      projectParam: projectParam,
+      tab: encodeParam(key),
+      param: param,
+    });
+  };
+
+  const fetchAllData = async (projectDecodeId) => {
     let projectList = [];
     let projectParam = [
       {
@@ -152,11 +172,12 @@ export const IssueListPage = () => {
         } else {
           isNull = true;
         }
-      } 
+      }
       if (isNull) {
         projectList = [];
         setProjects(projectList);
         setProject(projectList[0]);
+        // setSearchParamsURL({ projectParam: encodeParam(projectList[0])});
       } else {
         const { data: projectLists } = await axiosClient.post(
           `/Project/GetFilterData?sortString=created_date ASC`,
@@ -166,7 +187,16 @@ export const IssueListPage = () => {
         // console.log(projectLists)
         projectList = projectLists;
         setProjects(projectLists);
-        setProject(projectLists[0]);
+        // setProject(projectLists[0]);
+        projectDecodeId === null
+          ? setProject(projectList[0])
+          : setProject(
+              projectList.filter((ele) => ele.project_id === projectDecodeId)[0]
+            );
+        // console.log(
+        //   projectList.filter((ele) => ele.project_id === projectDecodeId)[0]
+        // );
+        // setSearchParamsURL({ projectParam: encodeParam(projectList[0]) });
       }
     } else {
       const { data: project } = await axiosClient.get(`/Project/${projectId}`);
@@ -177,6 +207,7 @@ export const IssueListPage = () => {
       projectList = [project];
       setProjects(projectLists);
       setProject(project);
+      // setSearchParamsURL({ projectParam: encodeParam(project) });
 
       const { data: milestoneArr } = await axiosClient.post(
         "/Milestone/GetFilterData?sortString=created_date ASC",
@@ -224,10 +255,22 @@ export const IssueListPage = () => {
     setLoadingProjects(true);
 
     if (projectList.length !== 0) {
-      setProject(projectList[0]);
-
+      // setProject(projectList[0]);
+      let newProject = [];
+      if (projectDecodeId === null) {
+        setProject(projectList[0]);
+        newProject = projectList;
+      } else {
+        setProject(
+          projectList.filter((ele) => ele.project_id === projectDecodeId)[0]
+        );
+        newProject = projectList.filter(
+          (ele) => ele.project_id === projectDecodeId
+        );
+      }
+      // console.log(newProject);
       const { data: issueSettings } = await axiosClient.post(
-        `IssueSetting/GetDataCombobox?project_id=${projectList[0].project_id}&class_id=${projectList[0].class_id}&subject_id=${projectList[0].subject_id}`
+        `IssueSetting/GetDataCombobox?project_id=${newProject[0].project_id}&class_id=${newProject[0].class_id}&subject_id=${newProject[0].subject_id}`
       );
       setIssueSettings(issueSettings);
       // console.log(issueSettings);
@@ -237,7 +280,12 @@ export const IssueListPage = () => {
         [
           {
             field: "project_id",
-            value: projectList[0].project_id,
+            value: newProject[0].project_id,
+            condition: ConditionEnum.Equal,
+          },
+          {
+            field: "status",
+            value: StatusEnum.Active,
             condition: ConditionEnum.Equal,
           },
         ]
@@ -249,7 +297,7 @@ export const IssueListPage = () => {
         [
           {
             field: "project_id",
-            value: projectList[0].project_id,
+            value: newProject[0].project_id,
             condition: ConditionEnum.Equal,
           },
         ]
@@ -297,20 +345,20 @@ export const IssueListPage = () => {
         },
         {
           field: "project_id",
-          value: projectList[0].project_id,
+          value: newProject[0].project_id,
           condition: ConditionEnum.Equal,
           operator: FilterOperatorEnum.OR,
           parenthesis: FilterOperatorEnum.OpenParenthesis,
         },
         {
           field: "class_id",
-          value: projectList[0].class_id,
+          value: newProject[0].class_id,
           condition: ConditionEnum.Equal,
           operator: FilterOperatorEnum.OR,
         },
         {
           field: "subject_id",
-          value: projectList[0].subject_id,
+          value: newProject[0].subject_id,
           condition: ConditionEnum.Equal,
           operator: FilterOperatorEnum.OR,
           parenthesis: FilterOperatorEnum.CloseParenthesis,
@@ -323,11 +371,48 @@ export const IssueListPage = () => {
 
       setSearchParams(newSearchParams);
       setIssueTypes(issueSettings.issue_types);
+      // console.log(decodeParam(tab));
+      if (issueSettings.issue_types.length !== 0) {
+        if (decodeParam(tab) === null) {
+          if (issueTypeId === "all") {
+            setSearchParamsURL({
+              projectParam: encodeParam(newProject[0].project_id),
+              tab: encodeParam("all"),
+              param: param,
+            });
+          } else if (issueTypeId === undefined) {
+            setSearchParamsURL({
+              projectParam: encodeParam(newProject[0].project_id),
+              tab: encodeParam(issueSettings.issue_types[0].issue_setting_id),
+              param: param,
+            });
+          } else {
+            setSearchParamsURL({
+              projectParam: encodeParam(newProject[0].project_id),
+              tab: encodeParam(issueTypeId),
+              param: param,
+            });
+          }
+        } else {
+          setSearchParamsURL({
+            projectParam: encodeParam(newProject[0].project_id),
+            tab: tab,
+            param: param,
+          });
+        }
+      } else {
+        setSearchParamsURL({
+          projectParam: encodeParam(newProject[0].project_id),
+          tab: encodeParam(null),
+          param: param,
+        });
+      }
 
-      const { data: issueRequirements } = await axiosClient.post(
-        `/Issue/GetRequirementIssue?projectId=${projectList[0].project_id}&class_id=${projectList[0].class_id}&subject_id=${projectList[0].subject_id}`
+      const { data: issueRequirementArr } = await axiosClient.post(
+        `/Issue/GetRequirementIssue?projectId=${newProject[0].project_id}&class_id=${newProject[0].class_id}&subject_id=${newProject[0].subject_id}`
       );
-      setIssueRequirements(issueRequirements);
+      setIssueRequirements(issueRequirementArr);
+      // console.log(issueRequirementArr);
     }
     setLoadingData(true);
     setLoadingSelectData(true);
@@ -337,7 +422,7 @@ export const IssueListPage = () => {
     let projectList = [];
     let projectParam = [];
     let isNull = false;
-    console.log(IsStudent(), currentUser);
+    // console.log(IsStudent(), currentUser);
     if (projectId === undefined) {
       if (IsStudent()) {
         const { data: classStudent } = await axiosClient.post(
@@ -470,6 +555,11 @@ export const IssueListPage = () => {
             value: projectList[0].project_id,
             condition: ConditionEnum.Equal,
           },
+          {
+            field: "status",
+            value: StatusEnum.Active,
+            condition: ConditionEnum.Equal,
+          },
         ]
       );
       setStudents(studentArr);
@@ -527,7 +617,7 @@ export const IssueListPage = () => {
     setLoadingSelectData(true);
   };
 
-  const fetchFilterData = async (projectId) => {
+  const fetchFilterData = async (projectId, isFilterProject) => {
     const { data: project } = await axiosClient.get(`/Project/${projectId}`);
     setProject(project);
     setLoadingProjects(true);
@@ -581,6 +671,11 @@ export const IssueListPage = () => {
           value: project.project_id,
           condition: ConditionEnum.Equal,
         },
+        {
+          field: "status",
+          value: StatusEnum.Active,
+          condition: ConditionEnum.Equal,
+        },
       ]
     );
     setStudents(studentArr);
@@ -630,6 +725,25 @@ export const IssueListPage = () => {
       }
     }
     setMilestonesCondition(milestones);
+    const { data: issueRequirementArr } = await axiosClient.post(
+      `/Issue/GetRequirementIssue?projectId=${project.project_id}&class_id=${project.class_id}&subject_id=${project.subject_id}`
+    );
+    setIssueRequirements(issueRequirementArr);
+
+    if (isFilterProject) {
+      setSearchParamsURL({
+        projectParam: encodeParam(projectId),
+        tab: encodeParam(issueSettings.issue_types[0].issue_setting_id),
+        param: encodeParam(null),
+      });
+    } else {
+      setSearchParamsURL({
+        projectParam: encodeParam(projectId),
+        tab: encodeParam(issueSettings.issue_types[0].issue_setting_id),
+        param: param,
+      });
+    }
+    // console.log(projectId)
     setLoadingSelectData(true);
   };
 
@@ -647,9 +761,10 @@ export const IssueListPage = () => {
     setLoadingData(false);
     setLoadingSelectData(false);
     setLoadingProjects(false);
-    fetchFilterData(filter.value);
+    fetchFilterData(filter.value, true);
   };
-
+  // console.log(decodeParam(projectParam));
+  // console.log(decodeParam(tab));
   const onChangeProject = (value) => {
     setCheckedProject(value);
   };
@@ -657,19 +772,31 @@ export const IssueListPage = () => {
     // fetchData();
     // fetchProjectsData();
     // fetchSelectData();
-    fetchAllData();
+    fetchAllData(decodeParam(projectParam));
+    // setProjectDecode(decodeParam(projectParam));
+    // setTabDecode(decodeParam(tab));
+    // console.log("abc");
   }, []);
   return (
     <>
       {/* {console.log(loadingData, loadingSelectData, loadingProjects)} */}
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
+      {/* {console.log(decodeParam(projectParam))} */}
       <NavbarDashboard
         position="issue"
         spin={loadingData && loadingSelectData && loadingProjects}
         dashboardBody={
           <Tabs
+            onChange={handleTabClick}
             type="card"
-            defaultActiveKey={issueTypeId !== undefined ? issueTypeId : undefined}
+            defaultActiveKey={
+              issueTypeId !== undefined
+                ? issueTypeId
+                : decodeParam(tab) === null
+                ? undefined
+                : decodeParam(tab)
+            }
+            activeKey={decodeParam(tab) === null ? undefined : decodeParam(tab)}
             className="flex_height tabScreen"
             items={
               issueTypes.length !== 0 &&
@@ -696,6 +823,11 @@ export const IssueListPage = () => {
                                   milestonesCondition={milestonesCondition}
                                   onChangeProject={onChangeProject}
                                   checkedProject={checkedProject}
+                                  searchParamsURL={searchParamsURL}
+                                  setSearchParamsURL={setSearchParamsURL}
+                                  param={param}
+                                  tab={tab}
+                                  projectParam={projectParam}
                                 />
                               )}
                           </div>

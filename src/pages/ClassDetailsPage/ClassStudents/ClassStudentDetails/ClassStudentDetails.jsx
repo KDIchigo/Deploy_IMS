@@ -14,6 +14,7 @@ import { BaseTextArea } from "src/components/Base/BaseTextArea/BaseTextArea";
 import { swalWithBootstrapButtons } from "src/enum/swal";
 import * as Yup from "yup";
 import "./ClassStudentDetails.scss";
+import { BaseDatePicker } from "src/components/Base/BaseDatePicker/BaseDatePicker";
 
 export const ClassStudentDetails = ({
   searchParams,
@@ -95,7 +96,7 @@ export const ClassStudentDetails = ({
 
           <ModalBody style={loadingData ? { pointerEvents: "none" } : {}}>
             <div className="row">
-              <div className="col-md-12 col-sm-12">
+              <div className="col-md-6 col-sm-12">
                 <BaseInputField
                   type="text"
                   id="student_name"
@@ -170,7 +171,7 @@ export const ClassStudentDetails = ({
                   <p className="hiddenMsg">acb</p>
                 )}
               </div>
-              <div className="col-md-6 col-sm-12">
+              {/* <div className="col-md-6 col-sm-12">
                 <BaseInputField
                   type="text"
                   id="class_code"
@@ -223,8 +224,43 @@ export const ClassStudentDetails = ({
                 ) : (
                   <p className="hiddenMsg">acb</p>
                 )}
+              </div> */}
+              <div className="col-md-3 col-sm-12 mt-1 ps-3">
+                {/* <BaseRadio label="Status" important="true" formik={formik} type="status"/> */}
+                <BaseRadio
+                  value={formik.values.status}
+                  formik={formik}
+                  type="status"
+                  isLabel={true}
+                  label="Status"
+                  important="true"
+                />
               </div>
-
+              <div className="col-md-3 col-sm-12 px-3">
+                <BaseDatePicker
+                  id="modified_date"
+                  label="Last Update"
+                  name="modified_date"
+                  className="w-100 px-2 datePicker"
+                  defaultValue={formik.values.modified_date}
+                  placeholder="It hasn't been updated"
+                  value={formik.values.modified_date}
+                  onChange={formik.handleChange}
+                  disabled={true}
+                  classNameInput={
+                    formik.errors.modified_date && formik.touched.modified_date
+                      ? "is-invalid"
+                      : ""
+                  }
+                  status={
+                    formik.errors.modified_date && formik.touched.modified_date
+                      ? "error"
+                      : ""
+                  }
+                  formik={formik}
+                  onBlur={formik.handleBlur}
+                />
+              </div>
               <div className="col-md-12 col-sm-12 px-3">
                 <BaseTextArea
                   formik={formik}

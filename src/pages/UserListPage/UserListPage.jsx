@@ -8,15 +8,17 @@ import Grid from "@mui/material/Grid";
 import { Tooltip } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { axiosClient } from "src/axios/AxiosClient";
 import { BaseButton } from "src/components/Base/BaseButton/BaseButton";
 import { BaseFilter } from "src/components/Base/BaseFilter/BaseFilter";
 import { BaseSearchAll } from "src/components/Base/BaseSearch/BaseSearchAll";
 import { NavbarDashboard } from "src/components/NavbarDashboard/NavBarDashboard";
-import { ConditionEnum, StatusEnum } from "src/enum/Enum";
+import { ConditionEnum, FilterOperatorEnum, StatusEnum } from "src/enum/Enum";
 import {
+  backDataStateParam,
+  checkCurrentURL,
   decodeParam,
   encodeParam,
   genDataStateParam,
@@ -52,9 +54,15 @@ const filter = {
 };
 
 export const UserListPage = () => {
+  const location = useLocation();
+
   const [searchParamsURL, setSearchParamsURL] = useSearchParams();
   const searchURLParams = new URLSearchParams(location.search);
   const param = searchURLParams.get("param");
+  const [paramDecode, setParamDecode] = useState(param);
+  // console.log(decodeParam(paramDecode));
+  // console.log(param);
+
   // const pageNumberURL = searchURLParams.get("pageNumber");
   // const pageSizeURL = searchURLParams.get("pageSize");
   // const sortStringURL = searchURLParams.get("sortString");
@@ -71,6 +79,8 @@ export const UserListPage = () => {
   const [roles, setRoles] = useState([]);
   const [dropdown, setDropdown] = useState(false);
   const [loadingTable, setLoadingTable] = useState(false);
+  const [loadingSettingApi, setLoadingSettingApi] = useState(false);
+  const [isCallSettings, setIsCallSettings] = useState(false);
   const [loading, setLoading] = useState(false);
   const [checkedSearchSelect, setCheckedSearchSelect] = useState(undefined);
   const [checkedSearchInput, setCheckedSearchInput] = useState(null);
@@ -81,16 +91,11 @@ export const UserListPage = () => {
   const [loadingSelectData, setLoadingSelectData] = useState(false);
   const dispatch = useDispatch();
   const [roleParams, setRoleParams] = useState([
-    {
-      field: "data_group",
-      value: "1",
-      condition: 1,
-    },
-    {
-      field: "status",
-      value: StatusEnum.Active,
-      condition: ConditionEnum.Equal,
-    },
+    // {
+    //   field: "status",
+    //   value: StatusEnum.Active,
+    //   condition: ConditionEnum.Equal,
+    // },
   ]);
   // const [searchParams, setSearchParams] = useState({
   //   pageNumber: decodeParam(param) === null ? 1 : decodeParam(param).pageNumber,
@@ -103,7 +108,7 @@ export const UserListPage = () => {
   //     decodeParam(param) === null ? [] : decodeParam(param).filterConditions,
   // });
   const [searchParams, setSearchParams] = useState(
-    decodeParam(param) === null
+    decodeParam(paramDecode) === null
       ? {
           pageNumber: 1,
           pageSize: 10,
@@ -111,10 +116,10 @@ export const UserListPage = () => {
           filterConditions: [],
         }
       : {
-          pageNumber: decodeParam(param).pageNumber,
-          pageSize: decodeParam(param).pageSize,
-          sortString: decodeParam(param).sortString,
-          filterConditions: decodeParam(param).filterConditions,
+          pageNumber: decodeParam(paramDecode).pageNumber,
+          pageSize: decodeParam(paramDecode).pageSize,
+          sortString: decodeParam(paramDecode).sortString,
+          filterConditions: decodeParam(paramDecode).filterConditions,
         }
   );
   // const [searchParams, setSearchParams] = useState({
@@ -130,26 +135,67 @@ export const UserListPage = () => {
   //   filterConditions: [],
   // };
   const fetchData = async (searchParams) => {
+    const { data: settings } = await axiosClient.post(
+      `/Setting/GetFilterData?sortString=display_order ASC`,
+      [
+        {
+          field: "setting_value",
+          value: "Admin",
+          condition: ConditionEnum.Equal,
+        },
+      ]
+    );
+    searchParams.filterConditions.push({
+      field: "setting_id",
+      value: settings[0].setting_id,
+      condition: ConditionEnum.NotEqual,
+    });
     const { data: userList } = await axiosClient.post(
       "/User/GetByPaging",
       searchParams
     );
     setUsers(userList);
+    setSearchParams(searchParams);
     setLoading(false);
     setLoadingData(true);
     setLoadingTable(false);
   };
 
   const fetchDataSelect = async () => {
-    const { data: roleArr } = await axiosClient.post(
-      `/Setting/GetFilterData?sortString=display_order ASC`,
-      roleParams
-    );
-    setRoles(roleArr);
-    genDataStateParam(param, setCheckedSearchInput, "search", [], searchUser);
-    genDataStateParam(param, setCheckedStatus, "status");
-    genDataStateParam(param, setCheckedSetting, "role", roleArr);
-    setLoadingSelectData(true);
+    if (!isCallSettings) {
+      setLoadingSettingApi(true);
+      const { data: roleArr } = await axiosClient.post(
+        `/Setting/GetFilterData?sortString=display_order ASC`,
+        [
+          {
+            field: "data_group",
+            value: "1",
+            condition: ConditionEnum.Equal,
+            operator: FilterOperatorEnum.AND
+          },
+          {
+            field: "setting_value",
+            value: "Admin",
+            condition: ConditionEnum.NotEqual,
+            operator: FilterOperatorEnum.AND
+          },
+        ]
+      );
+      setRoles(roleArr);
+      genDataStateParam(
+        paramDecode,
+        setCheckedSearchInput,
+        "search",
+        [],
+        searchUser
+      );
+      genDataStateParam(paramDecode, setCheckedStatus, "status", []);
+      genDataStateParam(paramDecode, setCheckedSetting, "role", roleArr);
+      setSearchParamsURL({ param: encodeParam(searchParams) });
+      setLoadingSelectData(true);
+      setLoadingSettingApi(false);
+      setIsCallSettings(true);
+    }
   };
 
   const handleNewUser = async (values, toggle, formik) => {
@@ -234,6 +280,8 @@ export const UserListPage = () => {
     setLoading(true);
     const newSearchParams = {
       ...searchParams,
+      // pageNumber: 1,
+      // pageSize: 10,
       filterConditions: [],
     };
     setSearchParams(newSearchParams);
@@ -249,37 +297,101 @@ export const UserListPage = () => {
   const fetchDataAndSelect = async () => {
     await Promise.all([fetchData(searchParams), fetchDataSelect()]);
   };
-  useEffect(() => {
-    // if (param !== null) {
-    //   if (decodeParam(param).filterConditions.length !== 0) {
-    //     if (
-    //       decodeParam(param).filterConditions.filter(
-    //         (ele) => ele.field === "status"
-    //       )
-    //     ) {
-    //       setCheckedStatus(
-    //         parseInt(decodeParam(param).filterConditions[0].value, 10) === StatusEnum.Active
-    //           ? "Active"
-    //           : "Inactive"
-    //       );
-    //     }
-    //   }
-    // }
-    fetchDataAndSelect();
-  }, []);
 
+  const fetchBackData = async () => {
+    const params = new URLSearchParams(location.search);
+    const paramFromURL = params.get("param");
+
+    // Nếu filter thay đổi, cập nhật trạng thái của component
+    if (paramDecode !== paramFromURL) {
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedSearchInput,
+        "search",
+        [],
+        searchUser,
+        "",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedStatus,
+        "status",
+        [],
+        [],
+        "status",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedSetting,
+        "role",
+        roles,
+        [],
+        "setting_id",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      // console.log(decodeParam(paramFromURL));
+    } else {
+      const { data: roleArr } = await axiosClient.post(
+        `/Setting/GetFilterData?sortString=display_order ASC`,
+        [
+          {
+            field: "data_group",
+            value: "1",
+            condition: ConditionEnum.Equal,
+            operator: FilterOperatorEnum.AND
+          },
+          {
+            field: "setting_value",
+            value: "Admin",
+            condition: ConditionEnum.NotEqual,
+            operator: FilterOperatorEnum.AND
+          },
+        ]
+      );
+      setRoles(roleArr);
+      genDataStateParam(
+        paramDecode,
+        setCheckedSearchInput,
+        "search",
+        [],
+        searchUser
+      );
+      genDataStateParam(paramDecode, setCheckedStatus, "status", []);
+      genDataStateParam(paramDecode, setCheckedSetting, "role", roleArr);
+    }
+  };
+  useEffect(() => {
+    // Xử lý sự thay đổi trong URL
+    fetchBackData();
+  }, [location.search, paramDecode]);
+
+  useEffect(() => {
+    fetchData(searchParams);
+    // fetchDataSelect();
+  }, []);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position="user"
-        spin={loadingData && loadingSelectData}
+        spin={loadingData}
         dashboardBody={
-          <Box className="box w-100 d-flex flex-column flexGrow_1">
+          <Box className="box w-100 d-flex flex-column flexGrow_1 font_sourceSans">
             <div className="card custom-card mb-0 flexGrow_1">
               <div className="card-body d-flex flex-column">
                 <div className="row">
-                  <h3 className="fw-bold m-0" style={{ paddingBottom: 20 }}>
+                  <h3 className="fw-bold m-0 " style={{ paddingBottom: 20 }}>
                     User List
                   </h3>
                   {/* <MonthWeekSelectorDemo/> */}
@@ -324,11 +436,14 @@ export const UserListPage = () => {
                                     fetchData={fetchData}
                                     searchParams={searchParams}
                                     onReset={onReset}
+                                    loadingSettingApi={loadingSettingApi}
+                                    fetchDataSelect={fetchDataSelect}
                                     checkedStatus={checkedStatus}
                                     onChangeStatus={onChangeStatus}
                                     checkedSetting={checkedSetting}
                                     onChangeSetting={onChangeSetting}
                                     handleSaveFilter={handleSaveFilter}
+                                    param={param}
                                   />
                                 </div>
                               </div>
@@ -345,9 +460,8 @@ export const UserListPage = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 position-relative align-items-center float-end">
-                      <NewUser roles={roles} handleNewUser={handleNewUser} />
-                      <div className="col-lg-7 float-end me-4 mt-1  d-flex h-100 justify-content-end">
+                    <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 position-relative d-flex align-items-center justify-content-end">
+                      <div className="col-lg-7 float-end d-flex h-100 justify-content-end">
                         <Tooltip
                           title="Reset"
                           placement="top"
@@ -369,6 +483,13 @@ export const UserListPage = () => {
                           )}
                         </Tooltip>
                       </div>
+                      <NewUser
+                        roles={roles}
+                        handleNewUser={handleNewUser}
+                        loadingSettingApi={loadingSettingApi}
+                        fetchDataSelect={fetchDataSelect}
+                        param={param}
+                      />
                     </div>
                   </div>
                 </div>
@@ -388,6 +509,9 @@ export const UserListPage = () => {
                       onPageSizeChange={onPageSizeChange}
                       fetchData={fetchData}
                       loadingTable={loadingTable}
+                      loadingSettingApi={loadingSettingApi}
+                      fetchDataSelect={fetchDataSelect}
+                      param={param}
                     />
                   </Grid>
                 </Grid>

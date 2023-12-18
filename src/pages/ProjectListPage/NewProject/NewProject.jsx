@@ -179,7 +179,9 @@ export const NewProject = ({
                 value={formik.values.status}
                 formik={formik}
                 type="status"
-                isLabel={false}
+                isLabel={true}
+                label="Status"
+                important="true"
               />
             </div>
             <div className="col-md-12 col-sm-12 mt-2  px-3">

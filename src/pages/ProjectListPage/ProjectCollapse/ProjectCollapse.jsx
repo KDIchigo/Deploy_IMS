@@ -5,7 +5,7 @@ import {
   MoreOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { Collapse, Dropdown, Tooltip } from "antd";
+import { Badge, Collapse, Dropdown, Tooltip } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
@@ -30,7 +30,9 @@ export const ProjectCollapse = ({
   handleMoveToAnotherProject,
   handleCollapseChangeStatus,
   handleCollapseStudentDelete,
+  handleCollapseClassStudentDelete,
   handleSetCollapseLeader,
+  handleProjectStudentChangeStatus,
   loadingStatus,
   loadingDelete,
   loadingCollapseDelete,
@@ -63,6 +65,16 @@ export const ProjectCollapse = ({
       searchParams
     );
   };
+
+  const handleProjectClassStudentDelete = (student, projectChange) => {
+    handleCollapseClassStudentDelete(
+      student,
+      projectChange,
+      fetchData,
+      searchParams
+    );
+  };
+
   const handleSetLeader = (studentId, project) => {
     handleSetCollapseLeader(studentId, project, setLoadingLeader);
   };
@@ -154,7 +166,7 @@ export const ProjectCollapse = ({
             }}
           >
             <SettingOutlined className="me-2" />
-            {project.status === 0 ? "Active" : "Inactive"}
+            {project.status === 0 ? "Activate" : "Deactivate"}
           </a>
         ),
       },
@@ -219,14 +231,43 @@ export const ProjectCollapse = ({
           </Tooltip>
         </>
       )} */}
-      <div>
-        <a onClick={() => navigate(`/project-dashboard/${project.project_id}`)} className="me-5 text-decoration-underline">View Dashboard</a>
-        <Tooltip title="More" placement="top" size="large">
-          <Dropdown menu={{ items }} trigger={["click"]} arrow>
-            <MoreOutlined style={{ fontSize: "18px" }} />
-          </Dropdown>
-        </Tooltip>
+      <div className="project_extra_item">
+        <a
+          onClick={() => navigate(`/project-dashboard/${project.project_id}`)}
+          className="text-decoration-underline "
+        >
+          View Dashboard
+        </a>
       </div>
+      <div className="project_extra_item">
+        <a>
+          {project.status === 1 ? (
+            <Badge
+              key="#26BF94"
+              color="#26BF94"
+              text="Active"
+              className="badgeActive"
+            />
+          ) : (
+            <Badge
+              key="red"
+              color="red"
+              text="Inactive"
+              className="badgeInactive"
+            />
+          )}
+        </a>
+      </div>
+      {(!IsStudent() || IsLeader(project.leader_id)) && (
+        <div className="project_extra_item">
+          <Tooltip title="More" placement="top" size="large">
+            <Dropdown menu={{ items }} trigger={["click"]} arrow>
+              <MoreOutlined style={{ fontSize: "18px" }} />
+            </Dropdown>
+          </Tooltip>
+        </div>
+      )}
+
       {/* <DeleteFilled
         onClick={(event) => {
           console.log(project.project_code);
@@ -236,7 +277,7 @@ export const ProjectCollapse = ({
   );
   // console.log(students);
   const onChange = (key) => {
-    console.log(key);
+    // console.log(key);
     // onFetchProjectStudent()
   };
   const fetchDataAndSelect = async () => {
@@ -282,12 +323,18 @@ export const ProjectCollapse = ({
                 handleSetLeader={handleSetLeader}
                 handleMoveToAnotherProject={handleMoveToAnotherProject}
                 handleProjectStudentDelete={handleProjectStudentDelete}
+                handleProjectClassStudentDelete={
+                  handleProjectClassStudentDelete
+                }
+                handleProjectStudentChangeStatus={
+                  handleProjectStudentChangeStatus
+                }
               />
             ),
             extra: genExtra(),
-            onDoubleClick: () => {
-              navigate(`/project-dashboard/${project.project_id}`);
-            },
+            // onDoubleClick: () => {
+            //   navigate(`/project-dashboard/${project.project_id}`);
+            // },
           },
         ]}
       />

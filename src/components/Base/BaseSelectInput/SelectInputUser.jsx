@@ -1,4 +1,4 @@
-import { Select } from "antd";
+import { Select, Spin } from "antd";
 import { useState } from "react";
 import { ConditionEnum } from "src/enum/Enum";
 const { Option } = Select;
@@ -10,6 +10,7 @@ export const SelectInputUser = ({
   important,
   defaultValue,
   onChange,
+  onClick,
   options,
   placeholder,
   disabled,
@@ -19,6 +20,9 @@ export const SelectInputUser = ({
   checked,
   status,
   onBlur,
+  loading,
+  loadingApi,
+  param,
 }) => {
   const className = `selectDesign ${disabled ? "disable" : ""}`;
   // const roleArr = [];
@@ -55,10 +59,12 @@ export const SelectInputUser = ({
           defaultValue={defaultValue}
           value={checked}
           id={id}
+          loading={loading}
           status={status}
           onBlur={onBlur}
           placeholder={placeholder}
           disabled={disabled}
+          onClick={() => onClick(param)}
           onChange={(value, object) => {
             if (isFilter) {
               const newFilter = {
@@ -75,18 +81,24 @@ export const SelectInputUser = ({
             // console.log(filter);
           }}
         >
-          {isFilter === true ? (
-            <Option key="all" value="all">
-              All
+          {loadingApi ? (
+            <Option disabled>
+              <Spin size="small" disabled />
             </Option>
           ) : (
-            ""
+            <>
+              {isFilter === true && (
+                <Option key="all" value="all">
+                  All
+                </Option>
+              )}
+              {options.map((option) => (
+                <Option key={option.user_id} value={option.fullname}>
+                  {option.fullname} ({option.email})
+                </Option>
+              ))}
+            </>
           )}
-          {options.map((option) => (
-            <Option key={option.user_id} value={option.fullname}>
-              {option.fullname} ({option.email})
-            </Option>
-          ))}
         </Select>
       </div>
     </>

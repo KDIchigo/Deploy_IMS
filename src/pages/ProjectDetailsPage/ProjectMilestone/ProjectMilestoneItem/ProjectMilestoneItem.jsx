@@ -135,7 +135,7 @@ export const ProjectMilestoneItem = ({
       title: "Description",
       dataIndex: "description",
       key: "description",
-      width: "25%",
+      width: "23%",
       ellipsis: true,
       sorter: (a, b) => a.description.length - b.description.length,
       render: (description) => (
@@ -148,7 +148,7 @@ export const ProjectMilestoneItem = ({
       title: "Status",
       dataIndex: "status",
       key: "status",
-      width: "10%",
+      width: "12%",
       align: "center",
     },
     {

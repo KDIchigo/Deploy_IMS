@@ -14,8 +14,16 @@ import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { HandleAuth } from "src/utils/handleAuth";
 import { showErrorMessage } from "src/utils/HandleErrorMessage";
+import { StatusEnum } from "src/enum/Enum";
 
-export const NewSubject = ({ users, fetchData, searchParams }) => {
+export const NewSubject = ({
+  users,
+  fetchData,
+  searchParams,
+  fetchSelectData,
+  loadingManagerApi,
+  param,
+}) => {
   const [loadingData, setLoadingData] = useState(false);
   const { currentUser } = HandleAuth();
   const formik = useFormik({
@@ -131,10 +139,14 @@ export const NewSubject = ({ users, fetchData, searchParams }) => {
                 id="assignee_id"
                 type="user"
                 defaultValue={formik.values.fullname}
-                options={users}
+                options={users.filter((ele) => ele.status === StatusEnum.Active)}
                 onChange={formik.handleChange}
                 important="true"
                 formik={formik}
+                onClick={fetchSelectData}
+                param={param}
+                loading={loadingManagerApi}
+                loadingApi={loadingManagerApi}
                 isFilter={false}
                 placeholder="Subject Manager"
                 status={
@@ -150,12 +162,14 @@ export const NewSubject = ({ users, fetchData, searchParams }) => {
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
-            <div className="col-md-6 col-sm-12 mt-3 px-3">
+            <div className="col-md-6 col-sm-12 px-3">
               <BaseRadio
                 value={formik.values.status}
                 formik={formik}
                 type="status"
                 isLabel={true}
+                label="Status"
+                important="true"
               />
             </div>
             <div className="col-md-12 col-sm-12 mt-0 px-3">

@@ -1,4 +1,4 @@
-import { Select } from "antd";
+import { Select, Spin } from "antd";
 import { useState } from "react";
 import { ConditionEnum } from "src/enum/Enum";
 const { Option } = Select;
@@ -9,6 +9,7 @@ export const BaseSelectInput = ({
   classNameDiv,
   important,
   defaultValue,
+  onClick,
   onChange,
   options,
   placeholder,
@@ -22,8 +23,10 @@ export const BaseSelectInput = ({
   onBlur,
   type,
   loading,
+  loadingApi,
   isFilterBasic,
   isLabel,
+  param,
 }) => {
   const selectInputOption = (type, option) => {
     let key = "";
@@ -114,6 +117,7 @@ export const BaseSelectInput = ({
           loading={loading}
           placeholder={placeholder}
           disabled={disabled}
+          onClick={() => onClick(param)}
           onChange={(value, object) => {
             const newFilter = {
               ...filter,
@@ -133,19 +137,28 @@ export const BaseSelectInput = ({
             // console.log(filter);
           }}
         >
-          {(isFilter || isFilterBasic) && isFilterIssue === undefined && (
-            <Option key="all" value="all">
-              All
+          {loadingApi ? (
+            <Option key="loading" disabled>
+              <Spin size="small" disabled />
             </Option>
+          ) : (
+            <>
+              {(isFilter || isFilterBasic) && isFilterIssue === undefined && (
+                <Option key="all" value="all">
+                  All
+                </Option>
+              )}
+              {options.length !== 0 &&
+                options.map((option, index) => (
+                  <Option
+                    key={selectInputOption(type, option).key}
+                    value={selectInputOption(type, option).value}
+                  >
+                    {selectInputOption(type, option).value}
+                  </Option>
+                ))}
+            </>
           )}
-          {options.map((option) => (
-            <Option
-              key={selectInputOption(type, option).key}
-              value={selectInputOption(type, option).value}
-            >
-              {selectInputOption(type, option).value}
-            </Option>
-          ))}
         </Select>
       </div>
     </>

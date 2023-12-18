@@ -27,11 +27,7 @@ const issue_group = [
   {
     value: IssueSettingEnum.WorkProcess,
     label: "Work Process",
-  },
-  {
-    value: IssueSettingEnum.Others,
-    label: "Others",
-  },
+  }
 ];
 export const FilterIssueSettings = ({
   onFilter,

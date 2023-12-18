@@ -1,4 +1,5 @@
 import {
+  CaretDownOutlined,
   CloseOutlined,
   ExportOutlined,
   ImportOutlined,
@@ -7,7 +8,7 @@ import {
   SyncOutlined,
 } from "@ant-design/icons";
 import { Box, Grid } from "@mui/material";
-import { Modal } from "antd";
+import { Empty, Modal } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useSearchParams } from "react-router-dom";
@@ -25,6 +26,7 @@ import {
   fetchClassDecodeAuth,
   fetchFilterAdmin,
   fetchFilterDecodeAdmin,
+  fetchFilterDecodeStudent,
   fetchFilterStudent,
   fetchProjectAdmin,
   fetchProjectAuth,
@@ -34,13 +36,14 @@ import {
 import { HandleAuth } from "src/utils/handleAuth";
 import { decodeParam } from "src/utils/handleEnDecode";
 import { exportToExcel } from "src/utils/handleExcel";
-import { filterBasicUtils } from "src/utils/handleSearchFilter";
 import { FilterDemo } from "./FilterProject/FilterDemo";
 import { NewProject } from "./NewProject/NewProject";
 import { ProjectCollapse } from "./ProjectCollapse/ProjectCollapse";
 import { ProjectHelpSync } from "./ProjectHelpSync/ProjectHelpSync";
 import "./ProjectListPage.scss";
 import { ProjectWaitingList } from "./ProjectWaitingList/ProjectWaitingList";
+import { BaseFilter } from "src/components/Base/BaseFilter/BaseFilter";
+import { FilterProject } from "./FilterProject/FilterProject";
 const getUnique = (arr, value) => {
   const unique = arr
     .map((e) => e[value])
@@ -171,6 +174,9 @@ export const ProjectListPage = () => {
   const fetchAllData = async () => {
     (IsManager() || IsAdmin()) &&
       fetchProjectAdmin(
+        currentUser,
+        IsAdmin,
+        IsManager,
         searchClassParams,
         setClasses,
         setSearchClassParams,
@@ -216,82 +222,125 @@ export const ProjectListPage = () => {
     classDecode,
     projectDecode
   ) => {
-    (IsManager() || IsAdmin()) && semesterDecode === undefined;
-    fetchFilterAdmin(
-      searchClassParams,
-      searchProjectParams,
-      isSelectClass,
-      setSemesters,
-      setSearchClassParams,
-      setSearchProjectParams,
-      setLoadingSemester,
-      setLoadingSubject,
-      setLoadingClass,
-      setLoadingData,
-      setSubjectOpt,
-      setClassOpt,
-      setClassObj,
-      setProjectOpt,
-      setClassId,
-      searchWaitingListParams,
-      setWaitingListStudents,
-      setSearchWaitingListParams,
-      setLoadingWaitingData,
-      setSearchParamsURL
-    );
-    (IsManager() || IsAdmin()) && semesterDecode !== undefined;
-    fetchFilterDecodeAdmin(
-      searchClassParams,
-      searchProjectParams,
-      isSelectClass,
-      setSemesters,
-      setSearchClassParams,
-      setSearchProjectParams,
-      setLoadingSemester,
-      setLoadingSubject,
-      setLoadingClass,
-      setLoadingData,
-      setSubjectOpt,
-      setClassOpt,
-      setClassObj,
-      setProjectOpt,
-      setClassId,
-      searchWaitingListParams,
-      setWaitingListStudents,
-      setSearchWaitingListParams,
-      setLoadingWaitingData,
-      setSearchParamsURL,
-      semesterDecode,
-      subjectDecode,
-      classDecode,
-      projectDecode
-    );
-    (IsTeacher() || IsStudent()) &&
-      fetchFilterStudent(
-        currentUser,
-        IsStudent,
-        IsTeacher,
-        searchClassParams,
-        searchProjectParams,
-        isSelectClass,
-        setSemesters,
-        setSearchClassParams,
-        setSearchProjectParams,
-        setLoadingSemester,
-        setLoadingSubject,
-        setLoadingClass,
-        setLoadingData,
-        setSubjectOpt,
-        setClassOpt,
-        setClassObj,
-        setProjectOpt,
-        setClassId,
-        searchWaitingListParams,
-        setWaitingListStudents,
-        setSearchWaitingListParams,
-        setLoadingWaitingData,
-        setSearchParamsURL
-      );
+    if (IsManager() || IsAdmin()) {
+      if (projectDecode === null || projectDecode === undefined) {
+        fetchFilterAdmin(
+          currentUser,
+          IsAdmin,
+          IsManager,
+          searchClassParams,
+          searchProjectParams,
+          isSelectClass,
+          setSemesters,
+          setSearchClassParams,
+          setSearchProjectParams,
+          setLoadingSemester,
+          setLoadingSubject,
+          setLoadingClass,
+          setLoadingData,
+          setSubjectOpt,
+          setClassOpt,
+          setClassObj,
+          setProjectOpt,
+          setClassId,
+          searchWaitingListParams,
+          setWaitingListStudents,
+          setSearchWaitingListParams,
+          setLoadingWaitingData,
+          setSearchParamsURL
+        );
+      } else {
+        fetchFilterDecodeAdmin(
+          currentUser,
+          IsAdmin,
+          IsManager,
+          searchClassParams,
+          searchProjectParams,
+          isSelectClass,
+          setSemesters,
+          setSearchClassParams,
+          setSearchProjectParams,
+          setLoadingSemester,
+          setLoadingSubject,
+          setLoadingClass,
+          setLoadingData,
+          setSubjectOpt,
+          setClassOpt,
+          setClassObj,
+          setProjectOpt,
+          setClassId,
+          searchWaitingListParams,
+          setWaitingListStudents,
+          setSearchWaitingListParams,
+          setLoadingWaitingData,
+          setSearchParamsURL,
+          semesterDecode,
+          subjectDecode,
+          classDecode,
+          projectDecode
+        );
+      }
+    }
+
+    if (IsTeacher() || IsStudent()) {
+      if (projectDecode === null || projectDecode === undefined) {
+        fetchFilterStudent(
+          currentUser,
+          IsStudent,
+          IsTeacher,
+          searchClassParams,
+          searchProjectParams,
+          isSelectClass,
+          setSemesters,
+          setSearchClassParams,
+          setSearchProjectParams,
+          setLoadingSemester,
+          setLoadingSubject,
+          setLoadingClass,
+          setLoadingData,
+          setSubjectOpt,
+          setClassOpt,
+          setClassObj,
+          setProjectOpt,
+          setClassId,
+          searchWaitingListParams,
+          setWaitingListStudents,
+          setSearchWaitingListParams,
+          setLoadingWaitingData,
+          setSearchParamsURL
+        );
+      } else {
+        fetchFilterDecodeStudent(
+          currentUser,
+          IsStudent,
+          IsTeacher,
+          searchClassParams,
+          searchProjectParams,
+          isSelectClass,
+          setSemesters,
+          setSearchClassParams,
+          setSearchProjectParams,
+          setLoadingSemester,
+          setLoadingSubject,
+          setLoadingClass,
+          setLoadingData,
+          setSubjectOpt,
+          setClassOpt,
+          setClassObj,
+          setProjectOpt,
+          setClassId,
+          searchWaitingListParams,
+          setWaitingListStudents,
+          setSearchWaitingListParams,
+          setLoadingWaitingData,
+          setSearchParamsURL,
+          semesterDecode,
+          subjectDecode,
+          classDecode,
+          projectDecode
+        );
+      }
+    }
   };
 
   const handleCollapseDelete = async (project) => {
@@ -342,11 +391,13 @@ export const ProjectListPage = () => {
             fetchCollapseData(newSearchCollapseParams);
             // fetchSemesterData()
             // fetchFilterData(searchClassParams);
-            fetchClassData(classId,
+            fetchClassData(
+              classId,
               checkedSemester,
               checkedSubject,
               checkedClass,
-              checkedProject);
+              checkedProject
+            );
           }
         }
       });
@@ -419,7 +470,7 @@ export const ProjectListPage = () => {
     toast.success("Add student successfully!");
     setLoadingAddStudent(false);
     // fetchWaitingData(searchWaitingParams)
-    console.log(classId);
+    // console.log(classId);
 
     const newSearchCollapseParams = [
       {
@@ -433,11 +484,13 @@ export const ProjectListPage = () => {
         condition: ConditionEnum.Equal,
       },
     ];
-    fetchClassData(classId,
+    fetchClassData(
+      classId,
       checkedSemester,
       checkedSubject,
       checkedClass,
-      checkedProject);
+      checkedProject
+    );
     // fetchCollapseData(newSearchCollapseParams)
     fetchWaitingListData(
       {
@@ -466,11 +519,13 @@ export const ProjectListPage = () => {
     } else {
       toast.success("Add project successfully!");
       setLoadingData(false);
-      fetchClassData(classId,
+      fetchClassData(
+        classId,
         checkedSemester,
         checkedSubject,
         checkedClass,
-        checkedProject);
+        checkedProject
+      );
       formik.resetForm();
     }
     toggle();
@@ -518,11 +573,15 @@ export const ProjectListPage = () => {
     setWaitingListStudents(data);
     setSearchWaitingListParams(searchWaitingListParams);
     // fetchFilterData(searchClassParams);
-    isFilter === false ? fetchFilterData(searchClassParams,
-      checkedSemester,
-      checkedSubject,
-      checkedClass,
-      checkedProject) : "";
+    isFilter === false
+      ? fetchFilterData(
+          searchClassParams,
+          checkedSemester,
+          checkedSubject,
+          checkedClass,
+          checkedProject
+        )
+      : "";
     // console.log(classId);
     // const { data: classItem } = await axiosClient.get(`/Class/${classId}`);
     // setClassObj(classItem);
@@ -586,7 +645,7 @@ export const ProjectListPage = () => {
           responseType: "arraybuffer", // Đảm bảo dữ liệu trả về dưới dạng binary
         }
       );
-      exportToExcel(exportExcel);
+      exportToExcel(exportExcel, "StudentList.xlsx");
     } catch (error) {
       console.error("Fail to download file Excel: ", error);
     }
@@ -618,11 +677,13 @@ export const ProjectListPage = () => {
       toast.success("Move student successfully!");
       // fetchFilterData(searchClassParams);
       setLoadingMove(false);
-      fetchClassData(classId,
+      fetchClassData(
+        classId,
         checkedSemester,
         checkedSubject,
         checkedClass,
-        checkedProject);
+        checkedProject
+      );
       // console.log(searchClassParams)
       // fetchCollapseData(searchParams);
       // fetchCollapseData()
@@ -641,6 +702,7 @@ export const ProjectListPage = () => {
       class_student_id: student.class_student_id,
       student_id: student.student_id,
       class_id: projectChange.class_id,
+      project_id: projectChange.project_id,
     });
     const { data, err } = await axiosClient.post(
       `ClassStudent/RemoveStudents`,
@@ -666,12 +728,12 @@ export const ProjectListPage = () => {
         },
         classId
       );
-      console.log(
-        checkedSemester,
-        checkedSubject,
-        checkedClass,
-        checkedProject
-      );
+      // console.log(
+      //   checkedSemester,
+      //   checkedSubject,
+      //   checkedClass,
+      //   checkedProject
+      // );
 
       fetchClassData(
         classId,
@@ -682,6 +744,60 @@ export const ProjectListPage = () => {
       );
     }
   };
+
+  const handleCollapseClassStudentDelete = async (
+    student,
+    projectChange
+    // fetchData,
+    // searchParams
+  ) => {
+    setActionId(student.class_student_id);
+    setLoadingRemove(true);
+    let studentArr = [];
+    studentArr.push(student.class_student_id);
+    const { data, err } = await axiosClient.delete(
+      `ClassStudent/DeleteMultiple`,
+      {
+        data: studentArr,
+      }
+    );
+    if (err) {
+      toast.error("Remove student fail!");
+      // showErrorMessage(err);
+      setLoadingRemove(false);
+      return;
+    } else {
+      toast.success("Remove student successful!");
+      // fetchFilterData(searchClassParams);
+      // console.log(searchClassParams)
+      setLoadingRemove(false);
+      // fetchData(searchParams);
+      fetchWaitingListData(
+        {
+          pageNumber: 1,
+          pageSize: 5,
+          sortString: "",
+          filterConditions: [],
+        },
+        classId
+      );
+      // console.log(
+      //   checkedSemester,
+      //   checkedSubject,
+      //   checkedClass,
+      //   checkedProject
+      // );
+
+      fetchClassData(
+        classId,
+        checkedSemester,
+        checkedSubject,
+        checkedClass,
+        checkedProject
+      );
+    }
+  };
+
   const handleCollapseChangeStatus = async (project) => {
     const projectIdArr = [];
     projectIdArr.push(project.project_id);
@@ -706,8 +822,8 @@ export const ProjectListPage = () => {
           );
 
           if (err) {
-            // toast.error(`The ${project.project_code} was changed fail`);
-            showErrorMessage(err);
+            toast.error(`The ${project.project_code} was changed fail`);
+            // showErrorMessage(err);
             setLoadingStatus(false);
             return;
           } else {
@@ -732,11 +848,13 @@ export const ProjectListPage = () => {
             // console.log(searchClassParams);
             // fetchSemesterData()
             // fetchFilterData(searchClassParams);
-            fetchClassData(classId,
+            fetchClassData(
+              classId,
               checkedSemester,
               checkedSubject,
               checkedClass,
-              checkedProject);
+              checkedProject
+            );
           }
         }
       });
@@ -781,35 +899,57 @@ export const ProjectListPage = () => {
             `Set leader of ${project.project_code} project successfully!`
           );
           setLoadingLeader(false);
-          fetchClassData(classId,
+          fetchClassData(
+            classId,
             checkedSemester,
             checkedSubject,
             checkedClass,
-            checkedProject);
+            checkedProject
+          );
         }
       });
   };
-  // console.log(searchClassParams);
-  //   const handleMoveToAnotherProject = async (project, student, fetchData, searchParams) => {
-  //   console.log(student);
-  //   const { data, err } = await axiosClient.put(
-  //     `ClassStudent/${student.class_student_id}`,
-  //     {
-  //       class_student_id: student.class_student_id,
-  //       student_id: student.student_id,
-  //       class_id: project.class_id,
-  //       project_id: project.project_id,
-  //     }
-  //   );
-  //   if (err) {
-  //     toast.error("Add fail!");
-  //     return;
-  //   } else {
-  //     toast.success("Add Successful!");
-  //     // fetchWaitingData(searchWaitingParams)
-  //     fetchData(searchParams);
-  //   }
-  // };
+
+  const handleProjectStudentChangeStatus = (student, project) => {
+    swalWithBootstrapButtons
+      .fire({
+        title: "Are you sure?",
+        text: `Are you sure to change status ${student.student_name} student?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Update it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          // setLoadingLeader(true);
+          let Id = [];
+          Id.push(student.class_student_id);
+          const { data, err } = await axiosClient.post(
+            `ClassStudent/UpdateStatus?status=${student.status === 1 ? 0 : 1}`,
+            Id
+          );
+
+          if (err) {
+            toast.error(`Change status ${student.student_name} student fail!`);
+            // setLoadingLeader(false);
+            return;
+          }
+          toast.success(
+            `Change status ${student.student_name} student  successfully!`
+          );
+          // setLoadingLeader(false);
+          fetchClassData(
+            classId,
+            checkedSemester,
+            checkedSubject,
+            checkedClass,
+            checkedProject
+          );
+        }
+      });
+  };
   const handleProjectAllocationSynchronize = async (classItem, projects) => {
     // console.log(classItem, projects)
     setLoadingSync(true);
@@ -817,29 +957,28 @@ export const ProjectListPage = () => {
     let bearToken = classItem.class_convert_token;
 
     let count = 0;
-
     if (convertId !== null && bearToken !== null) {
-      console.log("a");
+      // console.log("a");
       const { data, err } = await axiosClient.post(
         `/Project/AsyncProjectList?classConvertId=${convertId}&bearToken=${bearToken}`,
         projects
       );
       setLoadingSync(false);
-      projects.map((ele) => {
-        if (
-          ele.project_convert_id === null ||
-          ele.project_convert_id === null
-        ) {
-          if (count > 0) return;
-          toast.error(
-            `Synchronize projects ${classItem.class_code} fail!!! All projects must have project gitlab ID and bearToken.`
-          );
-          // setLoadingSync(false);
-          // return;
-        }
-        count++;
-        // console.log(count)
-      });
+      // projects.map((ele) => {
+      //   if (
+      //     ele.project_convert_id === null ||
+      //     ele.project_convert_id === null
+      //   ) {
+      //     if (count > 0) return;
+      //     toast.error(
+      //       `Synchronize projects ${classItem.class_code} fail!!! All projects must have project gitlab ID and bearToken.`
+      //     );
+      //     // setLoadingSync(false);
+      //     // return;
+      //   }
+      //   count++;
+      //   // console.log(count)
+      // });
       if (err) {
         toast.error(`Synchronize projects ${classItem.class_code} fail!`);
         // showErrorMessage(err);
@@ -851,15 +990,18 @@ export const ProjectListPage = () => {
         // fetchData(searchParams);
       }
     } else {
-      let toastErr = "";
-      convertId === null && (toastErr = toastErr + "convert ID");
-      convertId === null &&
-        bearToken === null &&
-        (toastErr = toastErr + " and ");
-      bearToken === null && (toastErr = toastErr + "bearToken");
       toast.error(
-        `Synchronize projects ${classItem.class_code} fail!!! Because the ${classItem.class_code} class does not have ${toastErr} yet.`
+        `You have not configured a personal token and group ID for this class. Please try again!`
       );
+      // let toastErr = "";
+      // convertId === null && (toastErr = toastErr + "convert ID");
+      // convertId === null &&
+      //   bearToken === null &&
+      //   (toastErr = toastErr + " and ");
+      // bearToken === null && (toastErr = toastErr + "bearToken");
+      // toast.error(
+      //   `Synchronize projects ${classItem.class_code} fail!!! Because the ${classItem.class_code} class does not have ${toastErr} yet.`
+      // );
     }
     setLoadingSync(false);
   };
@@ -872,7 +1014,7 @@ export const ProjectListPage = () => {
     projectDecode
   ) => {
     // console.log(classDecode);
-    classDecode === undefined
+    projectItem === null || projectItem === undefined
       ? fetchClassAuth(
           classId,
           currentUser,
@@ -908,9 +1050,9 @@ export const ProjectListPage = () => {
     classItem,
     projectItem
   ) => {
-    console.log(semesterItem, subjectItem, classItem, projectItem);
-    projectItem === undefined
+    projectItem === null || projectItem === undefined
       ? fetchProjectAuth(
+          projects,
           projectId,
           classId,
           setProjectOpt,
@@ -918,6 +1060,7 @@ export const ProjectListPage = () => {
           setSearchParamsURL
         )
       : fetchProjectDecodeAuth(
+          projects,
           projectId,
           classId,
           setProjectOpt,
@@ -1044,9 +1187,9 @@ export const ProjectListPage = () => {
         loadingData,
         loadingSubject,
         loadingClass,
-        loadingSemester
+        loadingSemester,loadingDecode
       )} */}
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position="project"
         spin={
@@ -1068,28 +1211,73 @@ export const ProjectListPage = () => {
                   <div className="row p-0 m-0 mb-2 align-items-center justify-content-between ">
                     <div className="col-lg-7 col-md-5 my-auto">
                       {loadingData &&
-                      loadingSubject &&
-                      loadingClass &&
-                      loadingSemester &&
-                      loadingDecode ? (
-                        <FilterDemo
-                          semesters={semesters}
-                          subjects={subjects}
-                          classes={classes}
-                          projects={projects}
-                          onFilter={onFilter}
-                          onClassFilter={onClassFilter}
-                          onProjectFilter={onProjectFilter}
-                          setIsSelectClass={setIsSelectClass}
-                          checkedSemester={checkedSemester}
-                          checkedSubject={checkedSubject}
-                          checkedClass={checkedClass}
-                          checkedProject={checkedProject}
-                          setSearchParamsURL={setSearchParamsURL}
+                        loadingSubject &&
+                        loadingClass &&
+                        loadingSemester &&
+                        loadingDecode && (
+                          <FilterDemo
+                            semesters={semesters}
+                            subjects={subjects}
+                            classes={classes}
+                            projects={projects}
+                            onFilter={onFilter}
+                            onClassFilter={onClassFilter}
+                            onProjectFilter={onProjectFilter}
+                            setIsSelectClass={setIsSelectClass}
+                            checkedSemester={checkedSemester}
+                            checkedSubject={checkedSubject}
+                            checkedClass={checkedClass}
+                            checkedProject={checkedProject}
+                            setSearchParamsURL={setSearchParamsURL}
+                          />
+                        )}
+                      {/* <div className="d-flex p-0 m-0">
+                        <BaseFilter
+                          className="me-1 p-0"
+                          icon={
+                            <BaseButton
+                              value="Filter"
+                              color="light"
+                              nameTitle="btnFilter"
+                              icon={<CaretDownOutlined />}
+                            />
+                          }
+                          filterBody={
+                            <div
+                              className="cardDropdown"
+                              style={{
+                                zIndex: 1,
+                              }}
+                            >
+                              <div className="card custom-card mb-0">
+                                <div className="card-body filterCard">
+                                  {loadingData &&
+                                    loadingSubject &&
+                                    loadingClass &&
+                                    loadingSemester &&
+                                    loadingDecode && (
+                                      <FilterProject
+                                        semesters={semesters}
+                                        subjects={subjects}
+                                        classes={classes}
+                                        projects={projects}
+                                        onFilter={onFilter}
+                                        onClassFilter={onClassFilter}
+                                        onProjectFilter={onProjectFilter}
+                                        setIsSelectClass={setIsSelectClass}
+                                        checkedSemester={checkedSemester}
+                                        checkedSubject={checkedSubject}
+                                        checkedClass={checkedClass}
+                                        checkedProject={checkedProject}
+                                        setSearchParamsURL={setSearchParamsURL}
+                                      />
+                                    )}
+                                </div>
+                              </div>
+                            </div>
+                          }
                         />
-                      ) : (
-                        ""
-                      )}
+                      </div> */}
                     </div>
                     <AuthoComponentRoutes
                       element={
@@ -1200,122 +1388,136 @@ export const ProjectListPage = () => {
                     />
                   </div>
                 </div>
-                <Grid container className="m-0 flexGrow_1">
-                  <Grid
-                    item
-                    md={12}
-                    sm={12}
-                    xs={12}
-                    className="d-flex flex-column"
-                  >
-                    <div id="project-allocation__header" className="d_flex_row">
-                      {/* <div className="text-center m-0" style={{ width: "3%" }}>
+                {projectOpt.length === 0 || classOpt === undefined ? (
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                ) : (
+                  <Grid container className="m-0 flexGrow_1">
+                    <Grid
+                      item
+                      md={12}
+                      sm={12}
+                      xs={12}
+                      className="d-flex flex-column"
+                    >
+                      <div
+                        id="project-allocation__header"
+                        className="d_flex_row"
+                      >
+                        {/* <div className="text-center m-0" style={{ width: "3%" }}>
                         <Checkbox />
                       </div> */}
-                      {IsStudent() ? (
-                        <>
-                          <div
-                            className="text-center m-0"
-                            style={{ width: "5%" }}
-                          >
-                            #
-                          </div>
-                          <div style={{ width: "30%" }}>Fullname</div>
-                          <div style={{ width: "35%" }}>Email</div>
-                          <div style={{ width: "20%" }}>Phone</div>
-                          <div
-                            className="text-center m-0"
-                            style={{ width: "10%" }}
-                          >
-                            Status
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div
-                            className="text-center m-0"
-                            style={{ width: "5%" }}
-                          >
-                            #
-                          </div>
-                          <div style={{ width: "30%" }}>Fullname</div>
-                          <div style={{ width: "45%" }}>Email</div>
-                          <div
-                            className="text-center m-0"
-                            style={{ width: "10%" }}
-                          >
-                            Status
-                          </div>
-                          <div
-                            className="text-center m-0"
-                            style={{ width: "10%" }}
-                          >
-                            Action
-                          </div>
-                        </>
-                      )}
-                    </div>
-                    <>
-                      {/* {console.log(projectOpt)} */}
-                      {loadingWaitingData && loadingDecode && (
-                        <ProjectWaitingList
-                          students={waitingListStudents}
-                          searchWaitingListParams={searchWaitingListParams}
-                          classId={classId}
-                          classObj={classObj}
-                          projects={projectOpt}
-                          isWaitingList={true}
-                          fetchFilterData={fetchFilterData}
-                          searchClassParams={searchClassParams}
-                          loadingAddStudent={loadingAddStudent}
-                          loadingWaitDelete={loadingWaitDelete}
-                          handleWaitingListDelete={handleWaitingListDelete}
-                          handleAddStudentToProject={handleAddStudentToProject}
-                          onPageChange={onPageChange}
-                        />
-                      )}
-                      {/* {console.log(semesters)}
+                        {IsStudent() ? (
+                          <>
+                            <div
+                              className="text-center m-0"
+                              style={{ width: "5%" }}
+                            >
+                              #
+                            </div>
+                            <div style={{ width: "30%" }}>Fullname</div>
+                            <div style={{ width: "55%" }}>Email</div>
+                            <div
+                              className="text-center m-0"
+                              style={{ width: "10%" }}
+                            >
+                              Status
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div
+                              className="text-center m-0"
+                              style={{ width: "5%" }}
+                            >
+                              #
+                            </div>
+                            <div style={{ width: "30%" }}>Fullname</div>
+                            <div style={{ width: "45%" }}>Email</div>
+                            <div
+                              className="text-center m-0"
+                              style={{ width: "10%" }}
+                            >
+                              Status
+                            </div>
+                            <div
+                              className="text-center m-0"
+                              style={{ width: "10%" }}
+                            >
+                              Action
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      <>
+                        {/* {console.log(projectOpt)} */}
+                        {loadingWaitingData && loadingDecode && (
+                          <ProjectWaitingList
+                            students={waitingListStudents}
+                            searchWaitingListParams={searchWaitingListParams}
+                            classId={classId}
+                            classObj={classObj}
+                            projects={projectOpt}
+                            isWaitingList={true}
+                            fetchFilterData={fetchFilterData}
+                            searchClassParams={searchClassParams}
+                            loadingAddStudent={loadingAddStudent}
+                            loadingWaitDelete={loadingWaitDelete}
+                            handleWaitingListDelete={handleWaitingListDelete}
+                            handleAddStudentToProject={
+                              handleAddStudentToProject
+                            }
+                            onPageChange={onPageChange}
+                          />
+                        )}
+                        {/* {console.log(semesters)}
                       {console.log(subjectOpt)}
                       {console.log(classObj)}
                       {console.log(projectOpt)} */}
-                      {loadingWaitingData &&
-                        loadingData &&
-                        loadingSubject &&
-                        loadingClass &&
-                        loadingSemester &&
-                        loadingDecode &&
-                        projectOpt?.map((project) => (
-                          <ProjectCollapse
-                            isWaitingList={false}
-                            key={project.project_id}
-                            project={project}
-                            projects={projectOpt}
-                            classId={classId}
-                            classObj={classObj}
-                            actionId={actionId}
-                            loadingStatus={loadingStatus}
-                            loadingCollapseDelete={loadingCollapseDelete}
-                            loadingMove={loadingMove}
-                            loadingRemove={loadingRemove}
-                            fetchCollapseData={fetchCollapseData}
-                            fetchFilterData={fetchFilterData}
-                            searchClassParams={searchClassParams}
-                            handleCollapseDelete={handleCollapseDelete}
-                            handleMoveToAnotherProject={
-                              handleMoveToAnotherProject
-                            }
-                            handleCollapseChangeStatus={
-                              handleCollapseChangeStatus
-                            }
-                            handleCollapseStudentDelete={
-                              handleCollapseStudentDelete
-                            }
-                            handleSetCollapseLeader={handleSetCollapseLeader}
-                          />
-                        ))}
-                    </>
+                        {loadingWaitingData &&
+                          loadingData &&
+                          loadingSubject &&
+                          loadingClass &&
+                          loadingSemester &&
+                          loadingDecode &&
+                          projectOpt?.map((project) => (
+                            <ProjectCollapse
+                              isWaitingList={false}
+                              key={project.project_id}
+                              project={project}
+                              projects={projectOpt}
+                              classId={classId}
+                              classObj={classObj}
+                              actionId={actionId}
+                              loadingStatus={loadingStatus}
+                              loadingCollapseDelete={loadingCollapseDelete}
+                              loadingMove={loadingMove}
+                              loadingRemove={loadingRemove}
+                              fetchCollapseData={fetchCollapseData}
+                              fetchFilterData={fetchFilterData}
+                              searchClassParams={searchClassParams}
+                              handleCollapseDelete={handleCollapseDelete}
+                              handleMoveToAnotherProject={
+                                handleMoveToAnotherProject
+                              }
+                              handleCollapseChangeStatus={
+                                handleCollapseChangeStatus
+                              }
+                              handleCollapseStudentDelete={
+                                handleCollapseStudentDelete
+                              }
+                              handleCollapseClassStudentDelete={
+                                handleCollapseClassStudentDelete
+                              }
+                              handleSetCollapseLeader={handleSetCollapseLeader}
+                              handleProjectStudentChangeStatus={
+                                handleProjectStudentChangeStatus
+                              }
+                            />
+                          ))}
+                      </>
+                    </Grid>
                   </Grid>
-                </Grid>
+                )}
                 {/* <Tooltip
                   title="Help"
                   placement="topLeft"
@@ -1323,7 +1525,7 @@ export const ProjectListPage = () => {
                   size="small "
                 > */}
                 <BaseButton
-                  color="info"
+                  color="warning"
                   variant="outline"
                   nameTitle="btnHelp"
                   onClick={helpToggle}

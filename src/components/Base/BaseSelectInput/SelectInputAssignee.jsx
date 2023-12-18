@@ -1,5 +1,5 @@
 import { UserOutlined } from "@ant-design/icons";
-import { Avatar, Select } from "antd";
+import { Avatar, Select, Spin } from "antd";
 import { useState } from "react";
 import { ConditionEnum } from "src/enum/Enum";
 const { Option } = Select;
@@ -23,6 +23,9 @@ export const SelectInputAssignee = ({
   onBlur,
   type,
   loading,
+  loadingApi,
+  onClick,
+  param,
   isFilterBasic,
   isLabel,
 }) => {
@@ -59,6 +62,7 @@ export const SelectInputAssignee = ({
           loading={loading}
           placeholder={placeholder}
           disabled={disabled}
+          onClick={() => onClick(param)}
           onChange={(value, object) => {
             const newFilter = {
               ...filter,
@@ -78,31 +82,39 @@ export const SelectInputAssignee = ({
             // console.log(filter);
           }}
         >
-          {(isFilter || isFilterBasic) && isFilterIssue === undefined && (
-            <Option key="all" value="all">
-              All
+          {loadingApi ? (
+            <Option key="loading" disabled>
+              <Spin size="small" disabled />
             </Option>
+          ) : (
+            <>
+              {(isFilter || isFilterBasic) && isFilterIssue === undefined && (
+                <Option key="all" value="all">
+                  All
+                </Option>
+              )}
+              {options.map((option) => (
+                <Option
+                  key={option.student_id}
+                  value={option.student_name}
+                  // style={{ height: "50px" }}
+                >
+                  <div className="row">
+                    <div className="col-2">
+                      <Avatar
+                        className="me-1"
+                        shape="circle"
+                        size="small"
+                        icon={<UserOutlined size={20} />}
+                        src={option?.student_avatar}
+                      />
+                    </div>
+                    <div className="col-10">{option.student_name}</div>
+                  </div>
+                </Option>
+              ))}
+            </>
           )}
-          {options.map((option) => (
-            <Option
-              key={option.student_id}
-              value={option.student_name}
-              // style={{ height: "50px" }}
-            >
-              <div className="row">
-                <div className="col-2">
-                  <Avatar
-                    className="me-1"
-                    shape="circle"
-                    size="small"
-                    icon={<UserOutlined size={20} />}
-                    src={option?.student_avatar}
-                  />
-                </div>
-                <div className="col-10">{option.student_name}</div>
-              </div>
-            </Option>
-          ))}
         </Select>
       </div>
     </>

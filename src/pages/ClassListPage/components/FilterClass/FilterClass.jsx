@@ -39,6 +39,12 @@ export const FilterClass = ({
   onChangeSubject,
   onChangeTeacher,
   checkedTeacher,
+  loadingSemesterApi,
+  fetchSystemSetting,
+  loadingSubjectApi,
+  fetchSubject,
+  loadingTeacherApi,
+  fetchTeacher,
   handleSaveFilter,
 }) => {
   return (
@@ -62,6 +68,9 @@ export const FilterClass = ({
           classNameDiv="col-11 mx-auto p-0 mt-3"
           placeholder="Semester"
           options={semesters}
+          loading={loadingSemesterApi}
+          loadingApi={loadingSemesterApi}
+          onClick={fetchSystemSetting}
           isFilter={true}
           onFilter={onFilter}
           checked={checkedSetting}
@@ -74,6 +83,9 @@ export const FilterClass = ({
           type="subject"
           placeholder="Subject Code"
           options={subjects}
+          loading={loadingSubjectApi}
+          loadingApi={loadingSubjectApi}
+          onClick={fetchSubject}
           isFilter={true}
           onFilter={onFilter}
           checked={checkedSubject}
@@ -86,6 +98,9 @@ export const FilterClass = ({
           type="teacher"
           placeholder="Teacher Name"
           options={teachers}
+          loading={loadingTeacherApi}
+          loadingApi={loadingTeacherApi}
+          onClick={fetchTeacher}
           isFilter={true}
           onFilter={onFilter}
           checked={checkedTeacher}

@@ -37,6 +37,7 @@ import { swalWithBootstrapButtons } from "src/enum/swal";
 import { showErrorMessage } from "src/utils/HandleErrorMessage";
 import moment from "moment";
 import { decodeParam, encodeParam } from "src/utils/handleEnDecode";
+import './ProjectMilestone.scss'
 
 export const ProjectMilestones = ({
   projectId,
@@ -332,23 +333,17 @@ export const ProjectMilestones = ({
         `/Milestone/AsyncMilestones?convertId=${convertId}&bearToken=${bearToken}&id=${id}&action=${action}`
       );
       if (err) {
-        toast.error(`Synchronize milestone project fail!`);
+        toast.error(`Synchronize milestone ${project.group_name} group fail!`);
         setLoadingTable(false);
         return;
       } else {
-        toast.success(`Synchronize milestone project successfully!`);
+        toast.success(`Synchronize milestone ${project.group_name} group successfully!`);
         setLoadingTable(false);
         fetchData(searchParams);
       }
     } else {
-      let toastErr = "";
-      convertId === null && (toastErr = toastErr + "convert ID");
-      convertId === null &&
-        bearToken === null &&
-        (toastErr = toastErr + " and ");
-      bearToken === null && (toastErr = toastErr + "bearToken");
       toast.error(
-        `Synchronize milestone project fail!!! Because the ${project.project_code} project does not have ${toastErr} yet.`
+        `You have not configured a personal token and project ID for this class. Please try again!`
       );
       setLoadingTable(false);
     }
@@ -496,15 +491,13 @@ export const ProjectMilestones = ({
   // }, []);
   return (
     <>
-      {/* {console.log(classMilestones)} */}
-      {/* {console.log(project.class_id)} */}
       <Box className="box w-100 d-flex flex-column flexGrow_1 flex_height">
         {/* <div className="card custom-card mb-0 flexGrow_1">
             <div className="  card-body d-flex flex-column"> */}
         <div className="row">
           <div className="row p-0 m-0  mb-4 align-items-center justify-content-between ">
             <h3 className="fw-bold m-0 " style={{ paddingBottom: 20 }}>
-              Milestone for Project {project.project_code}
+              Milestones for Project {project.project_code}
             </h3>
             <div className="col-lg-7 col-md-3 my-auto">
               {/* <BaseSearch
@@ -567,20 +560,13 @@ export const ProjectMilestones = ({
                 />
               </div>
             </div>
-            <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 px-2 position-relative align-items-center float-end ">
+            <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 px-2 position-relative d-flex align-items-center justify-content-end">
               {/* <div
                     className=" align-items-center float-end "
                     style={{ marginRight: "10px" }}
                   > */}
-              <NewProjectMilestone
-                classMilestones={classMilestones}
-                projectId={projectId}
-                fetchData={fetchData}
-                searchParams={searchParams}
-                project={project}
-              />
               {/* </div> */}
-              <div className="col-lg-7 float-end me-4 mt-1 d-flex h-100 justify-content-end">
+              <div className="col-lg-7 float-end d-flex h-100 justify-content-end">
                 <Tooltip
                   title="Reset"
                   placement="top"
@@ -644,6 +630,13 @@ export const ProjectMilestones = ({
                   }
                 /> */}
               </div>
+              <NewProjectMilestone
+                classMilestones={classMilestones}
+                projectId={projectId}
+                fetchData={fetchData}
+                searchParams={searchParams}
+                project={project}
+              />
             </div>
           </div>
         </div>

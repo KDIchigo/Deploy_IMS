@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import { SelectInputStatus } from "src/components/Base/BaseSelectInput/SelectInputStatus";
 import { SelectInputSetting } from "src/components/Base/BaseSelectInput/SelectInputSetting";
 import { BaseButton } from "src/components/Base/BaseButton/BaseButton";
-import { ConditionEnum } from "src/enum/Enum";
+import { ConditionEnum, StatusEnum } from "src/enum/Enum";
 import { BaseSelectInput } from "src/components/Base/BaseSelectInput/BaseSelectInput";
 
 const { RangePicker } = DatePicker;
@@ -24,11 +24,14 @@ export const FilterUser = ({
   fetchData,
   searchParams,
   onReset,
+  loadingSettingApi,
+  fetchDataSelect,
   checkedSetting,
   checkedStatus,
   onChangeSetting,
   onChangeStatus,
   handleSaveFilter,
+  param,
 }) => {
   return (
     <>
@@ -50,11 +53,15 @@ export const FilterUser = ({
           id="setting_id"
           classNameDiv="col-11 mx-auto p-0 mt-3"
           placeholder="Role"
-          options={roles}
+          onClick={fetchDataSelect}
+          loadingApi={loadingSettingApi}
+          loading={loadingSettingApi}
+          options={roles.filter((ele) => ele.status === StatusEnum.Active)}
           isFilter={true}
           onFilter={onFilter}
           checked={checkedSetting}
           onChange={onChangeSetting}
+          param={param}
         />
         <div className="col-11 mx-auto p-0 mt-3">
           <BaseButton

@@ -2,6 +2,7 @@ import { Tabs, Tooltip } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   Link,
+  useLocation,
   useNavigate,
   useParams,
   useSearchParams,
@@ -10,7 +11,7 @@ import { NavbarDashboard } from "src/components/NavbarDashboard/NavbarDashboard"
 import { ClassStudents } from "./ClassStudents/ClassStudents";
 import { axiosClient } from "src/axios/AxiosClient";
 import { ToastContainer } from "react-toastify";
-import { ConditionEnum } from "src/enum/Enum";
+import { ConditionEnum, StatusEnum } from "src/enum/Enum";
 import {
   filterUtils,
   handlePageSizeChange,
@@ -18,6 +19,7 @@ import {
   searchUtils,
 } from "src/utils/handleSearchFilter";
 import {
+  backDataStateParam,
   decodeParam,
   encodeParam,
   genDataStateParam,
@@ -37,9 +39,12 @@ const searchClassStudent = [
   },
 ];
 export const ClassDetailsStudents = () => {
+  const location = useLocation();
+
   const [searchParamsURL, setSearchParamsURL] = useSearchParams();
   const searchURLParams = new URLSearchParams(location.search);
   const param = searchURLParams.get("param");
+  const [paramDecode, setParamDecode] = useState(param);
 
   const { classId } = useParams();
   const navigate = useNavigate();
@@ -51,11 +56,45 @@ export const ClassDetailsStudents = () => {
     data: [],
     summary: "",
   });
+  const [classObj, setClassObj] = useState({});
   const [checkedSearchSelect, setCheckedSearchSelect] = useState(null);
   const [checkedSearchInput, setCheckedSearchInput] = useState(null);
   const [loading, setLoading] = useState(false);
   const [spin, setSpin] = useState(false);
 
+  const [loadingOther, setLoadingOther] = useState(false);
+  const [loadingOtherTable, setLoadingOtherTable] = useState(false);
+  const [loadingOtherData, setLoadingOtherData] = useState(false);
+  const [checkedSearchSelectOther, setCheckedSearchSelectOther] =
+    useState(undefined);
+  const [checkedSearchInputOther, setCheckedSearchInputOther] = useState(null);
+  const [existStudents, setExistStudents] = useState({
+    totalRecord: 0,
+    data: [],
+    summary: "",
+  });
+  const [studentsParams, setStudentsParams] = useState({
+    pageNumber: 1,
+    pageSize: 8,
+    sortString: "",
+    filterConditions: [
+      {
+        field: "class_id",
+        value: classId,
+        condition: ConditionEnum.NotIn,
+      },
+      {
+        field: "status",
+        value: StatusEnum.Active,
+        condition: ConditionEnum.Equal,
+      },
+      {
+        field: "setting_id",
+        value: settingStudent.setting_id,
+        condition: ConditionEnum.Equal,
+      },
+    ],
+  });
   const onResetSearchSelect = (value) => {
     setCheckedSearchSelect(value);
   };
@@ -72,7 +111,7 @@ export const ClassDetailsStudents = () => {
   ];
 
   const [searchParams, setSearchParams] = useState(
-    decodeParam(param) === null
+    decodeParam(paramDecode) === null
       ? {
           pageNumber: 1,
           pageSize: 10,
@@ -80,10 +119,10 @@ export const ClassDetailsStudents = () => {
           filterConditions: filterStudentCondition,
         }
       : {
-          pageNumber: decodeParam(param).pageNumber,
-          pageSize: decodeParam(param).pageSize,
-          sortString: decodeParam(param).sortString,
-          filterConditions: decodeParam(param).filterConditions,
+          pageNumber: decodeParam(paramDecode).pageNumber,
+          pageSize: decodeParam(paramDecode).pageSize,
+          sortString: decodeParam(paramDecode).sortString,
+          filterConditions: decodeParam(paramDecode).filterConditions,
         }
   );
   const fetchData = async (searchParams) => {
@@ -98,7 +137,9 @@ export const ClassDetailsStudents = () => {
     setLoadingTable(false);
   };
 
-  const fetchStudentData = async (searchParams) => {
+  const fetchStudentData = async (param) => {
+    const { data: classById } = await axiosClient.get(`/Class/${classId}`);
+    setClassObj(classById);
     const { data: studentArr } = await axiosClient.post(
       "/Setting/GetFilterData?sortString=display_order ASC",
       [
@@ -110,6 +151,44 @@ export const ClassDetailsStudents = () => {
       ]
     );
     setSettingStudent(studentArr[0]);
+
+    const newStudentsParams = {
+      ...studentsParams,
+      filterConditions: [
+        {
+          field: "class_id",
+          value: classId,
+          condition: ConditionEnum.NotIn,
+        },
+        {
+          field: "status",
+          value: StatusEnum.Active,
+          condition: ConditionEnum.Equal,
+        },
+        {
+          field: "setting_id",
+          value: studentArr[0].setting_id,
+          condition: ConditionEnum.Equal,
+        },
+      ],
+    };
+    const { data: studentsArr } = await axiosClient.post(
+      "/ClassStudent/GetStudents",
+      newStudentsParams
+    );
+    setExistStudents(studentsArr);
+    setStudentsParams(newStudentsParams)
+    // for (let student of studentArr.data) {
+    //   const { data: studentArray } = await axiosClient.get(
+    //     `/User/${student.student_id}`
+    //   );
+    //   setUsers(users.push(studentArray));
+    // }
+    // console.log(students, studentArr);
+    setLoadingOtherData(true);
+    setLoadingOtherTable(false);
+    setLoadingOther(false);
+
     genDataStateParam(
       param,
       setCheckedSearchInput,
@@ -120,7 +199,7 @@ export const ClassDetailsStudents = () => {
     // console.log(studentArr.data);
     setLoadingData(true);
   };
-  console.log(decodeParam(param))
+  // console.log(decodeParam(param))
   const onSearch = (filter) => {
     setLoadingTable(true);
     searchUtils(filter, searchParams, setSearchParams, fetchData);
@@ -200,13 +279,42 @@ export const ClassDetailsStudents = () => {
         break;
     }
   };
+
+  const fetchBackData = async () => {
+    const params = new URLSearchParams(location.search);
+    const paramFromURL = params.get("param");
+
+    // Nếu filter thay đổi, cập nhật trạng thái của component
+    if (paramDecode !== paramFromURL) {
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedSearchInput,
+        "search",
+        [],
+        searchClassStudent,
+        "",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      // console.log(decodeParam(paramFromURL));
+    } else {
+      fetchStudentData(paramDecode);
+    }
+  };
+  useEffect(() => {
+    // Xử lý sự thay đổi trong URL
+    fetchBackData();
+  }, [location.search, paramDecode]);
+
   useEffect(() => {
     fetchData(searchParams);
-    fetchStudentData();
+    fetchStudentData(param);
   }, []);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position="class"
         spin={loadingData}
@@ -248,6 +356,7 @@ export const ClassDetailsStudents = () => {
                       <div className="card-body flex_height">
                         <ClassStudents
                           classId={classId}
+                          classObj={classObj}
                           fetchData={fetchData}
                           students={students}
                           searchParams={searchParams}
@@ -265,6 +374,21 @@ export const ClassDetailsStudents = () => {
                           setCheckedSearchInput={setCheckedSearchInput}
                           setCheckedSearchSelect={setCheckedSearchSelect}
                           checkedSearchSelect={checkedSearchSelect}
+                          setSearchParamsURL={setSearchParamsURL}
+                          existStudents={existStudents}
+                          setExistStudents={setExistStudents}
+                          studentsParams={studentsParams}
+                          setStudentsParams={setStudentsParams}
+                          loadingOther={loadingOther}
+                          loadingOtherData={loadingOtherData}
+                          loadingOtherTable={loadingOtherTable}
+                          setLoadingOther={setLoadingOther}
+                          setLoadingOtherData={setLoadingOtherData}
+                          setLoadingOtherTable={setLoadingOtherTable}
+                          checkedSearchInputOther={checkedSearchInputOther}
+                          setCheckedSearchInputOther={setCheckedSearchInputOther}
+                          checkedSearchSelectOther={checkedSearchSelectOther}
+                          setCheckedSearchSelectOther={setCheckedSearchSelectOther}
                         />
                       </div>
                     </div>

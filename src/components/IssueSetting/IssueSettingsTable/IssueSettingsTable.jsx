@@ -181,6 +181,7 @@ export const IssueSettingsTable = ({
             Table: {
               borderColor: "rgba(0, 0, 0, 0.1)",
               headerBorderRadius: "4px",
+              headerBg: "#edececd1",
               controlItemBgActiveHover: "rgba(0, 0, 0, 0.05)",
               controlItemBgActive: "rgba(0, 0, 0, 0.05)",
             },
@@ -189,7 +190,7 @@ export const IssueSettingsTable = ({
       >
         <Table
           className="flexGrow_1"
-          style={{ paddingTop: 20, height: "60vh", overflow: "hidden" }}
+          style={{ paddingTop: 20, height: "50vh", overflow: "hidden" }}
           loading={loadingTable}
           columns={columns}
           dataSource={data}
@@ -199,7 +200,7 @@ export const IssueSettingsTable = ({
           bordered
           scroll={{
             x: 1130,
-            y: "60vh",
+            y: 310,
           }}
         />
         <BasePagination

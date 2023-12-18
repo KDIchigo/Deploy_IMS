@@ -21,6 +21,7 @@ export const NewIssueAll = ({
   searchParams,
   issueType,
   students,
+  issueRequirements,
   issues,
   milestones,
   projectId,
@@ -42,7 +43,7 @@ export const NewIssueAll = ({
       due_date: "",
       status: 1,
       project_id: projectId,
-      assignee: "",
+      // assignee: "",
       milestone_id: "",
       created_by: currentUser.email,
       user_id: currentUser.user_id,
@@ -159,38 +160,37 @@ export const NewIssueAll = ({
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
-            {/* <div className="col-md-6 col-sm-12 px-3">
-                <BaseSelectInput
-                  id="parent_id"
-                  name="parent_id"
-                  label="Issue Requirement"
-                  type="issue"
-                  defaultValue={
-                    formik.values.parent_title === ""
-                      ? undefined
-                      : formik.values.parent_title
-                  }
-                  options={issueRequirements}
-                  onChange={formik.handleChange}
-                  // important="true"
-                  formik={formik}
-                  isFilter={false}
-                  disabled={true}
-                  placeholder="Issue Requirement"
-                  status={
-                    formik.errors.parent_id && formik.touched.parent_id
-                      ? "error"
-                      : ""
-                  }
-                  onBlur={formik.handleBlur}
-                />
-                {formik.errors.parent_id && formik.touched.parent_id ? (
-                  <p className="errorMsg"> {formik.errors.parent_id} </p>
-                ) : (
-                  <p className="hiddenMsg">acb</p>
-                )}
-              </div> */}
             <div className="col-md-6 col-sm-12 px-3">
+              <BaseSelectInput
+                id="parent_id"
+                name="parent_id"
+                label="Issue Requirement"
+                type="issue"
+                defaultValue={
+                  formik.values.parent_title === ""
+                    ? undefined
+                    : formik.values.parent_title
+                }
+                options={issueRequirements}
+                onChange={formik.handleChange}
+                // important="true"
+                formik={formik}
+                isFilter={false}
+                placeholder="Issue Requirement"
+                status={
+                  formik.errors.parent_id && formik.touched.parent_id
+                    ? "error"
+                    : ""
+                }
+                onBlur={formik.handleBlur}
+              />
+              {formik.errors.parent_id && formik.touched.parent_id ? (
+                <p className="errorMsg"> {formik.errors.parent_id} </p>
+              ) : (
+                <p className="hiddenMsg">acb</p>
+              )}
+            </div>
+            <div className="col-md-3 col-sm-12 px-3">
               <BaseSelectInput
                 label="Issue Type"
                 id="issue_type"
@@ -220,7 +220,7 @@ export const NewIssueAll = ({
               )}
             </div>
 
-            <div className="col-md-6 col-sm-12 px-3">
+            <div className="col-md-3 col-sm-12 px-3">
               <BaseSelectInput
                 label="Work Process"
                 id="work_process"

@@ -15,11 +15,21 @@ import "./SubjectGeneral.scss";
 import { HandleAuth } from "src/utils/handleAuth";
 import { CloudSyncOutlined, LoadingOutlined } from "@ant-design/icons";
 import { showErrorMessage } from "src/utils/HandleErrorMessage";
+import { BaseDatePicker } from "src/components/Base/BaseDatePicker/BaseDatePicker";
 
-export const SubjectGeneral = ({ users, subjectObj, fetchData, code }) => {
+export const SubjectGeneral = ({
+  users,
+  subjectObj,
+  fetchData,
+  code,
+  fetchSelectData,
+  loadingManagerApi,
+}) => {
+  const { IsManager, IsAdmin } = HandleAuth();
   const navigate = useNavigate();
   const { currentUser } = HandleAuth();
   const [isView, setIsView] = useState(true);
+  const [isViewManager, setIsManager] = useState(true);
   const [loadingData, setLoadingData] = useState(false);
   const formik = useFormik({
     initialValues: {
@@ -66,6 +76,7 @@ export const SubjectGeneral = ({ users, subjectObj, fetchData, code }) => {
                     `The subject named ${subjectObj.subject_code} was updated successfully!`
                   );
                   setLoadingData(false);
+                  formik.setFieldValue("modified_date", new Date());
                   setIsView(true);
                   fetchData();
                 }
@@ -82,7 +93,7 @@ export const SubjectGeneral = ({ users, subjectObj, fetchData, code }) => {
         className=" d-flex flex-column flexGrow_1"
       >
         <h3 className="fw-bold m-0" style={{ paddingBottom: 30 }}>
-          {subjectObj.subject_name} Details
+          Subject Details for {subjectObj.subject_code}
         </h3>
 
         <div
@@ -99,7 +110,7 @@ export const SubjectGeneral = ({ users, subjectObj, fetchData, code }) => {
                 placeholder="Enter Subject Code"
                 value={formik.values.subject_code}
                 onChange={formik.handleChange}
-                readOnly={isView}
+                readOnly={isView || IsManager()}
                 classNameInput={
                   formik.errors.subject_code && formik.touched.subject_code
                     ? "is-invalid"
@@ -123,7 +134,7 @@ export const SubjectGeneral = ({ users, subjectObj, fetchData, code }) => {
                 placeholder="Enter Subject Name"
                 value={formik.values.subject_name}
                 onChange={formik.handleChange}
-                readOnly={isView}
+                readOnly={isView || IsManager()}
                 classNameInput={
                   formik.errors.subject_name && formik.touched.subject_name
                     ? "is-invalid"
@@ -149,7 +160,10 @@ export const SubjectGeneral = ({ users, subjectObj, fetchData, code }) => {
                 important="true"
                 formik={formik}
                 isFilter={false}
-                disabled={isView}
+                loadingApi={loadingManagerApi}
+                loading={loadingManagerApi}
+                onClick={fetchSelectData}
+                disabled={isView || IsManager()}
                 placeholder="Subject Manager"
                 status={
                   formik.errors.assignee_id && formik.touched.assignee_id
@@ -164,13 +178,40 @@ export const SubjectGeneral = ({ users, subjectObj, fetchData, code }) => {
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
-            <div className="col-md-6 col-sm-12 mt-3 px-3">
+            <div className="col-md-3 col-sm-12 px-3">
+              <BaseDatePicker
+                id="modified_date"
+                label="Last Update"
+                name="modified_date"
+                className="w-100 px-2 datePicker"
+                defaultValue={formik.values.modified_date}
+                placeholder="It hasn't been updated"
+                value={formik.values.modified_date}
+                onChange={formik.handleChange}
+                disabled={true}
+                classNameInput={
+                  formik.errors.modified_date && formik.touched.modified_date
+                    ? "is-invalid"
+                    : ""
+                }
+                status={
+                  formik.errors.modified_date && formik.touched.modified_date
+                    ? "error"
+                    : ""
+                }
+                formik={formik}
+                onBlur={formik.handleBlur}
+              />
+            </div>
+            <div className="col-md-3 col-sm-12 px-3">
               <BaseRadio
                 value={formik.values.status}
                 formik={formik}
                 type="status"
                 isLabel={true}
-                disabled={isView}
+                disabled={isView || IsManager()}
+                label="Status"
+                important="true"
               />
             </div>
             {/* <div className="col-md-6 col-sm-12 px-3">

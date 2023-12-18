@@ -156,7 +156,7 @@ export const ClassTable = ({
       title: "Subject Code",
       dataIndex: "subject_code",
       key: "subject_code",
-      width: "15%",
+      width: "14%",
       ellipsis: true,
       sorter: (a, b) => a.subject_code.length - b.subject_code.length,
       render: (subject_code) => (
@@ -195,7 +195,7 @@ export const ClassTable = ({
       title: "Semester",
       dataIndex: "setting_value",
       key: "setting_value",
-      width: "11%",
+      width: "10%",
       ellipsis: true,
       sorter: (a, b) => a.setting_value - b.setting_value,
       render: (setting_value) => (
@@ -208,7 +208,7 @@ export const ClassTable = ({
       title: "Status",
       dataIndex: "status",
       key: "status",
-      width: "10%",
+      width: "12%",
       align: "center",
       // sorter: (a, b) => a.status - b.status,
     },
@@ -236,6 +236,7 @@ export const ClassTable = ({
             Table: {
               borderColor: "rgba(0, 0, 0, 0.1)",
               headerBorderRadius: "4px",
+              headerBg: "#edececd1",
               controlItemBgActiveHover: "rgba(0, 0, 0, 0.05)",
               controlItemBgActive: "rgba(0, 0, 0, 0.05)",
             },
@@ -244,7 +245,7 @@ export const ClassTable = ({
       >
         <Table
           className="flexGrow_1"
-          style={{ paddingTop: 20, height: "60vh", overflow: "hidden" }}
+          style={{ paddingTop: 20, height: "50vh", overflow: "hidden" }}
           // rowSelection={rowSelection}
           loading={loadingTable}
           columns={columns}
@@ -254,7 +255,8 @@ export const ClassTable = ({
           bordered
           scroll={{
             x: 1130,
-            y: "60vh",
+            y: 362,
+            // y: "50vh",
           }}
           onRow={(record) => ({
             onDoubleClick: () => handleDoubleClick(record.key),

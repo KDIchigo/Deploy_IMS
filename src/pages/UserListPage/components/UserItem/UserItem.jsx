@@ -47,7 +47,7 @@ export const UserItem = ({ user, roles, fetchData, searchParams }) => {
   const roleBage = roleBadges.filter(
     (roleBadge) => roleBadge.role == user.setting_value
   );
-  console.log(user)
+  // console.log(user)
   return (
     <div className="col-xxl-3 col-xl-6 col-lg-6 col-md-6 col-sm-12">
       <div className="card custom-card">

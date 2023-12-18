@@ -1,5 +1,4 @@
 import { LoadingOutlined } from "@ant-design/icons";
-import { Spin } from "antd";
 import { useFormik } from "formik";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -10,12 +9,18 @@ import { BaseInputField } from "src/components/Base/BaseInputField/BaseInputFiel
 import { BaseRadio } from "src/components/Base/BaseRadio/BaseRadio";
 import { BaseSelectInput } from "src/components/Base/BaseSelectInput/BaseSelectInput";
 import { BaseTextArea } from "src/components/Base/BaseTextArea/BaseTextArea";
-import { UserEnum } from "src/enum/Enum";
-import * as Yup from "yup";
-import "./NewUser.scss";
+import { StatusEnum, UserEnum } from "src/enum/Enum";
 import { showErrorMessage } from "src/utils/HandleErrorMessage";
+import * as Yup from "yup";
 
-export const NewUser = ({ roles, fetchData, searchParams }) => {
+export const NewUser = ({
+  roles,
+  fetchData,
+  searchParams,
+  loadingSettingApi,
+  fetchDataSelect,
+  param,
+}) => {
   const [loadingData, setLoadingData] = useState(false);
   const formik = useFormik({
     initialValues: {
@@ -106,7 +111,7 @@ export const NewUser = ({ roles, fetchData, searchParams }) => {
             className="row"
             style={loadingData ? { pointerEvents: "none" } : {}}
           >
-            <div className="col-md-12 col-sm-12 px-3">
+            <div className="col-md-6 col-sm-12 px-3">
               <BaseInputField
                 type="text"
                 label="Full name"
@@ -184,12 +189,16 @@ export const NewUser = ({ roles, fetchData, searchParams }) => {
                 type="setting"
                 label="Role"
                 important="true"
+                onClick={fetchDataSelect}
+                loadingApi={loadingSettingApi}
+                loading={loadingSettingApi}
+                param={param}
                 defaultValue={
                   formik.values.setting_id === null
                     ? undefined
                     : formik.values.setting_value
                 }
-                options={roles}
+                options={roles.filter((ele) => ele.status === StatusEnum.Active)}
                 onChange={formik.handleChange}
                 placeholder="Role"
                 disabled={false}
@@ -209,16 +218,18 @@ export const NewUser = ({ roles, fetchData, searchParams }) => {
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
-            <div className="col-md-6 col-sm-12 px-3 mt-3">
+            <div className="col-md-6 col-sm-12 px-3">
               <BaseRadio
                 value={formik.values.status}
                 formik={formik}
                 type="status"
                 isLabel={true}
+                label="Status"
+                important="true"
               />
               {/* <BaseCheckbox formik={formik} type="status" /> */}
             </div>
-            <div className="col-md-12 col-sm-12 px-3">
+            <div className="col-md-12 mt-2 col-sm-12 px-3">
               <BaseTextArea
                 formik={formik}
                 label="Note"

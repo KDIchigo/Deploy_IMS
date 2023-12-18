@@ -15,7 +15,36 @@
 .projectCollapse {
     border-radius: 0;
     border-top: 0px !important;
-    .ant-collapse-header,
+    .ant-collapse-header {
+        border-radius: 0 !important;
+        width: 100%;
+        .ant-collapse-header-text {
+            width: 60%;
+            font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .ant-collapse-extra {
+            width: 40% !important;
+            display: flex;
+            .project_extra_item:nth-child(1) {
+                width: 46%;
+                display: flex;
+                justify-content: center;
+            }
+            .project_extra_item:nth-child(2) {
+                width: 36%;
+                display: flex;
+                justify-content: center;
+            }
+            .project_extra_item:nth-child(3) {
+                width: 18%;
+                display: flex;
+                justify-content: center;
+            }
+        }
+    }
     .ant-collapse-item {
         border-radius: 0 !important;
     }
@@ -27,13 +56,12 @@
         max-height: 140px;
         overflow-y: auto;
     }
-    .ant-collapse-header-text {
-        font-weight: bold
-    }
-    .ant-collapse-extra {
-        flex: 0 0 13.5%;
-    }
 }
+
+// .view_projects {
+//     margin-right: 20%;
+// }
+
 .btnLoadingSyn {
     width: 11.9% !important;
     height: 19.6px;

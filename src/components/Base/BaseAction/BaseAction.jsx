@@ -17,6 +17,7 @@ import { swalWithBootstrapButtons } from "src/enum/swal";
 import { SystemSettingDetails } from "src/pages/SystemSettingListPage/components/SystemSettingDetails/SystemSettingDetails";
 import { UserDetails } from "src/pages/UserListPage/components/UserDetails/UserDetails";
 import { showErrorMessage } from "src/utils/HandleErrorMessage";
+import { HandleAuth } from "src/utils/handleAuth";
 const status = [
   {
     value: 1,
@@ -48,10 +49,14 @@ export const BaseAction = ({
   selectTypeIssue,
   issueGroup,
   classMilestones,
-  code,
+  loadingSettingApi,
+  fetchDataSelect,
   issue_setting,
+  code,
+  param,
 }) => {
   const [modal, setModal] = useState(false);
+  const { IsManager } = HandleAuth();
   const [loadingData, setLoadingData] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
   const handleDelete = async (id) => {
@@ -157,7 +162,7 @@ export const BaseAction = ({
 
         {option.status === 1 ? (
           <Tooltip
-            title="Inactive"
+            title="Deactivate"
             placement="top"
             className={type === "Subject" ? "action_space" : ""}
             color="#dc3545"
@@ -167,6 +172,7 @@ export const BaseAction = ({
               {loadingStatus ? (
                 <BaseButton
                   color="danger"
+                  disabled={IsManager()}
                   variant="outline"
                   nameTitle="px-2 py-1"
                   icon={<LoadingOutlined />}
@@ -175,6 +181,7 @@ export const BaseAction = ({
                 <BaseButton
                   icon={<StopOutlined />}
                   variant="outline"
+                  disabled={IsManager()}
                   color="danger"
                   nameTitle="px-2 py-1"
                   onClick={() =>
@@ -190,7 +197,7 @@ export const BaseAction = ({
         {option.status === 0 ? (
           <>
             <Tooltip
-              title="Active"
+              title="Activate"
               placement="top"
               className={type === "Subject" ? "action_space" : ""}
               color="#198754"
@@ -200,6 +207,7 @@ export const BaseAction = ({
                 {loadingStatus ? (
                   <BaseButton
                     color="success"
+                    disabled={IsManager()}
                     variant="outline"
                     nameTitle="px-2 py-1"
                     icon={<LoadingOutlined />}
@@ -208,6 +216,7 @@ export const BaseAction = ({
                   <BaseButton
                     icon={<PoweroffOutlined />}
                     variant="outline"
+                    disabled={IsManager()}
                     color="success"
                     nameTitle="px-2 py-1"
                     onClick={() =>
@@ -228,6 +237,7 @@ export const BaseAction = ({
                   {loadingData ? (
                     <BaseButton
                       color="danger"
+                      disabled={IsManager()}
                       variant="outline"
                       nameTitle="px-2 py-1"
                       icon={<LoadingOutlined />}
@@ -235,6 +245,7 @@ export const BaseAction = ({
                   ) : (
                     <BaseButton
                       color="danger"
+                      disabled={IsManager()}
                       variant="outline"
                       nameTitle="px-2 py-1"
                       onClick={() => handleDelete(optionId)}
@@ -251,7 +262,21 @@ export const BaseAction = ({
           ""
         )}
 
-        {type === "User" ? (
+        {type === "User" && (
+          <UserDetails
+            roles={roles}
+            modal={modal}
+            setModal={setModal}
+            user={option}
+            fetchData={fetchData}
+            searchParams={searchParams}
+            loadingSettingApi={loadingSettingApi}
+            fetchDataSelect={fetchDataSelect}
+            code={code}
+            param={param}
+          />
+        )}
+        {type === "ClassStudent" && (
           <UserDetails
             roles={roles}
             modal={modal}
@@ -261,23 +286,8 @@ export const BaseAction = ({
             searchParams={searchParams}
             code={code}
           />
-        ) : (
-          ""
         )}
-        {type === "ClassStudent" ? (
-          <UserDetails
-            roles={roles}
-            modal={modal}
-            setModal={setModal}
-            user={option}
-            fetchData={fetchData}
-            searchParams={searchParams}
-            code={code}
-          />
-        ) : (
-          ""
-        )}
-        {type === "Setting" ? (
+        {type === "Setting" && (
           <SystemSettingDetails
             modal={modal}
             settings={settings}
@@ -288,8 +298,6 @@ export const BaseAction = ({
             dataGroup={dataGroup}
             code={code}
           />
-        ) : (
-          ""
         )}
         {/* {type === "IssueSetting" ? (
           <IssueSettingDetails

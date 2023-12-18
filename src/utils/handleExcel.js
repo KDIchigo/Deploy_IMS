@@ -24,16 +24,17 @@ const exportToExcelTemplate = (exportExcel) => {
   window.URL.revokeObjectURL(url);
 }
 
-const exportToExcel = (exportExcel) => {
+const exportToExcel = (exportExcel, filename) => {
   const blob = new Blob([exportExcel], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
+  console.log(blob)
 
   // Tạo liên kết tải về
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.setAttribute("download", "Danhsachsinhvien.xlsx");
+  link.setAttribute("download", filename);
   document.body.appendChild(link);
   link.click();
 

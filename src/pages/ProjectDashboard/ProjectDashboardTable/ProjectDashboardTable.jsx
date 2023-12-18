@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import { Status } from "src/pages/UserListPage/components/UserTable/Status/Status";
 import { BaseAction } from "src/components/Base/BaseAction/BaseAction";
 import { BasePagination } from "src/components/Base/BasePagination/BasePagination";
+import moment from "moment";
 const sortOptions = [
   { key: "asc", value: "Price ASC" },
   { key: "desc", value: "Price DESC" },
@@ -43,7 +44,7 @@ export const ProjectDashBoardTable = ({
       title: commit.title,
       committer_name: commit.committer_name,
       author_email: commit.author_email,
-      committed_date: commit.committed_date,
+      committed_date: moment(commit.committed_date).format('DD/MM/YYYY'),
       comments: commit.message,
     });
   }

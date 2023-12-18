@@ -3,8 +3,12 @@ body {
     padding: 0 !important;
     position: relative;
     height: 100vh;
-    font-family: Roboto, Helvetica, Arial, sans-serif;
+    font-family: source-sans-pro, sans-serif !important;
     width: 100vw;
+}
+
+.font_sourceSans {
+    font-family: source-sans-pro, sans-serif;
 }
 
 .ant-select-selector {
@@ -151,27 +155,6 @@ body {
     }
 }
 
-
-.milestoneCollapse {
-    border-radius: 0;
-    border-top: 0px !important;
-    .ant-collapse-header,
-    .ant-collapse-item {
-        border-radius: 0 !important;
-    }
-    .ant-collapse-content-box {
-        padding: 0 !important;
-    }
-
-    .ant-collapse-content {
-        max-height: 140px;
-        overflow-y: auto;
-    }
-    .ant-collapse-header-text {
-        font-weight: bold
-    }
-}
-
 .btn {
     height: 34px !important;
 }
@@ -249,7 +232,12 @@ body {
 
 .badgeActive {
     .ant-badge-status-text {
-        color: #198754 !important;
+        color: #26BF94 !important;
+    }
+}
+.badgePending {
+    .ant-badge-status-text {
+        color: #EC8550 !important;
     }
 }
 
@@ -327,7 +315,24 @@ body {
 }
 
 .action_space {
-    margin-right: 5% !important;
+    margin-right: 2% !important;
+}
+
+.btnFilter {
+    height: 34px !important;
+    width: 100px !important;
+    background-color: #edececd1 !important;
+    border: 1px solid #d9d9d9 !important;
+}
+
+.ant-tooltip-title {
+    color: black;
+}
+
+.truncate-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 // ----------- Google ------------------
@@ -346,7 +351,7 @@ body {
         justify-content: center;
 
         span {
-            color: #e6533c !important
+            color: #e6533c !important;
         }
 
         &:hover {
@@ -355,7 +360,7 @@ body {
                 background-color: #e6533c !important;
             }
             span {
-                color: #fff !important
+                color: #fff !important;
             }
         }
     }

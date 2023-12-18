@@ -263,6 +263,7 @@ export const NewClassStudentsTable = ({
             Table: {
               borderColor: "rgba(0, 0, 0, 0.1)",
               headerBorderRadius: "4px",
+              headerBg: "#edececd1",
               controlItemBgActiveHover: "rgba(0, 0, 0, 0.05)",
               controlItemBgActive: "rgba(0, 0, 0, 0.05)",
             },

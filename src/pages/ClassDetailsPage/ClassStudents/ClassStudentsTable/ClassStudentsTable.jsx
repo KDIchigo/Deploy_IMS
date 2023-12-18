@@ -179,6 +179,7 @@ export const ClassStudentsTable = ({
             Table: {
               borderColor: "rgba(0, 0, 0, 0.1)",
               headerBorderRadius: "4px",
+              headerBg: "#edececd1",
               controlItemBgActiveHover: "rgba(0, 0, 0, 0.05)",
               controlItemBgActive: "rgba(0, 0, 0, 0.05)",
             },
@@ -187,7 +188,7 @@ export const ClassStudentsTable = ({
       >
         <Table
           className="flexGrow_1"
-          style={{ paddingTop: 20, height: "60vh", overflow: "hidden" }}
+          style={{ paddingTop: 20, height: "40vh", overflow: "hidden" }}
           // rowSelection={rowSelection}
           loading={loadingTable}
           columns={columns}
@@ -197,7 +198,7 @@ export const ClassStudentsTable = ({
           bordered
           scroll={{
             x: 1130,
-            y: "60vh",
+            y: 332,
           }}
         />
         <BasePagination

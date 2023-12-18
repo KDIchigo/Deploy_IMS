@@ -31,6 +31,7 @@ const issue_group = [
 ];
 export const NewIssueSetting = ({
   id,
+  option,
   searchParams,
   fetchData,
   selectTypeIssue,
@@ -47,8 +48,8 @@ export const NewIssueSetting = ({
         description: "",
         status: 1,
         inherited_from: 2,
-        class_id: id,
-        is_editable: 1,
+        class_id: option.class_id,
+        is_editable: true,
         style: JSON.stringify({ color: "#1677ff" }),
         created_by: currentUser.email,
       };
@@ -61,7 +62,7 @@ export const NewIssueSetting = ({
         status: 1,
         inherited_from: 3,
         project_id: id,
-        is_editable: 1,
+        is_editable: true,
         style: JSON.stringify({ color: "#1677ff" }),
         created_by: currentUser.email,
       };
@@ -182,15 +183,23 @@ export const NewIssueSetting = ({
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
-            <div className="col-md-6 col-sm-12 mt-2 px-3">
-              <BaseColorPicker formik={formik} value={formik.values.style} />
+            <div className="col-md-6 col-sm-12 px-3">
+              <BaseColorPicker
+                formik={formik}
+                value={formik.values.style}
+                isLabel={true}
+                label="Style"
+                important="true"
+              />
             </div>
-            <div className="col-md-6 col-sm-12 mt-0 px-3">
+            <div className="col-md-6 col-sm-12 px-3">
               <BaseRadio
                 value={formik.values.status}
                 formik={formik}
                 type="status"
                 isLabel={true}
+                label="Status"
+                important="true"
               />
             </div>
             <div className="col-md-12 col-sm-12 mt-3 px-3">

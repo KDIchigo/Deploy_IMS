@@ -3,8 +3,12 @@
 }
 
 .widthBatchUpdate {
-    width: 200px !important;
+    width: 320px !important;
     border-left: 1px solid #d9d9d9;
+    // position: fixed;
+    // right: 0;
+    // z-index: 9999;
+    // background-color: #ffffff;
 }
 
 .widthUnBatchUpdate {
@@ -13,5 +17,5 @@
 
 .issue__list {
     overflow: scroll;
-    height: 60vh; 
+    height: 55vh; 
 }

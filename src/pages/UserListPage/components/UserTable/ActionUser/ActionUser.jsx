@@ -27,7 +27,7 @@ export const ActionUser = ({
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes",
     }).then( async (result) => {
-      console.log(result)
+      // console.log(result)
       if(result.isConfirmed) {
         const { data, err } = await axiosClient.post(
           `/User/UpdateStatus?status=${status}`,

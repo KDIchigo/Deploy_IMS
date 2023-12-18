@@ -229,7 +229,7 @@ const handleFilterChartProjectCondition = async (
     const { data: issueTypes } = await axiosClient.post(
       `IssueSetting/GetDataCombobox?project_id=${projectList[0].project_id}&class_id=${projectList[0].class_id}&subject_id=${projectList[0].subject_id}`
     );
-    console.log(issueTypes);
+    // console.log(issueTypes);
     setIssueTypes(issueTypes);
   }
 
@@ -505,7 +505,7 @@ const fetchFilterUserDashboardAdmin = async (
     }
   }
 
-  setLoadingSelectData(true);
+  // setLoadingSelectData(true);
   setLoadingFilterData(false);
   setLoadingData(true);
 };

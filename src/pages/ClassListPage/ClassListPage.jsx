@@ -12,7 +12,7 @@ import { BaseButton } from "src/components/Base/BaseButton/BaseButton";
 import { BaseFilter } from "src/components/Base/BaseFilter/BaseFilter";
 import { BaseSearch } from "src/components/Base/BaseSearch/BaseSearch";
 import { NavbarDashboard } from "src/components/NavbarDashboard/NavbarDashboard";
-import { ConditionEnum, StatusEnum } from "src/enum/Enum";
+import { ConditionEnum, FilterOperatorEnum, StatusEnum } from "src/enum/Enum";
 import { Role } from "src/enum/Role";
 import { AuthoComponentRoutes } from "src/routes/AuthoComponentRoutes";
 import "./ClassListPage.scss";
@@ -27,8 +27,9 @@ import {
   searchAllUtils,
 } from "src/utils/handleSearchFilter";
 import { BaseSearchAll } from "src/components/Base/BaseSearch/BaseSearchAll";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import {
+  backDataStateParam,
   decodeParam,
   encodeParam,
   genDataStateParam,
@@ -52,9 +53,11 @@ const searchClass = [
   // },
 ];
 export const ClassListPage = () => {
+  const location = useLocation();
   const [searchParamsURL, setSearchParamsURL] = useSearchParams();
   const searchURLParams = new URLSearchParams(location.search);
   const param = searchURLParams.get("param");
+  const [paramDecode, setParamDecode] = useState(param);
 
   const { currentUser, IsTeacher, IsManager } = HandleAuth();
   const [classes, setClasses] = useState({
@@ -62,6 +65,14 @@ export const ClassListPage = () => {
     data: [],
     summary: "",
   });
+
+  const [loadingSemesterApi, setLoadingSemesterApi] = useState(false);
+  const [isCallSemesters, setIsCallSemesters] = useState(false);
+  const [loadingSubjectApi, setLoadingSubjectApi] = useState(false);
+  const [isCallSubjects, setIsCallSubjects] = useState(false);
+  const [loadingTeacherApi, setLoadingTeacherApi] = useState(false);
+  const [isCallTeachers, setIsCallTeachers] = useState(false);
+
   const [dropdown, setDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingTable, setLoadingTable] = useState(false);
@@ -83,17 +94,18 @@ export const ClassListPage = () => {
       {
         field: "teacher_id",
         value: currentUser.user_id,
-        condition: 1,
+        condition: ConditionEnum.Equal,
       },
     ]);
-  IsManager() &&
-    (filterClassCondition = [
-      {
-        field: "created_by",
-        value: currentUser.email,
-        condition: 1,
-      },
-    ]);
+  // IsManager() &&
+  //   (filterClassCondition = [
+  //     {
+  //       field: "created_by",
+  //       value: currentUser.email,
+  //       condition: ConditionEnum.Equal,
+  //       operator: FilterOperatorEnum.OR
+  //     },
+  //   ]);
   // const [searchParams, setSearchParams] = useState({
   //   pageNumber: 1,
   //   pageSize: 10,
@@ -101,7 +113,7 @@ export const ClassListPage = () => {
   //   filterConditions: filterClassCondition,
   // });
   const [searchParams, setSearchParams] = useState(
-    decodeParam(param) === null
+    decodeParam(paramDecode) === null
       ? {
           pageNumber: 1,
           pageSize: 10,
@@ -109,10 +121,10 @@ export const ClassListPage = () => {
           filterConditions: filterClassCondition,
         }
       : {
-          pageNumber: decodeParam(param).pageNumber,
-          pageSize: decodeParam(param).pageSize,
-          sortString: decodeParam(param).sortString,
-          filterConditions: decodeParam(param).filterConditions,
+          pageNumber: decodeParam(paramDecode).pageNumber,
+          pageSize: decodeParam(paramDecode).pageSize,
+          sortString: decodeParam(paramDecode).sortString,
+          filterConditions: decodeParam(paramDecode).filterConditions,
         }
   );
 
@@ -122,11 +134,11 @@ export const ClassListPage = () => {
       value: "2",
       condition: ConditionEnum.Equal,
     },
-    {
-      field: "status",
-      value: StatusEnum.Active,
-      condition: ConditionEnum.Equal,
-    },
+    // {
+    //   field: "status",
+    //   value: StatusEnum.Active,
+    //   condition: ConditionEnum.Equal,
+    // },
   ]);
 
   const [teacherParams, setTeacherParams] = useState({
@@ -136,15 +148,78 @@ export const ClassListPage = () => {
   });
 
   const fetchData = async (searchParams) => {
+    let newFilterConditions = searchParams.filterConditions;
+    if (IsManager()) {
+      // newSearchParams = { ...searchParams };
+      const { data: subjectArr } = await axiosClient.post(
+        "/Subject/GetFilterData?sortString=created_date ASC",
+        [
+          {
+            field: "assignee_id",
+            value: currentUser.user_id,
+            condition: ConditionEnum.Equal,
+          },
+        ]
+      );
+
+      if (subjectArr.length !== 0) {
+        subjectArr.map((ele, index) => {
+          if (index === 0) {
+            if (subjectArr.length === 1) {
+              newFilterConditions.push({
+                field: "subject_id",
+                value: ele.subject_id,
+                condition: ConditionEnum.Equal,
+              });
+            } else {
+              newFilterConditions.push({
+                field: "subject_id",
+                value: ele.subject_id,
+                condition: ConditionEnum.Equal,
+                operator: FilterOperatorEnum.OR,
+                parenthesis: FilterOperatorEnum.OpenParenthesis,
+              });
+            }
+          }
+          if (index !== 0) {
+            if (index !== subjectArr.length - 1) {
+              newFilterConditions.push({
+                field: "subject_id",
+                value: ele.subject_id,
+                condition: ConditionEnum.Equal,
+                operator: FilterOperatorEnum.OR,
+              });
+            } else {
+              newFilterConditions.push({
+                field: "subject_id",
+                value: ele.subject_id,
+                condition: ConditionEnum.Equal,
+                parenthesis: FilterOperatorEnum.CloseParenthesis,
+              });
+            }
+          }
+        });
+      }
+    }
+    const newSearchClassParams = {
+      ...searchParams,
+      filterConditions: newFilterConditions,
+    };
     const { data: classList } = await axiosClient.post(
       "/Class/GetByPaging",
-      searchParams
+      newSearchClassParams
     );
     setClasses(classList);
     setLoading(false);
     setLoadingData(true);
     setLoadingTable(false);
   };
+
+  if ([].length !== 0) {
+    console.log([].filter((ele) => ele.project_id));
+  } else {
+    console.log("[]");
+  }
 
   const fetchDataSelect = async () => {
     const { data: systemSettingArr } = await axiosClient.post(
@@ -155,7 +230,26 @@ export const ClassListPage = () => {
 
     const { data: subjectArr } = await axiosClient.post(
       "/Subject/GetFilterData?sortString=created_date ASC",
-      []
+      IsManager()
+        ? [
+            {
+              field: "assignee_id",
+              value: currentUser.user_id,
+              condition: ConditionEnum.Equal,
+            },
+            // {
+            //   field: "status",
+            //   value: StatusEnum.Active,
+            //   condition: ConditionEnum.Equal,
+            // },
+          ]
+        : [
+            // {
+            //   field: "status",
+            //   value: StatusEnum.Active,
+            //   condition: ConditionEnum.Equal,
+            // },
+          ]
     );
     setSubjects(subjectArr);
 
@@ -178,75 +272,119 @@ export const ClassListPage = () => {
           value: roleList[0].setting_id,
           condition: ConditionEnum.Equal,
         },
-        {
-          field: "status",
-          value: StatusEnum.Active,
-          condition: ConditionEnum.Equal,
-        },
+        // {
+        //   field: "status",
+        //   value: StatusEnum.Active,
+        //   condition: ConditionEnum.Equal,
+        // },
       ]
     );
     setTeachers(userArr);
-    genDataStateParam(param, setCheckedStatus, "status_started");
-    genDataStateParam(param, setCheckedSearchInput, "search", [], searchClass);
-    genDataStateParam(param, setCheckedSubject, "subject", subjectArr);
-    genDataStateParam(param, setCheckedSetting, "semester", systemSettingArr);
-    genDataStateParam(param, setCheckedTeacher, "teacher", userArr);
+    genDataStateParam(paramDecode, setCheckedStatus, "status_started", []);
+    genDataStateParam(
+      paramDecode,
+      setCheckedSearchInput,
+      "search",
+      [],
+      searchClass
+    );
+    genDataStateParam(paramDecode, setCheckedSubject, "subject", subjectArr);
+    genDataStateParam(
+      paramDecode,
+      setCheckedSetting,
+      "semester",
+      systemSettingArr
+    );
+    genDataStateParam(paramDecode, setCheckedTeacher, "teacher", userArr);
+    // setSearchParamsURL({ param: encodeParam(searchParams) });
+    setIsCallSemesters(true);
+    setIsCallSubjects(true);
+    setIsCallTeachers(true);
     setLoadingSelect(true);
   };
 
   const fetchSystemSetting = async () => {
-    const { data: systemSettingArr } = await axiosClient.post(
-      "/Setting/GetFilterData?sortString=display_order ASC",
-      semesterParams
-    );
-    setSemesters(systemSettingArr);
-    genDataStateParam(param, setCheckedSetting, "semester", systemSettingArr);
+    if (!isCallSemesters) {
+      setLoadingSemesterApi(true);
+      const { data: systemSettingArr } = await axiosClient.post(
+        "/Setting/GetFilterData?sortString=display_order ASC",
+        semesterParams
+      );
+      setSemesters(systemSettingArr);
+      genDataStateParam(param, setCheckedSetting, "semester", systemSettingArr);
+      setIsCallSemesters(true);
+      setLoadingSemesterApi(false);
+    }
     // console.log(systemSettingArr);
     // return systemSettingArr;
   };
 
   const fetchSubject = async () => {
-    const { data: subjectArr } = await axiosClient.post(
-      "/Subject/GetFilterData?sortString=created_date ASC",
-      [
-        {
-          field: "status",
-          value: StatusEnum.Active,
-          condition: ConditionEnum.Equal,
-        },
-      ]
-    );
-    setSubjects(subjectArr);
-    genDataStateParam(param, setCheckedSubject, "subject", subjectArr);
+    if (!isCallSubjects) {
+      setLoadingSubjectApi(true);
+      const { data: subjectArr } = await axiosClient.post(
+        "/Subject/GetFilterData?sortString=created_date ASC",
+        IsManager()
+          ? [
+              {
+                field: "assignee_id",
+                value: currentUser.user_id,
+                condition: ConditionEnum.Equal,
+              },
+              // {
+              //   field: "status",
+              //   value: StatusEnum.Active,
+              //   condition: ConditionEnum.Equal,
+              // },
+            ]
+          : [
+              // {
+              //   field: "status",
+              //   value: StatusEnum.Active,
+              //   condition: ConditionEnum.Equal,
+              // },
+            ]
+      );
+      setSubjects(subjectArr);
+      genDataStateParam(param, setCheckedSubject, "subject", subjectArr);
+      setIsCallSubjects(true);
+      setLoadingSubjectApi(false);
+    }
   };
   const fetchTeacher = async () => {
-    const { data: roleList } = await axiosClient.post(
-      "/Setting/GetFilterData?sortString=created_date ASC",
-      [
-        {
-          field: "setting_value",
-          value: "Teacher",
-          condition: ConditionEnum.Equal,
-        },
-      ]
-    );
+    if (!isCallTeachers) {
+      setLoadingTeacherApi(true);
+      const { data: roleList } = await axiosClient.post(
+        "/Setting/GetFilterData?sortString=created_date ASC",
+        [
+          {
+            field: "setting_value",
+            value: "Teacher",
+            condition: ConditionEnum.Equal,
+          },
+        ]
+      );
 
-    const { data: userArr } = await axiosClient.post(
-      "/User/GetFilterData?sortString=created_date ASC",
-      [
-        {
-          field: "setting_id",
-          value: roleList[0].setting_id,
-          condition: ConditionEnum.Equal,
-        },
-        {
-          field: "status",
-          value: StatusEnum.Active,
-          condition: ConditionEnum.Equal,
-        },
-      ]
-    );
-    setTeachers(userArr);
+      const { data: userArr } = await axiosClient.post(
+        "/User/GetFilterData?sortString=created_date ASC",
+        [
+          {
+            field: "setting_id",
+            value: roleList[0].setting_id,
+            condition: ConditionEnum.Equal,
+          },
+          // {
+          //   field: "status",
+          //   value: StatusEnum.Active,
+          //   condition: ConditionEnum.Equal,
+          // },
+        ]
+      );
+      setTeachers(userArr);
+      genDataStateParam(paramDecode, setCheckedTeacher, "teacher", userArr);
+      setIsCallTeachers(true);
+      setLoadingTeacherApi(false);
+    }
   };
 
   const fetchDataAndSelect = async () => {
@@ -258,7 +396,7 @@ export const ClassListPage = () => {
     ]);
     setLoadingSelect(true);
   };
-  console.log(decodeParam(param));
+  // console.log(decodeParam(param));
 
   const onPageChange = (pageNumber, pageSize) => {
     setLoadingTable(true);
@@ -363,18 +501,95 @@ export const ClassListPage = () => {
   const onResetSearchInput = (value) => {
     setCheckedSearchInput(value);
   };
+
+  const fetchBackData = async () => {
+    const params = new URLSearchParams(location.search);
+    const paramFromURL = params.get("param");
+
+    // Nếu filter thay đổi, cập nhật trạng thái của component
+    if (paramDecode !== paramFromURL) {
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedSearchInput,
+        "search",
+        [],
+        searchClass,
+        "",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedStatus,
+        "status_started",
+        [],
+        [],
+        "status",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedSetting,
+        "semester",
+        semesters,
+        [],
+        "semester_id",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedSubject,
+        "subject",
+        subjects,
+        [],
+        "subject_id",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedTeacher,
+        "teacher",
+        teachers,
+        [],
+        "teacher_id",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      // console.log(decodeParam(paramFromURL))
+    } else {
+      fetchDataSelect();
+    }
+  };
+
+  useEffect(() => {
+    // Xử lý sự thay đổi trong URL
+    fetchBackData();
+  }, [location.search, paramDecode]);
   useEffect(() => {
     // fetchDataAndSelect();
     fetchData(searchParams);
-    fetchDataSelect();
+    // fetchDataSelect();
   }, []);
 
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position="class"
-        spin={loadingSelect}
+        spin={loadingData}
         dashboardBody={
           <Box className="box w-100 d-flex flex-column flexGrow_1">
             <div className="card custom-card mb-0 flexGrow_1">
@@ -427,6 +642,12 @@ export const ClassListPage = () => {
                                     checkedSubject={checkedSubject}
                                     checkedTeacher={checkedTeacher}
                                     onChangeTeacher={onChangeTeacher}
+                                    loadingSemesterApi={loadingSemesterApi}
+                                    fetchSystemSetting={fetchSystemSetting}
+                                    loadingSubjectApi={loadingSubjectApi}
+                                    fetchSubject={fetchSubject}
+                                    loadingTeacherApi={loadingTeacherApi}
+                                    fetchTeacher={fetchTeacher}
                                     handleSaveFilter={handleSaveFilter}
                                   />
                                 </div>
@@ -446,21 +667,8 @@ export const ClassListPage = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 position-relative align-items-center float-end">
-                      <AuthoComponentRoutes
-                        element={
-                          <NewClass
-                            semesters={semesters}
-                            subjects={subjects}
-                            teachers={teachers}
-                            fetchData={fetchData}
-                            searchParams={searchParams}
-                          />
-                        }
-                        listRole={[Role.Manager, Role.Admin]}
-                      />
-
-                      <div className="col-lg-7 me-4 float-end me-1 mt-1 d-flex h-100 justify-content-end">
+                    <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 position-relative d-flex align-items-center justify-content-end">
+                      <div className="col-lg-7 float-end me-1 d-flex h-100 justify-content-end">
                         <Tooltip
                           title="Reset"
                           placement="top"
@@ -483,6 +691,24 @@ export const ClassListPage = () => {
                           )}
                         </Tooltip>
                       </div>
+                      <AuthoComponentRoutes
+                        element={
+                          <NewClass
+                            semesters={semesters}
+                            subjects={subjects}
+                            teachers={teachers}
+                            fetchData={fetchData}
+                            searchParams={searchParams}
+                            loadingSemesterApi={loadingSemesterApi}
+                            fetchSystemSetting={fetchSystemSetting}
+                            loadingSubjectApi={loadingSubjectApi}
+                            fetchSubject={fetchSubject}
+                            loadingTeacherApi={loadingTeacherApi}
+                            fetchTeacher={fetchTeacher}
+                          />
+                        }
+                        listRole={[Role.Manager, Role.Admin]}
+                      />
                     </div>
                   </div>
                 </div>

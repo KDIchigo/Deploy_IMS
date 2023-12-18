@@ -33,11 +33,7 @@ const issue_group = [
   {
     value: IssueSettingEnum.WorkProcess,
     label: "Work Process",
-  },
-  {
-    value: IssueSettingEnum.Others,
-    label: "Others",
-  },
+  }
 ];
 
 export const ProjectDetailsSetting = () => {
@@ -123,7 +119,7 @@ export const ProjectDetailsSetting = () => {
   }, []);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position={IsStudent() ? "project-student-settings" : "project"}
         spin={loadingData}

@@ -14,6 +14,8 @@ export const SubjectDetailsGeneral = () => {
   const [users, setUsers] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
   const [loadingSelect, setLoadingSelect] = useState(false);
+  const [loadingManagerApi, setLoadingManagerApi] = useState(false);
+  const [isCallManagers, setIsCallManagers] = useState(false);
   const [subjectObj, setSubjectObj] = useState({});
   const fetchData = async () => {
     const { data: subjectById } = await axiosClient.get(
@@ -23,35 +25,40 @@ export const SubjectDetailsGeneral = () => {
     setLoadingData(true);
   };
   const fetchDataSelect = async () => {
-    const { data: roleArr } = await axiosClient.post(
-      "/Setting/GetFilterData?sortString=display_order ASC",
-      [
-        {
-          field: "setting_value",
-          value: "Manager",
-          condition: ConditionEnum.Equal,
-        },
-      ]
-    );
+    if (!isCallManagers) {
+      setLoadingManagerApi(true);
+      const { data: roleArr } = await axiosClient.post(
+        "/Setting/GetFilterData?sortString=display_order ASC",
+        [
+          {
+            field: "setting_value",
+            value: "Manager",
+            condition: ConditionEnum.Equal,
+          },
+        ]
+      );
 
-    const { data: userArr } = await axiosClient.post(
-      "/User/GetFilterData?sortString=created_date ASC",
-      [
-        {
-          field: "setting_id",
-          value: roleArr[0].setting_id,
-          condition: ConditionEnum.Equal,
-        },
-        {
-          field: "status",
-          value: StatusEnum.Active,
-          condition: ConditionEnum.Equal,
-        },
-      ]
-    );
-    setUsers(userArr);
-    setLoadingData(true);
-    setLoadingSelect(true);
+      const { data: userArr } = await axiosClient.post(
+        "/User/GetFilterData?sortString=created_date ASC",
+        [
+          {
+            field: "setting_id",
+            value: roleArr[0].setting_id,
+            condition: ConditionEnum.Equal,
+          },
+          {
+            field: "status",
+            value: StatusEnum.Active,
+            condition: ConditionEnum.Equal,
+          },
+        ]
+      );
+      setUsers(userArr);
+      setLoadingData(true);
+      setIsCallManagers(true);
+      setLoadingManagerApi(false);
+      // setLoadingSelect(true);
+    }
   };
   const onChange = (key) => {
     switch (key) {
@@ -68,15 +75,14 @@ export const SubjectDetailsGeneral = () => {
   };
   useEffect(() => {
     fetchData();
-    fetchDataSelect();
+    // fetchDataSelect();
   }, []);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
-
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position="subject"
-        spin={loadingData && loadingSelect}
+        spin={loadingData}
         dashboardBody={
           <Tabs
             defaultActiveKey="1"
@@ -90,15 +96,13 @@ export const SubjectDetailsGeneral = () => {
                   <div className="flex_height">
                     <div className="card custom-card mb-0 flex_height">
                       <div className="card-body flex_height">
-                        {loadingData && loadingSelect ? (
-                          <SubjectGeneral
-                            users={users}
-                            subjectObj={subjectObj}
-                            fetchData={fetchData}
-                          />
-                        ) : (
-                          ""
-                        )}
+                        <SubjectGeneral
+                          users={users}
+                          subjectObj={subjectObj}
+                          fetchData={fetchData}
+                          fetchSelectData={fetchDataSelect}
+                          loadingManagerApi={loadingManagerApi}
+                        />
                       </div>
                     </div>
                   </div>

@@ -165,6 +165,7 @@ export const ClassMilestoneTable = ({
             Table: {
               borderColor: "rgba(0, 0, 0, 0.1)",
               headerBorderRadius: "4px",
+              headerBg: "#edececd1",
               controlItemBgActiveHover: "rgba(0, 0, 0, 0.05)",
               controlItemBgActive: "rgba(0, 0, 0, 0.05)",
             },
@@ -173,7 +174,7 @@ export const ClassMilestoneTable = ({
       >
         <Table
           className="flexGrow_1"
-          style={{ height: "60vh", overflow: "hidden" }}
+          style={{ height: "50vh", overflow: "hidden" }}
           columns={columns}
           dataSource={data}
           loading={loadingTable}
@@ -182,7 +183,7 @@ export const ClassMilestoneTable = ({
           bordered
           scroll={{
             x: 1180,
-            y: "60vh",
+            y: 362,
           }}
         />
         {}

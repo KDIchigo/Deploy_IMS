@@ -17,9 +17,11 @@ export const ProjectMember = ({
   students,
   loadingTable,
   handleSetLeader,
+  handleChangeStatus,
   handleProjectStudentDelete,
   loadingLeader,
   loadingRemove,
+  loadingStatus,
   classId,
   actionId,
   classObj,
@@ -66,8 +68,10 @@ export const ProjectMember = ({
           actionId={actionId}
           loadingLeader={loadingLeader}
           loadingRemove={loadingRemove}
+          loadingStatus={loadingStatus}
           isLeader={project.leader_id === student.student_id}
           handleSetLeader={handleSetLeader}
+          handleChangeStatus={handleChangeStatus}
           handleProjectStudentDelete={handleProjectStudentDelete}
         />
       ),
@@ -161,6 +165,7 @@ export const ProjectMember = ({
             Table: {
               borderColor: "rgba(0, 0, 0, 0.1)",
               headerBorderRadius: "4px",
+              headerBg: "#edececd1",
               controlItemBgActiveHover: "rgba(0, 0, 0, 0.05)",
               controlItemBgActive: "rgba(0, 0, 0, 0.05)",
             },

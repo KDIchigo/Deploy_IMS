@@ -1,4 +1,4 @@
-import { Select } from "antd";
+import { Select, Spin } from "antd";
 import { useState } from "react";
 import { ConditionEnum } from "src/enum/Enum";
 const { Option } = Select;
@@ -19,6 +19,10 @@ export const SelectInputMilestone = ({
   checked,
   status,
   onBlur,
+  loading,
+  loadingApi,
+  onClick,
+  param,
 }) => {
   const className = `selectDesign ${disabled ? "disable" : ""}`;
   // const roleArr = [];
@@ -55,8 +59,10 @@ export const SelectInputMilestone = ({
           id={id}
           status={status}
           onBlur={onBlur}
+          loading={loading}
           placeholder={placeholder}
           disabled={disabled}
+          onClick={() => onClick(param)}
           onChange={(value, object) => {
             if (isFilter) {
               const newFilter = {
@@ -73,18 +79,26 @@ export const SelectInputMilestone = ({
             // console.log(filter);
           }}
         >
-          {isFilter === true ? (
-            <Option key="all" value="all">
-              All
+          {loadingApi ? (
+            <Option key="loading" disabled>
+              <Spin size="small" disabled />
             </Option>
           ) : (
-            ""
+            <>
+              {isFilter === true ? (
+                <Option key="all" value="all">
+                  All
+                </Option>
+              ) : (
+                ""
+              )}
+              {options.map((option) => (
+                <Option key={option.milestone_id} value={option.milestone_name}>
+                  {option.milestone_name}
+                </Option>
+              ))}
+            </>
           )}
-          {options.map((option) => (
-            <Option key={option.milestone_id} value={option.milestone_name}>
-              {option.milestone_name}
-            </Option>
-          ))}
         </Select>
       </div>
     </>

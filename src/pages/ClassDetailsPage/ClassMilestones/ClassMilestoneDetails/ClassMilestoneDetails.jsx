@@ -17,6 +17,7 @@ import { HandleAuth } from "src/utils/handleAuth";
 import * as Yup from "yup";
 import "./ClassMilestoneDetails.scss";
 import { InheritedEnum } from "src/enum/Enum";
+import { BaseDatePicker } from "src/components/Base/BaseDatePicker/BaseDatePicker";
 
 export const ClassMilestoneDetails = ({
   searchParams,
@@ -181,13 +182,40 @@ export const ClassMilestoneDetails = ({
               )}
             </div>
             <div className="col-md-6 col-sm-12 px-3">
+              <BaseDatePicker
+                id="modified_date"
+                label="Last Update"
+                name="modified_date"
+                className="w-100 px-2 datePicker"
+                defaultValue={formik.values.modified_date}
+                placeholder="It hasn't been updated"
+                value={formik.values.modified_date}
+                onChange={formik.handleChange}
+                disabled={true}
+                classNameInput={
+                  formik.errors.modified_date && formik.touched.modified_date
+                    ? "is-invalid"
+                    : ""
+                }
+                status={
+                  formik.errors.modified_date && formik.touched.modified_date
+                    ? "error"
+                    : ""
+                }
+                formik={formik}
+                onBlur={formik.handleBlur}
+              />
+            </div>
+            <div className="col-md-6 col-sm-12 px-3">
               {/* <BaseRadio label="Status" important="true" formik={formik} type="status"/> */}
               <BaseRadio
                 value={formik.values.status}
                 formik={formik}
                 type="status"
                 feature="pending"
-                isLabel={false}
+                isLabel={true}
+                label="Status"
+                important="true"
               />
             </div>
             <div className="col-md-12 col-sm-12 mt-3 px-3 ">

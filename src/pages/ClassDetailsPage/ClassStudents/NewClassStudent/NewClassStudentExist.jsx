@@ -11,7 +11,7 @@ import { GeneratePassword } from "src/pages/UserListPage/components/GeneratePass
 import * as Yup from "yup";
 import { NewClassStudentsTable } from "./NewClassStudentsTable/NewClassStudentsTable";
 import { axiosClient } from "src/axios/AxiosClient";
-import { ConditionEnum, StatusEnum } from "src/enum/Enum";
+import { ConditionEnum, FilterOperatorEnum, StatusEnum } from "src/enum/Enum";
 import {
   filterUtils,
   searchAllUtils,
@@ -19,6 +19,7 @@ import {
 } from "src/utils/handleSearchFilter";
 import { toast } from "react-toastify";
 import { showErrorMessage } from "src/utils/HandleErrorMessage";
+import { encodeParam } from "src/utils/handleEnDecode";
 
 export const NewClassStudentExist = ({
   modal,
@@ -27,39 +28,55 @@ export const NewClassStudentExist = ({
   fetchData,
   searchParams,
   settingStudent,
+  setSearchParamsURL,
+  students,
+  setStudents,
+  studentsParams,
+  setStudentsParams,
+  loading,
+  loadingData,
+  loadingTable,
+  setLoading,
+  setLoadingData,
+  setLoadingTable,
+  checkedSearchInput,
+  setCheckedSearchInput,
+  checkedSearchSelect,
+  setCheckedSearchSelect,
 }) => {
-  const [loading, setLoading] = useState(false);
-  const [loadingTable, setLoadingTable] = useState(false);
-  const [loadingData, setLoadingData] = useState(false);
-  const [checkedSearchSelect, setCheckedSearchSelect] = useState(undefined);
-  const [checkedSearchInput, setCheckedSearchInput] = useState(null);
-  const [students, setStudents] = useState({
-    totalRecord: 0,
-    data: [],
-    summary: "",
-  });
-  const [studentsParams, setStudentsParams] = useState({
-    pageNumber: 1,
-    pageSize: 8,
-    sortString: "",
-    filterConditions: [
-      {
-        field: "class_id",
-        value: classId,
-        condition: ConditionEnum.NotIn,
-      },
-      {
-        field: "status",
-        value: StatusEnum.Active,
-        condition: ConditionEnum.Equal,
-      },
-      {
-        field: "setting_id",
-        value: settingStudent.setting_id,
-        condition: ConditionEnum.Equal,
-      },
-    ],
-  });
+  // const [loading, setLoading] = useState(false);
+  // const [loadingTable, setLoadingTable] = useState(false);
+  // const [loadingData, setLoadingData] = useState(false);
+  // const [checkedSearchSelect, setCheckedSearchSelect] = useState(undefined);
+  // const [checkedSearchInput, setCheckedSearchInput] = useState(null);
+  // const [students, setStudents] = useState({
+  //   totalRecord: 0,
+  //   data: [],
+  //   summary: "",
+  // });
+  // const [studentsParams, setStudentsParams] = useState({
+  //   pageNumber: 1,
+  //   pageSize: 8,
+  //   sortString: "",
+  //   filterConditions: [
+  //     {
+  //       field: "class_id",
+  //       value: classId,
+  //       condition: ConditionEnum.NotIn,
+  //     },
+  //     {
+  //       field: "status",
+  //       value: StatusEnum.Active,
+  //       condition: ConditionEnum.Equal,
+  //     },
+  //     {
+  //       field: "setting_id",
+  //       value: settingStudent.setting_id,
+  //       condition: ConditionEnum.Equal,
+  //     },
+  //   ],
+  // });
+  console.log(students);
   const toggle = () => {
     setModalStudentExist(!modal);
     onReset();
@@ -123,13 +140,59 @@ export const NewClassStudentExist = ({
   };
   const onSearchAll = (filter, options) => {
     setLoadingTable(true);
-    searchAllUtils(
-      filter,
-      options,
-      studentsParams,
-      setStudentsParams,
-      fetchStudentData
+    // searchAllUtils(
+    //   filter,
+    //   options,
+    //   studentsParams,
+    //   setStudentsParams,
+    //   fetchStudentData,
+    //   setSearchParamsURL
+    // );
+    const filterConditions = studentsParams.filterConditions.filter(
+      (obj) => obj.condition !== ConditionEnum.Like
     );
+    if (options.length === 1) {
+      filterConditions.push({
+        field: options[0].id,
+        value: filter,
+        condition: ConditionEnum.Like,
+      });
+    } else {
+      options.map((ele, index) => {
+        if (index === 0) {
+          filterConditions.push({
+            field: ele.id,
+            value: filter,
+            condition: ConditionEnum.Like,
+            operator: FilterOperatorEnum.OR,
+            parenthesis: FilterOperatorEnum.OpenParenthesis,
+          });
+        }
+        if (index > 0 && index < options.length - 1) {
+          filterConditions.push({
+            field: ele.id,
+            value: filter,
+            condition: ConditionEnum.Like,
+            operator: FilterOperatorEnum.OR,
+          });
+        }
+        if (index === options.length - 1) {
+          filterConditions.push({
+            field: ele.id,
+            value: filter,
+            condition: ConditionEnum.Like,
+            parenthesis: FilterOperatorEnum.CloseParenthesis,
+          });
+        }
+      });
+    }
+    const newSearchParams = {
+      ...searchParams,
+      pageNumber: 1,
+      filterConditions: filterConditions,
+    };
+    setStudentsParams(newSearchParams);
+    fetchStudentData(newSearchParams);
   };
   const onFilter = (filter) => {
     filterUtils(filter, studentsParams, setStudentsParams, fetchStudentData);
@@ -166,9 +229,9 @@ export const NewClassStudentExist = ({
       toggle();
     }
   };
-  useEffect(() => {
-    fetchStudentData(studentsParams);
-  }, []);
+  // useEffect(() => {
+  //   fetchStudentData(studentsParams);
+  // }, []);
 
   return (
     <>
@@ -179,25 +242,25 @@ export const NewClassStudentExist = ({
             <ModalHeader toggle={toggle}>New Existing Student</ModalHeader>
             <ModalBody style={{ pointerEvents: loading ? "none" : "auto" }}>
               <div className="row">
-                {loadingData && (
-                  <NewClassStudentsTable
-                    classId={classId}
-                    students={students}
-                    onPageChange={onPageChange}
-                    searchParams={studentsParams}
-                    fetchData={fetchStudentData}
-                    onSearch={onSearch}
-                    onSearchAll={onSearchAll}
-                    onReset={onReset}
-                    loading={loading}
-                    loadingTable={loadingTable}
-                    checkedSearchSelect={checkedSearchSelect}
-                    onResetSearchSelect={onResetSearchSelect}
-                    checkedSearchInput={checkedSearchInput}
-                    onResetSearchInput={onResetSearchInput}
-                    handleNewClassStudentExist={handleNewClassStudentExist}
-                  />
-                )}
+                {/* {loadingData && ( */}
+                <NewClassStudentsTable
+                  classId={classId}
+                  students={students}
+                  onPageChange={onPageChange}
+                  searchParams={studentsParams}
+                  fetchData={fetchStudentData}
+                  onSearch={onSearch}
+                  onSearchAll={onSearchAll}
+                  onReset={onReset}
+                  loading={loading}
+                  loadingTable={loadingTable}
+                  checkedSearchSelect={checkedSearchSelect}
+                  onResetSearchSelect={onResetSearchSelect}
+                  checkedSearchInput={checkedSearchInput}
+                  onResetSearchInput={onResetSearchInput}
+                  handleNewClassStudentExist={handleNewClassStudentExist}
+                />
+                {/* )} */}
               </div>
             </ModalBody>
             {/* <ModalFooter>

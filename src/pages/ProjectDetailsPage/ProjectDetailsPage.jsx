@@ -73,7 +73,7 @@ export const ProjectDetailsPage = () => {
   }, []);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position={IsStudent() ? "project-student-general" : "project"}
         spin={loadingData && loadingSelect}

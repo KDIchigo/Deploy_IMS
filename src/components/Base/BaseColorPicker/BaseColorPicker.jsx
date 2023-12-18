@@ -2,18 +2,24 @@ import { ColorPicker, theme } from "antd";
 import React, { useMemo, useState } from "react";
 import "./BaseColorPicker.scss";
 
-export const BaseColorPicker = ({ formik, value }) => {
+export const BaseColorPicker = ({
+  formik,
+  value,
+  isLabel,
+  label,
+  important,
+}) => {
   // kiểm tra nếu value có dấu nháy kép đầu cuối thì loại bỏ
   if (value.startsWith('"') && value.endsWith('"')) {
     value = value.slice(1, -1);
   }
   // Loại bỏ các escape không cần thiết, bao gồm \\\\, \\r\\n, \\r, \\n, \\
   value = value
-    .replace(/\\\\/g, '')
-    .replace(/\\r\\n/g, '')
-    .replace(/\\r/g, '')
-    .replace(/\\n/g, '')
-    .replace(/\\/g, '');
+    .replace(/\\\\/g, "")
+    .replace(/\\r\\n/g, "")
+    .replace(/\\r/g, "")
+    .replace(/\\n/g, "")
+    .replace(/\\/g, "");
 
   const [colorHex, setColorHex] = useState(JSON.parse(value).color);
   const [formatHex, setFormatHex] = useState("hex");
@@ -87,16 +93,30 @@ export const BaseColorPicker = ({ formik, value }) => {
 
   return (
     <>
-      <ColorPicker
-        showText
-        format={formatHex}
-        value={colorHex}
-        onChange={(e) => {
-          handleColor(e);
-        }}
-        onFormatChange={setFormatHex}
-      />
+      {isLabel ? (
+        <label htmlFor="input-placeholder" className="form-label me-2">
+          {label}
+          {important === "true" && (
+            <span className="ms-1" style={{ color: "red" }}>
+              *
+            </span>
+          )}
+        </label>
+      ) : (
+        ""
+      )}
       <br />
+      <div className="input-group">
+        <ColorPicker
+          showText
+          format={formatHex}
+          value={colorHex}
+          onChange={(e) => {
+            handleColor(e);
+          }}
+          onFormatChange={setFormatHex}
+        />
+      </div>
       {/* <ColorPicker value={colorList} open={false} 
       onChange={handleColorChange}
       getPopupContainer={(triggerNode) => triggerNode.parentNod8e}/> */}

@@ -41,9 +41,9 @@ export const LoginWithGoogle = () => {
       <div id="loginGoogle">
         <GoogleLogin
           clientId={clientId}
-          buttonText="Login"
           onSuccess={onSuccess}
           onFailure={onFailure}
+          buttonText="Sign in with Google"
           cookiePolicy={"single_host_origin"}
           isSignedIn={true}
         />

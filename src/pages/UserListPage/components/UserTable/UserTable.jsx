@@ -16,6 +16,9 @@ export const UserTable = ({
   onPageChange,
   onPageSizeChange,
   fetchData,
+  loadingSettingApi,
+  fetchDataSelect,
+  param,
   handleChangeStatus,
   loadingTable,
 }) => {
@@ -76,7 +79,7 @@ export const UserTable = ({
   //   }, 1000);
   // };
   const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
+    // console.log("selectedRowKeys changed: ", newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
@@ -133,6 +136,9 @@ export const UserTable = ({
           code={user.fullname}
           fetchData={fetchData}
           searchParams={searchParams}
+          loadingSettingApi={loadingSettingApi}
+          fetchDataSelect={fetchDataSelect}
+          param={param}
         />
       ),
     });
@@ -260,7 +266,9 @@ export const UserTable = ({
             Table: {
               borderColor: "rgba(0, 0, 0, 0.1)",
               headerBorderRadius: "4px",
-              controlItemBgActiveHover: "rgba(0, 0, 0, 0.05)",
+              headerBg: "#edececd1",
+              // rowHoverBg: "#fff7f0",
+              fontFamily: "source-sans-pro, sans-serif",
               controlItemBgActive: "rgba(0, 0, 0, 0.05)",
             },
           },
@@ -269,7 +277,7 @@ export const UserTable = ({
         <Table
           className="flexGrow_1"
           // rowSelection={rowSelection}
-          style={{ height: "60vh", overflow: "hidden" }}
+          style={{ height: "50vh", overflow: "hidden" }}
           loading={loadingTable}
           columns={columns}
           dataSource={data}
@@ -278,7 +286,7 @@ export const UserTable = ({
           bordered
           scroll={{
             x: 1130,
-            y: "60vh",
+            y: 362,
           }}
         />
         <BasePagination
@@ -287,7 +295,7 @@ export const UserTable = ({
             onPageChange(pageNumber, pageSize);
           }}
           onPageSizeChange={(pageSize) => {
-            onPageSizeChange(pageSize)
+            onPageSizeChange(pageSize);
           }}
           pageSize={searchParams.pageSize}
           totalRecord={users.totalRecord}

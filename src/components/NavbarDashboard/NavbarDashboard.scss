@@ -1,10 +1,11 @@
 .logoDashboard {
   background-color: #dddddd;
-  max-height: 65px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  max-height: 63px;
+  border-bottom: 1px solid #ffffff;
   justify-content: center;
   align-items: center;
   z-index: 2;
+  border-right: 1px solid rgba(5, 5, 5, 0.06);
 }
 
 .headerDashboard {
@@ -14,14 +15,14 @@
   border-left: 1px solid white;
   background-color: white;
   min-width: 100vh;
-  min-height: 65px;
+  min-height: 62px;
   z-index: 20;
   // marginLeft: mgLeft !== false ? "" : "250px";
   position: "sticky";
 }
 
 .widthCollapse {
-  min-width: 260px;
+  min-width: 258px;
   transition: all 0.3s;
 }
 
@@ -67,11 +68,23 @@
   display: flex !important;
   flex-direction: column;
   flex-grow: 1;
+  border-radius: 0px !important;
+
+  // .card-body {
+  //   background-color: whitesmoke !important;
+  // }
   // minHeight: "600px",
   // marginLeft: mgLeft !== false ? "" : "250px",
 }
+
+.custom-card {
+  border-radius: 0px !important;
+}
+
 // .siderDashboard {
 //   overflow: "auto";
+//   max-width: 261px !important;
+//   min-width: 261px !important;
 //   background-color: rgba(0, 0, 0, 0.05);
 //   // position: fixed !== false ? "" : "fixed",
 //   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -80,6 +93,7 @@
 //   bottom: 0;
 //   height: 100vh;
 // }
+
 .btnHelpNav{
   width: 70px !important;
 display: flex;
@@ -87,9 +101,15 @@ justify-content: center;
 }
 .tagRole{
   border-radius: 50px;
-  width: 25%;
+  // width: 25%;
+  padding-left: 35px;
+  padding-right: 15px;
   height: 35px;
   margin-top: 15px;
   display: flex;
   align-items: center;
 }
+
+// .ant-menu-title-content {
+//   font-size: 18px;
+// }

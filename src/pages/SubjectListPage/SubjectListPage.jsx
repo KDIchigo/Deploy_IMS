@@ -29,8 +29,13 @@ import { NewSubject } from "./components/NewSubject/NewSubject";
 import { SubjectTable } from "./components/SubjectTable/SubjectTable";
 import { HandleAuth } from "src/utils/handleAuth";
 import { BaseSearchAll } from "src/components/Base/BaseSearch/BaseSearchAll";
-import { useSearchParams } from "react-router-dom";
-import { decodeParam, encodeParam, genDataStateParam } from "src/utils/handleEnDecode";
+import { useLocation, useSearchParams } from "react-router-dom";
+import {
+  backDataStateParam,
+  decodeParam,
+  encodeParam,
+  genDataStateParam,
+} from "src/utils/handleEnDecode";
 
 const searchSubject = [
   {
@@ -48,11 +53,13 @@ const filter = {
   condition: ConditionEnum.Equal,
 };
 export const SubjectListPage = () => {
+  const location = useLocation();
+
   const { currentUser, IsManager } = HandleAuth();
   const [searchParamsURL, setSearchParamsURL] = useSearchParams();
   const searchURLParams = new URLSearchParams(location.search);
   const param = searchURLParams.get("param");
-
+  const [paramDecode, setParamDecode] = useState(param);
 
   const [subjects, setSubjects] = useState({
     totalRecord: 0,
@@ -66,6 +73,8 @@ export const SubjectListPage = () => {
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const [loadingSelectData, setLoadingSelectData] = useState(false);
+  const [loadingManagerApi, setLoadingManagerApi] = useState(false);
+  const [isCallManagers, setIsCallManagers] = useState(false);
   const [checkedAssignee, setCheckedAssignee] = useState();
   const [checkedStatus, setCheckedStatus] = useState();
   const [checkedSearchSelect, setCheckedSearchSelect] = useState(undefined);
@@ -86,7 +95,7 @@ export const SubjectListPage = () => {
   //   filterConditions: filterSubjectCondition,
   // });
   const [searchParams, setSearchParams] = useState(
-    decodeParam(param) === null
+    decodeParam(paramDecode) === null
       ? {
           pageNumber: 1,
           pageSize: 10,
@@ -94,10 +103,10 @@ export const SubjectListPage = () => {
           filterConditions: filterSubjectCondition,
         }
       : {
-          pageNumber: decodeParam(param).pageNumber,
-          pageSize: decodeParam(param).pageSize,
-          sortString: decodeParam(param).sortString,
-          filterConditions: decodeParam(param).filterConditions,
+          pageNumber: decodeParam(paramDecode).pageNumber,
+          pageSize: decodeParam(paramDecode).pageSize,
+          sortString: decodeParam(paramDecode).sortString,
+          filterConditions: decodeParam(paramDecode).filterConditions,
         }
   );
   const fetchData = async (searchParams) => {
@@ -112,44 +121,54 @@ export const SubjectListPage = () => {
     setLoadingData(true);
     setLoadingTable(false);
   };
-  const fetchSelectData = async () => {
-    const { data: roleArr } = await axiosClient.post(
-      "/Setting/GetFilterData?sortString=display_order ASC",
-      [
-        {
-          field: "setting_value",
-          value: "Manager",
-          condition: ConditionEnum.Equal,
-        },
-      ]
-    );
+  const fetchSelectData = async (param) => {
+    if (!isCallManagers) {
+      setLoadingManagerApi(true);
+      const { data: roleArr } = await axiosClient.post(
+        "/Setting/GetFilterData?sortString=display_order ASC",
+        [
+          {
+            field: "setting_value",
+            value: "Manager",
+            condition: ConditionEnum.Equal,
+          },
+        ]
+      );
 
-    const { data: userArr } = await axiosClient.post(
-      "/User/GetFilterData?sortString=created_date ASC",
-      [
-        {
-          field: "setting_id",
-          value: roleArr[0].setting_id,
-          condition: ConditionEnum.Equal,
-        },
-        {
-          field: "status",
-          value: StatusEnum.Active,
-          condition: ConditionEnum.Equal,
-        },
-      ]
-    );
-    setUsers(userArr);
-    // console.log(userArr);
-    genDataStateParam(param, setCheckedSearchInput, "search", [], searchSubject);
-    genDataStateParam(param, setCheckedStatus, "status");
-    genDataStateParam(param, setCheckedAssignee, "assignee", userArr);
-    
-    setLoadingSelectData(true);
+      const { data: userArr } = await axiosClient.post(
+        "/User/GetFilterData?sortString=created_date ASC",
+        [
+          {
+            field: "setting_id",
+            value: roleArr[0].setting_id,
+            condition: ConditionEnum.Equal,
+          },
+          // {
+          //   field: "status",
+          //   value: StatusEnum.Active,
+          //   condition: ConditionEnum.Equal,
+          // },
+        ]
+      );
+      setUsers(userArr);
+      // console.log(userArr);
+      genDataStateParam(
+        param,
+        setCheckedSearchInput,
+        "search",
+        [],
+        searchSubject
+      );
+      genDataStateParam(param, setCheckedStatus, "status");
+      genDataStateParam(param, setCheckedAssignee, "assignee", userArr);
+      setIsCallManagers(true);
+      setLoadingManagerApi(false);
+      // setLoadingSelectData(true);
+    }
   };
 
   const fetchDataAndSelect = async () => {
-    await Promise.all([fetchData(searchParams), fetchSelectData()]);
+    await Promise.all([fetchData(searchParams), fetchSelectData(param)]);
     setLoadingSelectData(true);
   };
   // console.log(users);
@@ -185,7 +204,14 @@ export const SubjectListPage = () => {
   };
   const onSearchAll = (filter, options) => {
     setLoadingTable(true);
-    searchAllUtils(filter, options, searchParams, setSearchParams, fetchData, setSearchParamsURL);
+    searchAllUtils(
+      filter,
+      options,
+      searchParams,
+      setSearchParams,
+      fetchData,
+      setSearchParamsURL
+    );
   };
   const onSearch = (filter) => {
     setLoadingTable(true);
@@ -229,16 +255,70 @@ export const SubjectListPage = () => {
     setCheckedStatus(value);
   };
 
+  const fetchBackData = async () => {
+    const params = new URLSearchParams(location.search);
+    const paramFromURL = params.get("param");
+
+    // Nếu filter thay đổi, cập nhật trạng thái của component
+    if (paramDecode !== paramFromURL) {
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedSearchInput,
+        "search",
+        [],
+        searchSubject,
+        "",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedStatus,
+        "status",
+        [],
+        [],
+        "status",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedAssignee,
+        "assignee",
+        users,
+        [],
+        "assignee_id",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      // console.log(decodeParam(paramFromURL))
+    } else {
+      fetchSelectData(paramDecode);
+    }
+  };
+
   useEffect(() => {
-    fetchDataAndSelect();
+    // Xử lý sự thay đổi trong URL
+    fetchBackData();
+  }, [location.search, paramDecode]);
+
+  useEffect(() => {
+    // fetchDataAndSelect();
+    fetchData(searchParams);
   }, []);
 
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position="subject"
-        spin={loadingSelectData && loadingData}
+        spin={loadingData}
         dashboardBody={
           // <div className="col-xl-12">
           <Box className="box w-100 d-flex flex-column flexGrow_1">
@@ -288,6 +368,9 @@ export const SubjectListPage = () => {
                                     onChangeAssignee={onChangeAssignee}
                                     onChangeStatus={onChangeStatus}
                                     handleSaveFilter={handleSaveFilter}
+                                    fetchSelectData={fetchSelectData}
+                                    loadingManagerApi={loadingManagerApi}
+                                    param={param}
                                   />
                                 </div>
                               </div>
@@ -306,39 +389,12 @@ export const SubjectListPage = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-lg-5 col-md-8 mt-sm-0 mt-2  position-relative align-items-center float-end ">
+                    <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 position-relative  d-flex align-items-center justify-content-end">
                       {/* <div
                           className=" align-items-center float-end "
                           style={{ marginRight: "10px" }}
                         > */}
-                      <AuthoComponentRoutes
-                        element={
-                          <NewSubject
-                            users={users}
-                            fetchData={fetchData}
-                            searchParams={searchParams}
-                          />
-                        }
-                        listRole={[Role.Admin]}
-                      />
-
-                      {/* <Tooltip
-                        title="delete"
-                        placement="top"
-                        color="#ffc107"
-                        size="large"
-                      >
-                        <div>
-                          <BaseButton
-                            icon={<DeleteOutline />}
-                            variant="outline"
-                            nameTitle="px-2 py-1"
-                            color="danger"
-                          />
-                        </div>
-                      </Tooltip> */}
-                      {/* </div> */}
-                      <div className="col-lg-7 float-end me-4 mt-1 d-flex h-100 justify-content-end">
+                      <div className="col-lg-7 float-end d-flex h-100 justify-content-end">
                         <Tooltip
                           title="Reset"
                           placement="top"
@@ -361,6 +417,19 @@ export const SubjectListPage = () => {
                           )}
                         </Tooltip>
                       </div>
+                      <AuthoComponentRoutes
+                        element={
+                          <NewSubject
+                            users={users}
+                            fetchData={fetchData}
+                            searchParams={searchParams}
+                            fetchSelectData={fetchSelectData}
+                            loadingManagerApi={loadingManagerApi}
+                            param={param}
+                          />
+                        }
+                        listRole={[Role.Admin]}
+                      />
                     </div>
                   </div>
                 </div>

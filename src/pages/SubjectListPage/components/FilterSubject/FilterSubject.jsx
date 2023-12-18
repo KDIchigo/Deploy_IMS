@@ -25,6 +25,9 @@ export const FilterSubject = ({
   fetchData,
   searchParams,
   onReset,
+  fetchSelectData,
+  loadingManagerApi,
+  param,
   checkedAssignee,
   checkedStatus,
   onChangeAssignee,
@@ -54,6 +57,9 @@ export const FilterSubject = ({
           placeholder="Subject Manager"
           options={users}
           // important="true"
+          loadingApi={loadingManagerApi}
+          loading={loadingManagerApi}
+          onClick={() => fetchSelectData(param)}
           isFilter={true}
           onFilter={onFilter}
           checked={checkedAssignee}

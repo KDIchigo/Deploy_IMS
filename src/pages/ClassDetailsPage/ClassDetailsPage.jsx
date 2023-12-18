@@ -89,8 +89,7 @@ export const ClassDetailsPage = () => {
   }, []);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
-
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position="class"
         spin={loadingData && loadingSelect}

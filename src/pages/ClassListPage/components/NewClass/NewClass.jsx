@@ -26,6 +26,12 @@ export const NewClass = ({
   teachers,
   fetchData,
   searchParams,
+  loadingSemesterApi,
+  fetchSystemSetting,
+  loadingSubjectApi,
+  fetchSubject,
+  loadingTeacherApi,
+  fetchTeacher,
 }) => {
   const [loadingData, setLoadingData] = useState(false);
   const { currentUser } = HandleAuth();
@@ -120,7 +126,10 @@ export const NewClass = ({
                 id="subject_id"
                 placeholder="Subject Code"
                 defaultValue={formik.values.subject_name}
-                options={subjects}
+                options={subjects.filter((ele) => ele.status === StatusEnum.Active)}
+                loading={loadingSubjectApi}
+                loadingApi={loadingSubjectApi}
+                onClick={fetchSubject}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 status={
@@ -145,7 +154,10 @@ export const NewClass = ({
                 id="semester_id"
                 placeholder="Semester"
                 defaultValue={formik.values.semester_name}
-                options={semesters}
+                loading={loadingSemesterApi}
+                loadingApi={loadingSemesterApi}
+                onClick={fetchSystemSetting}
+                options={semesters.filter((ele) => ele.status === StatusEnum.Active)}
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
                 status={
@@ -171,7 +183,10 @@ export const NewClass = ({
                 id="teacher_id"
                 placeholder="Teacher"
                 defaultValue={formik.values.teacher_name}
-                options={teachers}
+                options={teachers.filter((ele) => ele.status === StatusEnum.Active)}
+                loading={loadingTeacherApi}
+                loadingApi={loadingTeacherApi}
+                onClick={fetchTeacher}
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
                 status={
@@ -195,10 +210,13 @@ export const NewClass = ({
                 formik={formik}
                 type="status"
                 feature="class"
+                isLabel={true}
+                label="Status"
+                important="true"
               />
               {/* <BaseCheckbox formik={formik} type="status" /> */}
             </div>
-            <div className="col-md-12 col-sm-12 mt-3 px-3">
+            <div className="col-md-12 col-sm-12 mt-2 px-3">
               <BaseTextArea
                 formik={formik}
                 label="Description"

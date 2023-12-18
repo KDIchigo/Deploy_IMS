@@ -68,7 +68,7 @@ export const ImportPage = () => {
       toast.error("Import fail!");
       return;
     } else {
-      // toast.success("Import Successful!");
+      toast.success("Data Successful!");
       setImportData(data);
       data.successData.length === 0 ? setIsView(true) : setIsView(false);
       if (
@@ -147,7 +147,6 @@ export const ImportPage = () => {
   }, []);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
       <NavbarDashboard
         position="class"
         spin={true}

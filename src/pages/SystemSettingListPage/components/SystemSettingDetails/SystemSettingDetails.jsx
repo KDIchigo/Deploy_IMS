@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { HandleAuth } from "src/utils/handleAuth";
 import { LoadingOutlined } from "@ant-design/icons";
 import { showErrorMessage } from "src/utils/HandleErrorMessage";
+import { BaseDatePicker } from "src/components/Base/BaseDatePicker/BaseDatePicker";
 
 export const SystemSettingDetails = ({
   searchParams,
@@ -132,6 +133,7 @@ export const SystemSettingDetails = ({
                 placeholder="Enter Setting Value"
                 value={formik.values.setting_value}
                 onChange={formik.handleChange}
+                readOnly={parseInt(formik.values.data_group, 10) === 1}
                 classNameInput={
                   formik.errors.setting_value && formik.touched.setting_value
                     ? "is-invalid"
@@ -148,7 +150,7 @@ export const SystemSettingDetails = ({
             </div>
             <div className="col-md-6 col-sm-12 px-3">
               <SelectInputSettingGroup
-                label="Data Group"
+                label="Setting Group"
                 id="data_group"
                 defaultValue={formik.values.data_group}
                 options={data_group}
@@ -156,8 +158,9 @@ export const SystemSettingDetails = ({
                 dataGroup={dataGroup}
                 important="true"
                 formik={formik}
+                disabled={parseInt(formik.values.data_group, 10) === 1}
                 isFilter={false}
-                placeholder="Data Group"
+                placeholder="Setting Group"
                 status={
                   formik.errors.setting_id && formik.touched.setting_id
                     ? "error"
@@ -195,12 +198,39 @@ export const SystemSettingDetails = ({
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
-            <div className="col-md-6 col-sm-12 mt-3 px-3">
+            <div className="col-md-3 col-sm-12 ps-3">
               <BaseRadio
                 value={formik.values.status}
                 formik={formik}
                 type="status"
                 isLabel={true}
+                label="Status"
+                important="true"
+              />
+            </div>
+            <div className="col-md-3 col-sm-12 px-3">
+              <BaseDatePicker
+                id="modified_date"
+                label="Last Update"
+                name="modified_date"
+                className="w-100 px-2 datePicker"
+                defaultValue={formik.values.modified_date}
+                placeholder="It hasn't been updated"
+                value={formik.values.modified_date}
+                onChange={formik.handleChange}
+                disabled={true}
+                classNameInput={
+                  formik.errors.modified_date && formik.touched.modified_date
+                    ? "is-invalid"
+                    : ""
+                }
+                status={
+                  formik.errors.modified_date && formik.touched.modified_date
+                    ? "error"
+                    : ""
+                }
+                formik={formik}
+                onBlur={formik.handleBlur}
               />
             </div>
             <div className="col-md-12 col-sm-12 mt-0 px-3">

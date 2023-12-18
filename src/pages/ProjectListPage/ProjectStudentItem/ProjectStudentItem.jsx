@@ -24,6 +24,8 @@ export const ProjectStudentItem = ({
   handleAddStudentToProject,
   handleMoveToAnotherProject,
   handleProjectStudentDelete,
+  handleProjectClassStudentDelete,
+  handleProjectStudentChangeStatus,
   handleSetLeader,
   onPageChange,
   actionId,
@@ -64,8 +66,8 @@ export const ProjectStudentItem = ({
             status:
               student.status === 1 ? (
                 <Badge
-                  key="#198754"
-                  color="#198754"
+                  key="#26BF94"
+                  color="#26BF94"
                   text="Active"
                   className="badgeActive"
                 />
@@ -129,8 +131,8 @@ export const ProjectStudentItem = ({
             status:
               student.status === 1 ? (
                 <Badge
-                  key="#198754"
-                  color="#198754"
+                  key="#26BF94"
+                  color="#26BF94"
                   text="Active"
                   className="badgeActive"
                 />
@@ -162,6 +164,8 @@ export const ProjectStudentItem = ({
                     handleSetLeader={handleSetLeader}
                     handleMoveToAnotherProject={handleMoveToAnotherProject}
                     handleProjectStudentDelete={handleProjectStudentDelete}
+                    handleProjectClassStudentDelete={handleProjectClassStudentDelete}
+                    handleProjectStudentChangeStatus={handleProjectStudentChangeStatus}
                     isLeader={
                       project.leader_id === student.student_id
                     }

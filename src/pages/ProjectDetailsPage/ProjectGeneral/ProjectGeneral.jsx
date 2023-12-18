@@ -14,6 +14,11 @@ import { swalWithBootstrapButtons } from "src/enum/swal";
 import { HandleAuth } from "src/utils/handleAuth";
 import * as Yup from "yup";
 import "./ProjectGeneral.scss";
+import {
+  isErrorMessageEmpty,
+  showErrorMessage,
+} from "src/utils/HandleErrorMessage";
+import { BaseDatePicker } from "src/components/Base/BaseDatePicker/BaseDatePicker";
 
 export const ProjectGeneral = ({ project, classes, students, fetchData }) => {
   const navigate = useNavigate();
@@ -67,6 +72,7 @@ export const ProjectGeneral = ({ project, classes, students, fetchData }) => {
       description: project.description,
       project_convert_id: project.project_convert_id,
       project_convert_token: project.project_convert_token,
+      modified_date: project.modified_date,
       modified_by: currentUser.email,
     },
     validationSchema: Yup.object({
@@ -106,9 +112,13 @@ export const ProjectGeneral = ({ project, classes, students, fetchData }) => {
                   value
                 );
                 if (err) {
-                  toast.error(
-                    `The project named ${project.project_code} was updated fail!`
-                  );
+                  if (!isErrorMessageEmpty(err)) {
+                    showErrorMessage(err);
+                  } else {
+                    toast.error(
+                      `The project named ${project.project_code} was updated fail!`
+                    );
+                  }
                   setLoadingData(false);
                   return;
                 } else {
@@ -118,6 +128,7 @@ export const ProjectGeneral = ({ project, classes, students, fetchData }) => {
                   setLoadingData(false);
                   fetchData();
                 }
+
                 setIsView(true);
               }
             });
@@ -295,8 +306,8 @@ export const ProjectGeneral = ({ project, classes, students, fetchData }) => {
                 type="number"
                 id="project_convert_id"
                 name="project_convert_id"
-                label="Gitlab project id"
-                placeholder="Gitlab project id"
+                label="Gitlab Project ID"
+                placeholder="Gitlab Project ID"
                 value={formik.values.project_convert_id}
                 onChange={formik.handleChange}
                 readOnly={isView}
@@ -315,14 +326,41 @@ export const ProjectGeneral = ({ project, classes, students, fetchData }) => {
                 <p className="hiddenMsg">acb</p>
               )}
             </div>
-            <div className="col-md-6 col-sm-12 mt-3 px-3">
+            <div className="col-md-3 col-sm-12 px-3">
+              <BaseDatePicker
+                id="modified_date"
+                label="Last Update"
+                name="modified_date"
+                className="w-100 px-2 datePicker"
+                defaultValue={formik.values.modified_date}
+                placeholder="It hasn't been updated"
+                value={formik.values.modified_date}
+                onChange={formik.handleChange}
+                disabled={true}
+                classNameInput={
+                  formik.errors.modified_date && formik.touched.modified_date
+                    ? "is-invalid"
+                    : ""
+                }
+                status={
+                  formik.errors.modified_date && formik.touched.modified_date
+                    ? "error"
+                    : ""
+                }
+                formik={formik}
+                onBlur={formik.handleBlur}
+              />
+            </div>
+            <div className="col-md-3 col-sm-12 px-3">
               {/* <BaseRadio label="Status" important="true" formik={formik} type="status"/> */}
               <BaseRadio
                 value={formik.values.status}
                 formik={formik}
                 type="status"
                 isLabel={true}
-                disabled={isView}
+                disabled={isView || IsStudent()}
+                label="Status"
+                important="true"
               />
             </div>
             <div className="col-md-12 col-sm-12 mt-0 px-3">

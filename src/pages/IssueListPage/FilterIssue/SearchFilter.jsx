@@ -55,8 +55,8 @@ export const SearchFilter = ({
           options={issueRequirements}
           isFilter={true}
           onFilter={onFilter}
-          checked={checkedAssignee}
-          onChange={onChangeAssignee}
+          checked={checkedRequirement}
+          onChange={onChangeRequirement}
         />
         <BaseSelectInput
           label="Issue Status"

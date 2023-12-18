@@ -120,14 +120,14 @@ export const IssueSettings = ({
         fetchData(searchParams);
       }
     } else {
-      let toastErr = "";
-      convertId === null && (toastErr = toastErr + "convert ID");
-      convertId === null &&
-        bearToken === null &&
-        (toastErr = toastErr + " and ");
-      bearToken === null && (toastErr = toastErr + "bearToken");
+      // let toastErr = "";
+      // convertId === null && (toastErr = toastErr + "convert ID");
+      // convertId === null &&
+      //   bearToken === null &&
+      //   (toastErr = toastErr + " and ");
+      // bearToken === null && (toastErr = toastErr + "bearToken");
       toast.error(
-        `Synchronize issue setting ${typeIssue} fail!!! Because the ${option.project_code} project does not have ${toastErr} yet.`
+        `You have not configured a personal token and project ID for this class. Please try again!`
       );
       setLoadingTable(false);
     }
@@ -301,7 +301,7 @@ export const IssueSettings = ({
         <div className="card-body d-flex flex-column flexGrow_1"> */}
         <div className="row p-0 m-0  mb-2 align-items-center justify-content-between ">
           <h3 className="fw-bold m-0 px-0" style={{ paddingBottom: 20 }}>
-            Setting for{" "}
+            Settings for{" "}
             {typeIssue === "class" ? " Class " + option.class_code : ""}
             {/* {typeIssue === "subject" ? " Subject " + option.subject_code : ""} */}
             {typeIssue === "project" ? " Project " + option.project_code : ""}
@@ -364,17 +364,8 @@ export const IssueSettings = ({
               />
             </div>
           </div>
-          <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 position-relative align-items-center float-end p-0">
-            <NewIssueSetting
-              // dataGroup={IssueSettingEnum.WorkProcess}
-              id={id}
-              typeIssue={typeIssue}
-              selectTypeIssue={selectTypeIssue}
-              searchParams={searchParams}
-              fetchData={fetchData}
-              issueGroup={issueGroup}
-            />
-            <div className="col-lg-7 float-end me-4 mt-1 d-flex h-100 justify-content-end flex-row align-items-center">
+          <div className="col-lg-5 col-md-8 mt-sm-0 mt-2 p-0 position-relative d-flex align-items-center justify-content-end">
+            <div className="col-lg-7 float-end d-flex h-100 justify-content-end">
               <Tooltip
                 title="Reset"
                 placement="topLeft"
@@ -450,6 +441,16 @@ export const IssueSettings = ({
                 ""
               )}
             </div>
+            <NewIssueSetting
+              // dataGroup={IssueSettingEnum.WorkProcess}
+              id={id}
+              option={option}
+              typeIssue={typeIssue}
+              selectTypeIssue={selectTypeIssue}
+              searchParams={searchParams}
+              fetchData={fetchData}
+              issueGroup={issueGroup}
+            />
           </div>
         </div>
 

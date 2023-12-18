@@ -214,6 +214,7 @@ export const SystemSettingTable = ({
             Table: {
               borderColor: "rgba(0, 0, 0, 0.1)",
               headerBorderRadius: "4px",
+              headerBg: "#edececd1",
               controlItemBgActiveHover: "rgba(0, 0, 0, 0.05)",
               controlItemBgActive: "rgba(0, 0, 0, 0.05)",
             },
@@ -222,7 +223,7 @@ export const SystemSettingTable = ({
       >
         <Table
           className="flexGrow_1 "
-          style={{ height: "60vh", overflow: "hidden" }}
+          style={{ height: "50vh", overflow: "hidden" }}
           // rowSelection={rowSelection}
           loading={loadingTable}
           columns={columns}
@@ -232,7 +233,7 @@ export const SystemSettingTable = ({
           bordered
           scroll={{
             x: 1130,
-            y: "60vh",
+            y: 362,
           }}
         />
         <BasePagination

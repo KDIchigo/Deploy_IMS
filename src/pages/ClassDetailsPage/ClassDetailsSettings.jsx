@@ -1,13 +1,17 @@
 import { Tabs } from "antd";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { useSearchParams } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { axiosClient } from "src/axios/AxiosClient";
 import { IssueSettings } from "src/components/IssueSetting/IssueSettings";
 import { NavbarDashboard } from "src/components/NavbarDashboard/NavbarDashboard";
 import { IssueSettingEnum } from "src/enum/Enum";
-import { decodeParam, genDataStateParam } from "src/utils/handleEnDecode";
+import {
+  backDataStateParam,
+  decodeParam,
+  genDataStateParam,
+} from "src/utils/handleEnDecode";
 import { HandleIssueSettings } from "src/utils/handleIssueSettings";
 const searchIssueSetting = [
   {
@@ -28,16 +32,14 @@ const issue_group = [
   {
     value: IssueSettingEnum.WorkProcess,
     label: "Work Process",
-  },
-  {
-    value: IssueSettingEnum.Others,
-    label: "Others",
-  },
+  }
 ];
 export const ClassDetailsSettings = () => {
+  const location = useLocation();
   const [searchParamsURL, setSearchParamsURL] = useSearchParams();
   const searchURLParams = new URLSearchParams(location.search);
   const param = searchURLParams.get("param");
+  const [paramDecode, setParamDecode] = useState(param);
 
   const { classId } = useParams();
   const navigate = useNavigate();
@@ -61,7 +63,7 @@ export const ClassDetailsSettings = () => {
   // }
 
   const [searchParams, setSearchParams] = useState(
-    decodeParam(param) === null
+    decodeParam(paramDecode) === null
       ? {
           pageNumber: 1,
           pageSize: 10,
@@ -69,32 +71,41 @@ export const ClassDetailsSettings = () => {
           filterConditions: [],
         }
       : {
-          pageNumber: decodeParam(param).pageNumber,
-          pageSize: decodeParam(param).pageSize,
-          sortString: decodeParam(param).sortString,
-          filterConditions: decodeParam(param).filterConditions,
+          pageNumber: decodeParam(paramDecode).pageNumber,
+          pageSize: decodeParam(paramDecode).pageSize,
+          sortString: decodeParam(paramDecode).sortString,
+          filterConditions: decodeParam(paramDecode).filterConditions,
         }
   );
-  const fetchData = async () => {
+  const fetchData = async (param) => {
     const { data: classById } = await axiosClient.get(`/Class/${classId}`);
     setClassObj(classById);
 
     let filterConditions = handleClassIssueSetting(classId, classById);
     // console.log(filterConditions)
-    let newSearchParams = {...searchParams, filterConditions: filterConditions.filterConditions}
+    let newSearchParams = {
+      ...searchParams,
+      filterConditions: filterConditions.filterConditions,
+    };
     const { data: issueSettingArr } = await axiosClient.post(
       "/IssueSetting/GetByPaging",
       newSearchParams
     );
 
-    setSearchParams(newSearchParams)
+    setSearchParams(newSearchParams);
     setIssueSettings(issueSettingArr);
-    genDataStateParam(param, setCheckedSearchInput, "search", [], searchIssueSetting);
+    genDataStateParam(
+      param,
+      setCheckedSearchInput,
+      "search",
+      [],
+      searchIssueSetting
+    );
     genDataStateParam(param, setCheckedStatus, "status");
     genDataStateParam(param, setCheckedSetting, "issue_setting", issue_group);
     setLoadingData(true);
   };
-  console.log(decodeParam(param))
+  // console.log(decodeParam(param))
 
   const onChange = (key) => {
     switch (key) {
@@ -112,12 +123,81 @@ export const ClassDetailsSettings = () => {
         break;
     }
   };
+
+  const fetchBackData = async () => {
+    const params = new URLSearchParams(location.search);
+    const paramFromURL = params.get("param");
+
+    // Nếu filter thay đổi, cập nhật trạng thái của component
+    if (paramDecode !== paramFromURL) {
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedSearchInput,
+        "search",
+        [],
+        searchIssueSetting,
+        "",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedStatus,
+        "status",
+        [],
+        [],
+        "status",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      backDataStateParam(
+        paramDecode,
+        paramFromURL,
+        setCheckedSetting,
+        "issue_setting",
+        [],
+        [],
+        "issue_group",
+        setParamDecode,
+        setSearchParams,
+        fetchData
+      );
+      // genDataStateParam(param, setCheckedToDate, "to_date");
+
+      // console.log(decodeParam(paramFromURL))
+    } else {
+      genDataStateParam(
+        paramDecode,
+        setCheckedSearchInput,
+        "search",
+        [],
+        searchIssueSetting
+      );
+      genDataStateParam(paramDecode, setCheckedStatus, "status");
+      genDataStateParam(
+        paramDecode,
+        setCheckedSetting,
+        "issue_setting",
+        issue_group
+      );
+    }
+  };
+
+  // useEffect(() => {
+  //   // Xử lý sự thay đổi trong URL
+  //   fetchBackData();
+  // }, [location.search, paramDecode]);
+
   useEffect(() => {
-    fetchData();
+    fetchData(param);
   }, []);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position="class"
         spin={loadingData}

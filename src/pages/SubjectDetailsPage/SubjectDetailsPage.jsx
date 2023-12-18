@@ -65,8 +65,7 @@ export const SubjectDetailsPage = () => {
   }, []);
   return (
     <>
-      <ToastContainer autoClose="2000" theme="colored" />
-
+      {/* <ToastContainer autoClose="2000" theme="colored" /> */}
       <NavbarDashboard
         position="subject"
         spin={loadingData && loadingSelect}

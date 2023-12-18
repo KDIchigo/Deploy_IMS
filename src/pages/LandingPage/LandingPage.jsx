@@ -48,6 +48,12 @@ export const LandingPage = () => {
       []
     );
     setProjects(projectArr);
+
+    const { data: issueArr } = await axiosClient.post(
+      `/Issue/GetFilterData?sortString=created_date ASC`,
+      []
+    );
+    setIssues(issueArr);
   };
 
   useEffect(() => {
@@ -225,8 +231,15 @@ export const LandingPage = () => {
                             and synchronize gitlab that will wow your target
                             viewers or users to no end.
                           </div>
-                          <a href="index.html" className="m-1 btn btn-danger">
-                            View Demos
+                          <a
+                            onClick={() =>
+                              navigate(
+                                token === null ? "/sign-in" : "/user-dashboard"
+                              )
+                            }
+                            className="m-1 btn btn-danger"
+                          >
+                            Go to IMS
                             <i className="ri-eye-line ms-2 align-middle"></i>
                           </a>
                         </div>
